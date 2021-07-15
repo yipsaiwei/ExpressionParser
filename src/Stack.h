@@ -14,7 +14,7 @@ struct  StackStruct{
 };
 
 StackStruct *createStack();
-void  freeStack(StackStruct *stack);
+void  freeStack(StackStruct *stack, void (*freeFunction)(void *));
 void  pushToStack(StackStruct *stack, void  *data);
 ListItem  *popFromStack(StackStruct  *stack);
 #endif // STACK_H

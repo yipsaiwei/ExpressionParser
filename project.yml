@@ -37,6 +37,7 @@
     - src/**
   :support:
     - test/support
+    - Tokenizer/src/*
   :libraries: []
 
 :defines:

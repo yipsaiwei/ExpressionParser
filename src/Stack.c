@@ -11,9 +11,9 @@ StackStruct *createStack(){
   return  stack;
 }
 
-void  freeStack(StackStruct *stack){
+void  freeStack(StackStruct *stack, void (*freeFunction)(void *)){
   if(stack->list)
-    linkedListFreeList(stack->list, free);
+    linkedListFreeList(stack->list, freeFunction);
   if(stack)
     memFree(stack);
 }
