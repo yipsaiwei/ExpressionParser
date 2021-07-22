@@ -20,11 +20,6 @@ void tearDown(void)
 {
 }
 
-void test_Stack_NeedToImplement(void)
-{
-    TEST_IGNORE_MESSAGE("Need to Implement Stack");
-}
-
 void  test_createStack_expect_size_0_list_points_to_NULL(void){
   StackStruct *stack = createStack();
   TEST_ASSERT_EQUAL(0, stack->size);
@@ -376,6 +371,41 @@ void  test_pushToStack_then_popFromStack_given_4_tokens_expect_all_able_to_be_pu
     freeTokenizer(tokenizer);
 }
 
+void  test_peekTopOfStack_given_2_elements_expect_top_element_can_be_viewed_but_not_pop(){
+  StackStruct *stack = createStack();
+  ListItem  *peekItem = peekTopOfStack(stack);
+  TEST_ASSERT_EQUAL_PTR(NULL, peekItem);
+  
+  Data  *data = memAlloc(sizeof(Data));
+  data->val1 = 5;
+  data->val2 = 1.999;
+  pushToStack(stack, (void  *)data);
+  peekItem = peekTopOfStack(stack);
+  TEST_ASSERT_EQUAL_PTR(data, peekItem->data);
+  
+  
+  Data  *data2 = memAlloc(sizeof(Data));
+  data2->val1 = 10;
+  data2->val2 = 2.33333;
+  pushToStack(stack, (void  *)data2);
+  peekItem = peekTopOfStack(stack);
+  TEST_ASSERT_EQUAL_PTR(data2, peekItem->data);
+  
+  ListItem  *popItem = NULL;
+  popItem = popFromStack(stack);
+  peekItem = peekTopOfStack(stack);
+  TEST_ASSERT_EQUAL_PTR(data, peekItem->data);
+  
+  linkedListFreeListItem(popItem);
+  
+  popItem = popFromStack(stack);
+  peekItem = peekTopOfStack(stack);
+  TEST_ASSERT_EQUAL_PTR(NULL, peekItem);
+  
+  linkedListFreeListItem(popItem);
+  
+  freeStack(stack, free);
+}
 
 
 

@@ -34,3 +34,9 @@ ListItem  *popFromStack(StackStruct  *stack){
   return  itemPop;
 }
 
+ListItem  *peekTopOfStack(StackStruct *stack){
+  if(stack->list == NULL)
+    return  NULL;
+  else
+    return  (stack->list->head);
+}
