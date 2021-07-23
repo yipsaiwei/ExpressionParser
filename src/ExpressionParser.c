@@ -11,7 +11,7 @@ OperatorTableStruct  operatorPrecedenceTable[127] = {
   ['*'] = {3, NULL},  // *
   ['/'] = {3, NULL},  // /
   ['%'] = {3, NULL},  // %
-  ['+'] = {4, NULL},  // +
+  ['+'] = {4, infixAddition},  // +
   ['-'] = {4, NULL},  // -
 };
 
@@ -27,20 +27,36 @@ void  shuntingYard(Tokenizer  *tokenizer, StackStruct *operatorStack, StackStruc
 }
 */
 
-int  checkOperator1PrecedenceGreater(Token  *operatorToken1, Token  *operatorToken2){
-  return  (getPrecedence(operatorToken1) < getPrecedence(operatorToken2));
-}
-
 //take the operator and operate on the operands
 //3 different scenarios " infix, prefix, suffix
 
-/*
-void  unwindStack(StackStruct *operatorStack, StackStruct *operandStack){
-  
+void  unwindStack(StackStruct *operatorStack, StackStruct *operandStack, Operator *currentOperator){
+  ListItem *peekItem = popFromStack(operandStack);
+  ListItem  *popItem;
+  switch(currentOperator->arity){
+    case  BINARY:
+      if(getItemOperatorPrecedence(peekItem) >= currentOperator->precedence){
+        while(getItemOperatorPrecedence(peekItem) >= currentOperator->precedence){
+          popItem = popFromStack(operandStack);
+          OperatorTableStruct instruction = operatorPrecedenceTable[getItemOperator(popItem)];
+          instruction.operation(operandStack);
+          linkedListFreeListItem(popItem);
+        }
+      }else
+        pushToStack(operatorStack, (void  *)currentOperator);
+    break;
+    case  UNARY:
+    ;
+    break;
+    
+    case  TERNARY:
+    ;
+    break;
+    default:
+    ;
+  }
 }
-*/
 
-//Not yet consider floating type token
 void  infixAddition(StackStruct *operandStack){
   ListItem *operand2 = popFromStack(operandStack);
   ListItem *operand1 = popFromStack(operandStack);
@@ -59,26 +75,59 @@ void  infixAddition(StackStruct *operandStack){
   pushToStack(operandStack, (void *)resultNumber);
 }
 
-//Not yet consider floating type token
-/*
 void  infixSubtraction(StackStruct *operandStack){
   ListItem *operand2 = popFromStack(operandStack);
   ListItem *operand1 = popFromStack(operandStack);
-  
-  int result = getItemDataInteger(operand1) - getItemDataInteger(operand2);
-  char  *numberStr = malloc(sizeof(1 + countDigit(result)));
-  itoa(result, numberStr, 10);
-  
-  Tokenizer *resultTokenizer = createTokenizer(numberStr);
-  Token *resultToken = getToken(resultTokenizer);
-  
-  linkedListFreeListItem(operand1);
+  Number  *resultNumber;
+  if(getItemDataType(operand2) == INTEGER_NUMBER && getItemDataType(operand1) == INTEGER_NUMBER){
+    int *result = malloc(sizeof(int));
+    *result = getItemDataInteger(operand1) - getItemDataInteger(operand2); 
+    resultNumber = createNumber((void *)result, INTEGER_NUMBER);
+  }else{
+    double  *result = malloc(sizeof(double));
+    *result = getItemDataFloat(operand2) + getItemDataFloat(operand1); 
+    resultNumber = createNumber((void *)result, FLOAT_NUMBER);
+  }
+  linkedListFreeListItem(operand1);                         
   linkedListFreeListItem(operand2);
-  freeTokenizer(resultTokenizer);
-  
-  pushToStack(operandStack, (void *)resultToken);
+  pushToStack(operandStack, (void *)resultNumber);
 }
-*/
+
+void  infixMultiplication(StackStruct *operandStack){
+  ListItem *operand2 = popFromStack(operandStack);
+  ListItem *operand1 = popFromStack(operandStack);
+  Number  *resultNumber;
+  if(getItemDataType(operand2) == INTEGER_NUMBER && getItemDataType(operand1) == INTEGER_NUMBER){
+    int *result = malloc(sizeof(int));
+    *result = getItemDataInteger(operand1) * getItemDataInteger(operand2); 
+    resultNumber = createNumber((void *)result, INTEGER_NUMBER);
+  }else{
+    double  *result = malloc(sizeof(double));
+    *result = getItemDataFloat(operand2) * getItemDataFloat(operand1); 
+    resultNumber = createNumber((void *)result, FLOAT_NUMBER);
+  }
+  linkedListFreeListItem(operand1);                         
+  linkedListFreeListItem(operand2);
+  pushToStack(operandStack, (void *)resultNumber);
+}
+
+void  infixDivision(StackStruct *operandStack){
+  ListItem *operand2 = popFromStack(operandStack);
+  ListItem *operand1 = popFromStack(operandStack);
+  Number  *resultNumber;
+  if(getItemDataType(operand2) == INTEGER_NUMBER && getItemDataType(operand1) == INTEGER_NUMBER){
+    int *result = malloc(sizeof(int));
+    *result = getItemDataInteger(operand1) / getItemDataInteger(operand2); 
+    resultNumber = createNumber((void *)result, INTEGER_NUMBER);
+  }else{
+    double  *result = malloc(sizeof(double));
+    *result = getItemDataFloat(operand2) / getItemDataFloat(operand1); 
+    resultNumber = createNumber((void *)result, FLOAT_NUMBER);
+  }
+  linkedListFreeListItem(operand1);                         
+  linkedListFreeListItem(operand2);
+  pushToStack(operandStack, (void *)resultNumber);
+}
 
 Number  *createNumber(void  *value, NUMBERTYPE  type){
   Number  *newNumber = malloc(sizeof(Number));

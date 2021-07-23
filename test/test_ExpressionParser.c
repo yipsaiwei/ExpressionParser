@@ -21,6 +21,7 @@ void tearDown(void)
 {
 }
 
+/*
 void  test_checkOperator1PrecedenceGreater_given_2_tokens_token_1_higher_precedence_expect_1_returned(){
   Token *token1 = (Token *)createOperatorToken("~", 0, "~   !", TOKEN_OPERATOR_TYPE);
   Token *token2 = (Token *)createOperatorToken("+", 0, "+   !", TOKEN_OPERATOR_TYPE);
@@ -34,6 +35,7 @@ void  test_checkOperator1PrecedenceGreater_given_2_tokens_token_2_higher_precede
   int precedence = checkOperator1PrecedenceGreater(token1, token2);
   TEST_ASSERT_EQUAL(0, precedence);
 }
+*/
 
 void  test_extractNumberFromToken_given_1_IntToken_expect_correct_number_with_integer_type_returned(){
   Token *token1 = (Token *)createIntToken(999, 0, "999", "999",TOKEN_INTEGER_TYPE);
@@ -112,73 +114,106 @@ void  test_infixAddition_given_2_integer_45_n_11_expect_result_with_56_returned(
   freeStack(stack, free);
 }
 
-/*
-void  test_infixSubtraction_given_2_integer_tokens_88_and_23_expect_resultToken_with_65_returned(){
-  Tokenizer *tokenizer = NULL;
-  StackStruct *operandStack = createStack();
-  tokenizer = createTokenizer("  88 23"); 
-  IntegerToken *token0 = NULL;
-  Try{
-    token0 = (IntegerToken  *)getToken(tokenizer);
+void  test_infixSubtraction_given_2_integer688_n_300_expect_result_with_388_returned(){
+  int *num1 = malloc(sizeof(int));
+  *num1 = 688;
+  int *num2 = malloc(sizeof(int));
+  *num2 = 300;  
+  Number  *number1 = createNumber((void  *)num1, INTEGER_NUMBER);
+  Number  *number2 = createNumber((void  *)num2, INTEGER_NUMBER);
+  StackStruct *stack = createStack();
   
-    IntegerToken *token1 = NULL;
-    token1 = (IntegerToken  *)getToken(tokenizer);
-    
-    pushToStack(operandStack, (void  *)token0);
-    
-    pushToStack(operandStack, (void  *)token1);
-    
-    TEST_ASSERT_EQUAL(2, operandStack->size);
-    
-    infixSubtraction(operandStack);
-    TEST_ASSERT_EQUAL(1, operandStack->size);
-    IntegerToken *testIntToken = operandStack->list->head->data;
-    TEST_ASSERT_EQUAL(TOKEN_INTEGER_TYPE, testIntToken->type);
-    TEST_ASSERT_EQUAL_STRING("65", testIntToken->str);
-    
-    freeStack(operandStack, freeToken);
-    freeTokenizer(tokenizer);
-  }Catch(ex){
-    dumpTokenErrorMessage(ex, 1);
-    TEST_FAIL_MESSAGE("Do not expect any exception to be thrown.");     
-  }  
+  pushToStack(stack, (void  *)number1);
+  
+  pushToStack(stack, (void  *)number2);
+  
+  infixSubtraction(stack);
+  
+  ListItem  *peekItem = peekTopOfStack(stack);
+  
+  TEST_ASSERT_EQUAL(388, getItemDataInteger(peekItem));
+  TEST_ASSERT_EQUAL(INTEGER_NUMBER, getItemDataType(peekItem));
+  
+  freeNumber(number1);
+  freeNumber(number2);
+  
+  freeStack(stack, free); 
 }
-*/
 
-/*
-void  test_infixSubtraction_given_2_integer_tokens_67_and_99_expect_resultToken_with_negative_32_returned(){
-  Tokenizer *tokenizer = NULL;
-  StackStruct *operandStack = createStack();
-  tokenizer = createTokenizer("67      99"); 
-  IntegerToken *token0 = NULL;
-  Try{
-    token0 = (IntegerToken  *)getToken(tokenizer);
+void  test_infixSubtraction_given_2_integer__67_n_99_expect_result_with_negative_32_returned(){
+  int *num1 = malloc(sizeof(int));
+  *num1 = 67;
+  int *num2 = malloc(sizeof(int));
+  *num2 = 99;  
+  Number  *number1 = createNumber((void  *)num1, INTEGER_NUMBER);
+  Number  *number2 = createNumber((void  *)num2, INTEGER_NUMBER);
+  StackStruct *stack = createStack();
   
-    IntegerToken *token1 = NULL;
-    token1 = (IntegerToken  *)getToken(tokenizer);
-    
-    pushToStack(operandStack, (void  *)token0);
-    
-    pushToStack(operandStack, (void  *)token1);
-    
-    TEST_ASSERT_EQUAL(2, operandStack->size);
-    
-    infixSubtraction(operandStack);
-    TEST_ASSERT_EQUAL(1, operandStack->size);
-    IntegerToken *testOpToken = operandStack->list->head->data;
-    TEST_ASSERT_EQUAL(TOKEN_OPERATOR_TYPE, testOpToken->type);
-    TEST_ASSERT_EQUAL_STRING("-", testOpToken->str);
-    
-    TEST_ASSERT_EQUAL(1, operandStack->size);
-    IntegerToken *testIntToken = operandStack->list->head->data;
-    TEST_ASSERT_EQUAL(TOKEN_INTEGER_TYPE, testIntToken->type);
-    ("65", testIntToken->str);
-    
-    freeStack(operandStack, freeToken);
-    freeTokenizer(tokenizer);
-  }Catch(ex){
-    dumpTokenErrorMessage(ex, 1);
-    TEST_FAIL_MESSAGE("Do not expect any exception to be thrown.");     
-  }  
+  pushToStack(stack, (void  *)number1);
+  
+  pushToStack(stack, (void  *)number2);
+  
+  infixSubtraction(stack);
+  
+  ListItem  *peekItem = peekTopOfStack(stack);
+  
+  TEST_ASSERT_EQUAL(-32, getItemDataInteger(peekItem));
+  TEST_ASSERT_EQUAL(INTEGER_NUMBER, getItemDataType(peekItem));
+  
+  freeNumber(number1);
+  freeNumber(number2);
+  
+  freeStack(stack, free); 
 }
-*/
+
+void  test_infixMultiplication_given_2_integer__8_n_12_expect_result_with_negative_96_returned(){
+  int *num1 = malloc(sizeof(int));
+  *num1 = 8;
+  int *num2 = malloc(sizeof(int));
+  *num2 = 12;  
+  Number  *number1 = createNumber((void  *)num1, INTEGER_NUMBER);
+  Number  *number2 = createNumber((void  *)num2, INTEGER_NUMBER);
+  StackStruct *stack = createStack();
+  
+  pushToStack(stack, (void  *)number1);
+  
+  pushToStack(stack, (void  *)number2);
+  
+  infixMultiplication(stack);
+  
+  ListItem  *peekItem = peekTopOfStack(stack);
+  
+  TEST_ASSERT_EQUAL(96, getItemDataInteger(peekItem));
+  TEST_ASSERT_EQUAL(INTEGER_NUMBER, getItemDataType(peekItem));
+  
+  freeNumber(number1);
+  freeNumber(number2);
+  
+  freeStack(stack, free); 
+}
+
+void  test_infixDivision_given_2_integer_144_n_12_expect_result_with_12_returned(){
+  int *num1 = malloc(sizeof(int));
+  *num1 = 144;
+  int *num2 = malloc(sizeof(int));
+  *num2 = 12;  
+  Number  *number1 = createNumber((void  *)num1, INTEGER_NUMBER);
+  Number  *number2 = createNumber((void  *)num2, INTEGER_NUMBER);
+  StackStruct *stack = createStack();
+  
+  pushToStack(stack, (void  *)number1);
+  
+  pushToStack(stack, (void  *)number2);
+  
+  infixDivision(stack);
+  
+  ListItem  *peekItem = peekTopOfStack(stack);
+  
+  TEST_ASSERT_EQUAL(12, getItemDataInteger(peekItem));
+  TEST_ASSERT_EQUAL(INTEGER_NUMBER, getItemDataType(peekItem));
+  
+  freeNumber(number1);
+  freeNumber(number2);
+  
+  freeStack(stack, free); 
+}
