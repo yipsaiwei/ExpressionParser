@@ -40,3 +40,7 @@ ListItem  *peekTopOfStack(StackStruct *stack){
   else
     return  (stack->list->head);
 }
+
+int isStackEmpty(StackStruct  *stack){
+  return  stack->size == 0;
+}

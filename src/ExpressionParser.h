@@ -1,6 +1,7 @@
 #ifndef EXPRESSIONPARSER_H
 #define EXPRESSIONPARSER_H
 
+#include "OperatorTable.h"
 #include "DoubleLinkedList.h"
 #include "Stack.h"
 #include "Token.h"
@@ -8,8 +9,7 @@
 #include "TokenizerExceptionThrowing.h"
 #include "Stack.h"
 #include  "Arithmetic.h"
-
-typedef void (*Operation)(StackStruct *operandStack);
+#include  "Arity.h"
 
 typedef enum
 {
@@ -17,12 +17,14 @@ typedef enum
 	FLOAT_NUMBER,
 }OPERANDTYPE;
 
-typedef enum
-{
+/*
+typedef enum{
+  NULLARY, 
 	UNARY,
 	BINARY,
   TERNARY,
 }ARITY;
+*/
 
 typedef struct  Number  Number;
 struct  Number{
@@ -41,42 +43,37 @@ struct  Double{
   double value;
 };
 
+//typedef void (*Operation)(StackStruct *operandStack);
+typedef Number  *(*Operation)(Number  *number1, Number  *number2);
+
 typedef struct  OperatorTableStruct  OperatorTableStruct;
 struct  OperatorTableStruct{
     int precedence;
     Operation operation;
+    int arity;
 };
 
-typedef struct  Operator  Operator;
-struct  Operator{
-  char  *str;
-  int precedence;
-  ARITY arity;
-};
-
-//#define getItemType(item)                   (item->data->type)
-//#define getItemDataInteger(item)            *((int  *)((Number *)(*item).data)->value)
-//#define getItemDataFloat(item)              *((double  *)((Number *)(*item).data)->value)
 #define getItemOperator(item)               *(((Operator  *)(*item).data)->str)
 #define getItemDataType(item)               (((Number *)(*item).data)->type)
 #define getItemOperatorPrecedence(item)     (((Operator *)(*item).data)->precedence)
 
 #define getItemInteger(item)                ((Integer  *)(*item).data)->value
-#define getItemDouble(item)                ((Double  *)(*item).data)->value
+#define getNumberInteger(number)            ((Integer *)(number))->value
+#define getItemDouble(item)                 ((Double  *)(*item).data)->value
+#define getNumberDouble(number)             ((Double  *)(number))->value
+#define getItemNumber(item)                 ((Number  *)(*item).data)
 
 int obtainOperatorPrecedence(Token  *token);
 int  checkOperator1PrecedenceGreater(Token  *operatorToken1, Token  *operatorToken2);
-void  infixAddition(StackStruct *operandStack);
-void  infixSubtraction(StackStruct *operandStack);
-void  infixMultiplication(StackStruct *operandStack);
-void  infixDivision(StackStruct *operandStack);
+Number  *infixAddition(Number  *operand1, Number *operand2);
+Number  *infixSubtraction(Number  *operand1, Number *operand2);
+Number  *infixMultiplication(Number  *operand1, Number *operand2);
+Number  *infixDivision(Number  *operand1, Number *operand2);
 int isOperandType(void    *number, OPERANDTYPE  type);
 Integer *createInteger(int  value);
 Double *createDouble(double  value);
 Integer  *extractIntegerFromToken(Token *token);
 Double  *extractFloatingPointFromToken(Token *token);
-Operator  *createOperator();
-Operator  *extractOperatorFromToken(Token *token);
-void  freeOperator(Operator *operator);
+void  unwindStack(StackStruct *operatorStack, StackStruct *operandStack, Operator *currentOperator);
 
 #endif // EXPRESSIONPARSER_H

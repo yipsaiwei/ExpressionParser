@@ -1,18 +1,17 @@
 #include "ExpressionParser.h"
 
-OperatorTableStruct  operatorPrecedenceTable[127] = {
-  ['('] = {1, NULL},  // (
-  [')'] = {1, NULL},  // )
-  ['['] = {1, NULL},  // [
-  [']'] = {1, NULL},  // ]
-  ['.'] = {1, NULL},  // .
-  ['~'] = {2, NULL},  // ~
-  ['!'] = {2, NULL},  // !
-  ['*'] = {3, infixMultiplication},  // *
-  ['/'] = {3, infixDivision},  // /
-  ['%'] = {3, NULL},  // %
-  ['+'] = {4, infixAddition},  // +
-  ['-'] = {4, infixSubtraction},  // -
+OperatorTableStruct  operatorPrecedenceTable[] = {
+  ['('] = {1, NULL, NULLARY},  
+  [')'] = {1, NULL, NULLARY},  
+  ['['] = {1, NULL, NULLARY},  
+  [']'] = {1, NULL, NULLARY},  
+  ['~'] = {2, NULL, UNARY},  
+  ['!'] = {2, NULL, UNARY},  
+  ['*'] = {3, NULL, BINARY},  
+  ['/'] = {3, NULL, BINARY},  
+  ['%'] = {3, NULL, BINARY},  
+  ['+'] = {4, infixAddition, BINARY},  
+  ['-'] = {4, NULL, BINARY},  
 };
 
 /*
@@ -27,7 +26,7 @@ void  shuntingYard(Tokenizer  *tokenizer, StackStruct *operatorStack, StackStruc
     }else
       unwindStack(operatorStack, operandStack, currentOperator);
     
-  }else if (token->type == TOKEN_INTEGER_TYPE || token->type == TOKEN_FLOAT_TYPE){
+  }else{
     extractedNumber = extractNumberFromToken(token);
     pushToStack(operandStack, (void  *)extractedNumber);
   }
@@ -36,18 +35,21 @@ void  shuntingYard(Tokenizer  *tokenizer, StackStruct *operatorStack, StackStruc
 
 //take the operator and operate on the operands
 //3 different scenarios " infix, prefix, suffix
+/*
 void  unwindStack(StackStruct *operatorStack, StackStruct *operandStack, Operator *currentOperator){
-  ListItem *peekItem = popFromStack(operandStack);
+  ListItem *peekItem = peekTopOfStack(operatorStack);
   ListItem  *popItem;
   switch(currentOperator->arity){
     case  BINARY:
-      if(getItemOperatorPrecedence(peekItem) >= currentOperator->precedence){
-        while(getItemOperatorPrecedence(peekItem) >= currentOperator->precedence){
+      if(getItemOperatorPrecedence(peekItem) <= currentOperator->precedence){
+        while(!isStackEmpty(operatorStack) && (getItemOperatorPrecedence(peekItem) <= currentOperator->precedence)){
           popItem = popFromStack(operatorStack);
           OperatorTableStruct instruction = operatorPrecedenceTable[getItemOperator(popItem)];
           instruction.operation(operandStack);
           linkedListFreeListItem(popItem);
+          peekItem = peekTopOfStack(operatorStack);
         }
+        pushToStack(operatorStack, (void  *)currentOperator);
       }else
         pushToStack(operatorStack, (void  *)currentOperator);
     break;
@@ -62,45 +64,44 @@ void  unwindStack(StackStruct *operatorStack, StackStruct *operandStack, Operato
     ;
   }
 }
+*/
 
-void  infixAddition(StackStruct *operandStack){
+/*
+Number  *handleInfix(StackStruct *operandStack, StackStruct *operatorStack){
   ListItem *operand2 = popFromStack(operandStack);
   ListItem *operand1 = popFromStack(operandStack);
+  ListItem *operator = popFromStack(operatorStack);
+  Number  *result;
+  OperatorTableStruct instruction = operatorPrecedenceTable[getItemOperator(operator)];
+  result = instruction.operation(getItemNumber(operand1), getItemNumber(operand2));
+  pushToStack(operandStack, (void *)result);
+  linkedListFreeListItem(operand1);                         
+  linkedListFreeListItem(operand2);  
+}
+*/
+
+Number  *infixAddition(Number  *operand1, Number *operand2){
   Number  *result;
   arithmeticCalculation(operand1, operand2, +);
-  pushToStack(operandStack, (void *)result);
-  linkedListFreeListItem(operand1);                         
-  linkedListFreeListItem(operand2);
+  return  result;
 }
 
-void  infixSubtraction(StackStruct *operandStack){
-  ListItem *operand2 = popFromStack(operandStack);
-  ListItem *operand1 = popFromStack(operandStack);
+Number  *infixSubtraction(Number  *operand1, Number *operand2){
   Number  *result;
   arithmeticCalculation(operand1, operand2, -);
-  pushToStack(operandStack, (void *)result);
-  linkedListFreeListItem(operand1);                         
-  linkedListFreeListItem(operand2);
+  return  result;
 }
 
-void  infixMultiplication(StackStruct *operandStack){
-  ListItem *operand2 = popFromStack(operandStack);
-  ListItem *operand1 = popFromStack(operandStack);
+Number  *infixMultiplication(Number  *operand1, Number *operand2){
   Number  *result;
   arithmeticCalculation(operand1, operand2, *);
-  pushToStack(operandStack, (void *)result);
-  linkedListFreeListItem(operand1);                         
-  linkedListFreeListItem(operand2);
+  return  result;
 }
 
-void  infixDivision(StackStruct *operandStack){
-  ListItem *operand2 = popFromStack(operandStack);
-  ListItem *operand1 = popFromStack(operandStack);
+Number  *infixDivision(Number  *operand1, Number *operand2){
   Number  *result;
-  arithmeticDivisionCalculation(operand1, operand2);
-  pushToStack(operandStack, (void *)result);
-  linkedListFreeListItem(operand1);                         
-  linkedListFreeListItem(operand2);
+  arithmeticDivisionCalculation(operand1, operand2, /);
+  return  result;
 }
 
 Integer *createInteger(int  value){
@@ -120,9 +121,11 @@ int isOperandType(void    *number, OPERANDTYPE  type){
   return  (((Number *)number)->type == type);
 }
 
-Operator  *createOperator(){
-  Operator  *newOperator = malloc(sizeof(Operator));
-  return  newOperator;
+char  *duplicateString(char *str, int length){
+  char  *resultstr = memAlloc((length+1)*sizeof(char));
+  strncpy(resultstr, str, length);
+  resultstr[length] = '\0';
+  return  resultstr;
 }
 
 Integer  *extractIntegerFromToken(Token *token){
@@ -139,15 +142,4 @@ Double  *extractFloatingPointFromToken(Token *token){
   newFloat->type = FLOAT_NUMBER;
   newFloat->value = tokenPointer->value;
   return  newFloat;
-}
-
-Operator  *extractOperatorFromToken(Token *token){
-  Operator  *newOperator = createOperator();
-  newOperator->str = token->str;              //???
-  return  newOperator;
-}
-
-void  freeOperator(Operator *operator){
-  if(operator)
-    free(operator);
 }
