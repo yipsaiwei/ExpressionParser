@@ -44,12 +44,14 @@ struct  Double{
 };
 
 //typedef void (*Operation)(StackStruct *operandStack);
-typedef Number  *(*Operation)(Number  *number1, Number  *number2);
+typedef Number  *(*ArithmeticOperation)(Number  *number1, Number  *number2);
+typedef void    (*ArityHandler)(StackStruct *operandStack, StackStruct *operatorStack);
 
 typedef struct  OperatorTableStruct  OperatorTableStruct;
 struct  OperatorTableStruct{
     int precedence;
-    Operation operation;
+    ArithmeticOperation arithmeticHandler;
+    ArityHandler  arityHandler;
     int arity;
 };
 
@@ -75,5 +77,6 @@ Double *createDouble(double  value);
 Integer  *extractIntegerFromToken(Token *token);
 Double  *extractFloatingPointFromToken(Token *token);
 void  unwindStack(StackStruct *operatorStack, StackStruct *operandStack, Operator *currentOperator);
+void  handleInfix(StackStruct *operandStack, StackStruct *operatorStack);
 
 #endif // EXPRESSIONPARSER_H

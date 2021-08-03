@@ -218,6 +218,79 @@ void  test_infixDivision_given_1_floating_pt_1_int_6point333_n_3_expect_result_w
   free(number2);
 }
 
+
+void  test_handleInfix_given_two_operand_Integers_1_infix_add_expect_the_values_able_to_be_returned(){
+  Integer *number1 = createInteger(13);
+  Integer  *number2 = createInteger(77);
+  
+  Operator  *operator = createOperator("+", 4, BINARY);
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  pushToStack(operandStack, (void*)number1);
+  pushToStack(operandStack, (void*)number2);
+  pushToStack(operatorStack, (void*)operator);
+  
+  handleInfix(operandStack, operatorStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL(90, getItemInteger(peekItem));
+  TEST_ASSERT_EQUAL(INTEGER_NUMBER, getItemDataType(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free); 
+}
+
+void  test_handleInfix_given_two_operand_Integer_Double_1_infix_mult_expect_the_values_able_to_be_returned(){
+  Integer *number1 = createInteger(34);
+  Double  *number2 = createDouble(4.888);
+  
+  Operator  *operator = createOperator("*", 3, BINARY);
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  pushToStack(operandStack, (void*)number1);
+  pushToStack(operandStack, (void*)number2);
+  pushToStack(operatorStack, (void*)operator);
+  
+  handleInfix(operandStack, operatorStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL_FLOAT(166.192, getItemDouble(peekItem));
+  TEST_ASSERT_EQUAL(FLOAT_NUMBER, getItemDataType(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free); 
+}
+
+void  test_handleInfix_given_two_operand_Doubles_1_infix_division_expect_the_values_able_to_be_returned(){
+  Double  *number1 = createDouble(9.57434);
+  Double  *number2 = createDouble(4.888);
+  
+  Operator  *operator = createOperator("/", 3, BINARY);
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  pushToStack(operandStack, (void*)number1);
+  pushToStack(operandStack, (void*)number2);
+  pushToStack(operatorStack, (void*)operator);
+  
+  handleInfix(operandStack, operatorStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL_FLOAT(1.958743863, getItemDouble(peekItem));
+  TEST_ASSERT_EQUAL(FLOAT_NUMBER, getItemDataType(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free); 
+}
+
 /*
 void  test_unwindStack_given_2_operands_1_lower_precedence_operator_inside_operator_stack_expect_currentOperator_pushed_into_operator_stack(){
   Integer *number1 = createInteger(13);

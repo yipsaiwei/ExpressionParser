@@ -11,16 +11,16 @@ OperatorInformationTable operatorInformationTable[] = {
   ['*'] = {{MULTIPLY, UND, UND}, NULL},  
   ['/'] = {{DIVIDE, UND, UND}, NULL},  
   ['%'] = {{REMAINDER, UND, UND}, NULL},  
-  ['+'] = {{ADD, INC, ADD_ASSIGN}, NULL},     //There are postfix infix inc, addition, +=?
-  ['-'] = {{MINUS, DEC, MINUS_ASSIGN}, NULL}, 
-  ['<'] = {{LESSER, SHIFT_LEFT, LESSER_EQ}, NULL}, 
-  ['>'] = {{GREATER, SHIFT_RIGHT, GREATER_EQ}, NULL}, 
+  ['+'] = {{ADD, INC, ADD_ASSIGN}, returnDoubleCharacterOperator},     //There are postfix infix inc, addition, +=?
+  ['-'] = {{MINUS, DEC, MINUS_ASSIGN}, returnDoubleCharacterOperator}, 
+  ['<'] = {{LESSER, SHIFT_LEFT, LESSER_EQ}, returnDoubleCharacterOperator}, 
+  ['>'] = {{GREATER, SHIFT_RIGHT, GREATER_EQ}, returnDoubleCharacterOperator}, 
 };
 
-Operator  *createOperator(char  *str, int  precedence, int arity){
+Operator  *createOperator(char  *str, int  precedence, OperationType id){
   Operator  *newOperator = malloc(sizeof(Operator));
-  newOperator->arity = arity;
   newOperator->precedence = precedence;
+  newOperator->id = id;
   newOperator->str = duplicateSubstring(str, returnStringSize(str));
   return  newOperator;
 }
@@ -32,9 +32,16 @@ int returnStringSize(char *str){
   return  (ptr - str);
 }
 
-Operator  *extractOperatorFromToken(Token *token, int precedence, Tokenizer *tokenizer){
-  Operator  *newOperator = createOperator(token->str, precedence, BINARY);
-  return  newOperator;
+Operator  *extractOperatorFromToken(Token *token, Tokenizer *tokenizer){
+  Operator  *operator;
+  char  *operatorStr;
+  Token *nextToken = peekToken(tokenizer);
+  OperatorInformationTable  information = operatorInformationTable[*(token->str)];
+  if(isNextTokenAdjacentToCurrent(token, nextToken) || isNextTokenAOperator(nextToken))
+    operator = information.func(token, nextToken);
+  else
+    operator = createOperator(token->str, 0, information.type[0]); 
+  return  operator;
 }
 
 void  freeOperator(Operator *operator){
@@ -42,59 +49,22 @@ void  freeOperator(Operator *operator){
     free(operator);
 }
 
-void  checkDoubleCharacterOperator(Tokenizer  *tokenizer, Token *token){
-  Token *nextToken = peekToken(tokenizer);
-  if(isNextTokenAOperator(nextToken)){
-    if(isTokenStringSame(token, nextToken)){
-      switch(*(token->str)){
-        case '+':
-        ;
-        break;
-        case  '-':
-        ;
-        break;
-        case  '<':
-        ;
-        break;
-        case  '>':
-        ;
-        break;        
-        case  '&':
-        ;
-        break; 
-        case  '|':
-        ;
-        break; 
-        default:
-        ; //Throw exception
-      }
-    }else{
-      switch(*(token->str)){
-        case '+':
-        ;
-        break;
-        case  '-':
-        ;
-        break;
-        case  '<':
-        ;
-        break;
-        case  '>':
-        ;
-        break;        
-        case  '&':
-        ;
-        break; 
-        case  '|':
-        ;
-        break; 
-        default:
-        ; //Throw exception
-      }      
-    }
+Operator  *returnDoubleCharacterOperator(Token *token, Token *nextToken){
+  char  *operatorStr;
+  Operator  *operator;
+  OperatorInformationTable  information = operatorInformationTable[*(token->str)];
+  if(!isNextTokenAdjacentToCurrent(token, nextToken)){
+    //Throw Exception
+    throwException(ERROR_INVALID_OPERATOR,NULL, 0, "Invalid Operator!");
   }
+  strcat(token->str, nextToken->str);
+  operatorStr = strdup(token->str);
+  if(areTwoCharSame(token->str, nextToken->str))
+    operator = createOperator(operatorStr, 0, information.type[1]);
+  else 
+    operator = createOperator(operatorStr, 0, information.type[2]);
+  return  operator;
 }
-
 
 Token *peekToken(Tokenizer  *tokenizer){
   int indexBeforeGetToken = tokenizer->index;

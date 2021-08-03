@@ -5,11 +5,13 @@
 #include "Tokenizer.h"
 //#include "ExpressionParser.h"
 #include  "Arity.h"
+#include <string.h>
 
-#define isTokenNull(token)                  (token->type == NULL)
-#define isTokenStringSame(token1, token2)   (token1->str == token2->str)
-#define isNextTokenAOperator(token)         (token->type == TOKEN_OPERATOR_TYPE)
-typedef void (*FuncPtr)(Tokenizer *tokenizer, Token *token);
+#define isTokenNull(token)                                      (token->type == NULL)
+#define isTokenStringSame(token1, token2)                       (*(token1->str) == *(token2->str))
+#define areTwoCharSame(str1, str2)                               *str1 == *str2                                                      
+#define isNextTokenAOperator(token)                             (token->type == TOKEN_OPERATOR_TYPE)
+#define isNextTokenAdjacentToCurrent(token, nextToken)          ((token->startColumn + 1) == nextToken->startColumn)
 
 typedef enum{
   UND,
@@ -41,8 +43,10 @@ typedef struct  Operator  Operator;
 struct  Operator{
   char  *str;
   int precedence;
-  int arity;
+  OperationType id;
 };
+
+typedef Operator *(*FuncPtr)(Token *token, Token *nextToken);
 
 typedef struct  OperatorInformationTable  OperatorInformationTable;
 struct  OperatorInformationTable{
@@ -50,8 +54,9 @@ struct  OperatorInformationTable{
   FuncPtr func;
 };
 
-Operator  *createOperator(char  *str, int  precedence, int arity);
-Operator  *extractOperatorFromToken(Token *token, int precedence, Tokenizer *tokenizer);
+Operator  *createOperator(char  *str, int  precedence, OperationType id);
+Operator  *extractOperatorFromToken(Token *token, Tokenizer *tokenizer);
+Operator  *returnDoubleCharacterOperator(Token *token, Token *nextToken);
 void  freeOperator(Operator *opt);
 int returnStringSize(char *str);
 void  checkDoubleCharacterOperator(Tokenizer  *tokenizer, Token *token);

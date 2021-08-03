@@ -1,17 +1,17 @@
 #include "ExpressionParser.h"
 
 OperatorTableStruct  operatorPrecedenceTable[] = {
-  ['('] = {1, NULL, NULLARY},  
-  [')'] = {1, NULL, NULLARY},  
-  ['['] = {1, NULL, NULLARY},  
-  [']'] = {1, NULL, NULLARY},  
-  ['~'] = {2, NULL, UNARY},  
-  ['!'] = {2, NULL, UNARY},  
-  ['*'] = {3, NULL, BINARY},  
-  ['/'] = {3, NULL, BINARY},  
-  ['%'] = {3, NULL, BINARY},  
-  ['+'] = {4, infixAddition, BINARY},  
-  ['-'] = {4, NULL, BINARY},  
+  ['('] = {1, NULL, NULL},  
+  [')'] = {1, NULL, NULL},  
+  ['['] = {1, NULL, NULL},  
+  [']'] = {1, NULL, NULL},  
+  ['~'] = {2, NULL, NULL},  
+  ['!'] = {2, NULL, NULL},  
+  ['*'] = {3, infixMultiplication, handleInfix},  
+  ['/'] = {3, infixDivision, handleInfix},  
+  ['%'] = {3, NULL, NULL},  
+  ['+'] = {4, infixAddition, handleInfix},  
+  ['-'] = {4, infixSubtraction, handleInfix},  
 };
 
 /*
@@ -66,19 +66,18 @@ void  unwindStack(StackStruct *operatorStack, StackStruct *operandStack, Operato
 }
 */
 
-/*
-Number  *handleInfix(StackStruct *operandStack, StackStruct *operatorStack){
+void  handleInfix(StackStruct *operandStack, StackStruct *operatorStack){
   ListItem *operand2 = popFromStack(operandStack);
   ListItem *operand1 = popFromStack(operandStack);
   ListItem *operator = popFromStack(operatorStack);
   Number  *result;
   OperatorTableStruct instruction = operatorPrecedenceTable[getItemOperator(operator)];
-  result = instruction.operation(getItemNumber(operand1), getItemNumber(operand2));
+  result = instruction.arithmeticHandler(getItemNumber(operand1), getItemNumber(operand2));
   pushToStack(operandStack, (void *)result);
   linkedListFreeListItem(operand1);                         
-  linkedListFreeListItem(operand2);  
+  linkedListFreeListItem(operand2); 
+  linkedListFreeListItem(operator);
 }
-*/
 
 Number  *infixAddition(Number  *operand1, Number *operand2){
   Number  *result;
