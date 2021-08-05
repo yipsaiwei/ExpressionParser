@@ -15,6 +15,7 @@ OperatorInformationTable operatorInformationTable[] = {
   ['-'] = {{MINUS, DEC, MINUS_ASSIGN}, returnDoubleCharacterOperator}, 
   ['<'] = {{LESSER, SHIFT_LEFT, LESSER_EQ}, returnDoubleCharacterOperator}, 
   ['>'] = {{GREATER, SHIFT_RIGHT, GREATER_EQ}, returnDoubleCharacterOperator}, 
+  ['&'] = {{BITWISE_AND, LOGICAL_AND, BITWISE_AND_ASSIGN},returnDoubleCharacterOperator},
 };
 
 Operator  *createOperator(char  *str, int  precedence, OperationType id){

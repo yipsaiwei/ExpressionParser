@@ -12,6 +12,7 @@ OperatorTableStruct  operatorPrecedenceTable[] = {
   [REMAINDER]         = {3, NULL, NULL},  
   [ADD]               = {4, infixAdd, handleInfix},  
   [MINUS]             = {4, infixMinus, handleInfix},  
+  [BITWISE_AND]       = {8, NULL, NULL},
 };
 
 /*
@@ -35,36 +36,18 @@ void  shuntingYard(Tokenizer  *tokenizer, StackStruct *operatorStack, StackStruc
 
 //take the operator and operate on the operands
 //3 different scenarios " infix, prefix, suffix
-/*
 void  unwindStack(StackStruct *operatorStack, StackStruct *operandStack, Operator *currentOperator){
   ListItem *peekItem = peekTopOfStack(operatorStack);
-  ListItem  *popItem;
-  switch(currentOperator->arity){
-    case  BINARY:
-      if(getItemOperatorPrecedence(peekItem) <= currentOperator->precedence){
-        while(!isStackEmpty(operatorStack) && (getItemOperatorPrecedence(peekItem) <= currentOperator->precedence)){
-          popItem = popFromStack(operatorStack);
-          OperatorTableStruct instruction = operatorPrecedenceTable[getItemOperator(popItem)];
-          instruction.operation(operandStack);
-          linkedListFreeListItem(popItem);
-          peekItem = peekTopOfStack(operatorStack);
-        }
-        pushToStack(operatorStack, (void  *)currentOperator);
-      }else
-        pushToStack(operatorStack, (void  *)currentOperator);
-    break;
-    case  UNARY:
-    ;
-    break;
-    
-    case  TERNARY:
-    ;
-    break;
-    default:
-    ;
-  }
+  if(getItemOperatorPrecedence(peekItem) <= currentOperator->precedence){
+    while(!isStackEmpty(operatorStack) && (getItemOperatorPrecedence(peekItem) <= currentOperator->precedence)){
+      OperatorTableStruct instruction = operatorPrecedenceTable[getItemOperatorId(peekItem)];
+      instruction.arityHandler(operandStack, operatorStack);
+      peekItem = peekTopOfStack(operatorStack);
+  }  
+  pushToStack(operatorStack, (void  *)currentOperator);
+  }else
+    pushToStack(operatorStack, (void  *)currentOperator);
 }
-*/
 
 void  handleInfix(StackStruct *operandStack, StackStruct *operatorStack){
   ListItem *operand2 = popFromStack(operandStack);

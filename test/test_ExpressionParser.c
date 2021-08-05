@@ -313,13 +313,12 @@ void  test_handlePrefix_given_operand_bitwise_not_expect_the_value_able_to_be_re
   freeStack(operatorStack, free); 
 }
 
-/*
 void  test_unwindStack_given_2_operands_1_lower_precedence_operator_inside_operator_stack_expect_currentOperator_pushed_into_operator_stack(){
   Integer *number1 = createInteger(13);
   Double  *number2 = createDouble(54.452);
 
-  Operator  *currentOperator = createOperator("+", 4, BINARY);
-  Operator  *operator = createOperator("&", 8, UNARY);
+  Operator  *currentOperator = createOperator("/", 3, DIVIDE);
+  Operator  *operator = createOperator("+", 4, ADD);
   
   StackStruct *operandStack = createStack();
   StackStruct *operatorStack = createStack();
@@ -332,7 +331,7 @@ void  test_unwindStack_given_2_operands_1_lower_precedence_operator_inside_opera
   
   ListItem  *peekItem = peekTopOfStack(operatorStack);
   
-  TEST_ASSERT_EQUAL_STRING("+", ((Operator  *)(*peekItem).data)->str);
+  TEST_ASSERT_EQUAL_STRING("/", ((Operator  *)(*peekItem).data)->str);
   
   //free(number1);                    //Since no arithmetic is performed, the numbers still belong to stack
   //free(number2);                    //Thus let freeStack do the number1 and number2 freeing
@@ -341,12 +340,13 @@ void  test_unwindStack_given_2_operands_1_lower_precedence_operator_inside_opera
   freeStack(operandStack, free); 
   freeStack(operatorStack, free); 
 }
+
 void  test_unwindStack_given_2_operands_1_higher_precedence_operator_inside_operator_stack_expect_higher_operator_computed(){
   Integer *number1 = createInteger(13);
   Integer  *number2 = createInteger(3);
 
-  Operator  *currentOperator = createOperator("+", 4, BINARY);
-  Operator  *operator = createOperator("*", 3, UNARY);
+  Operator  *currentOperator = createOperator("+", 4, ADD);
+  Operator  *operator = createOperator("*", 3, MULTIPLY);
   
   StackStruct *operandStack = createStack();
   StackStruct *operatorStack = createStack();
@@ -378,9 +378,9 @@ void  test_unwindStack_given_2_operators_1_higher_precedence_operator_inside_ope
   Integer  *number3 = createInteger(6);
   Integer  *number4 = createInteger(8);
 
-  Operator  *currentOperator = createOperator("+", 4, BINARY);
-  Operator  *operator1 = createOperator("-", 3, UNARY);
-  Operator  *operator2 = createOperator("*", 3, UNARY);
+  Operator  *currentOperator = createOperator("+", 4, ADD);
+  Operator  *operator1 = createOperator("-", 3, MINUS);
+  Operator  *operator2 = createOperator("*", 3, MULTIPLY);
   
   StackStruct *operandStack = createStack();
   StackStruct *operatorStack = createStack();
@@ -405,4 +405,3 @@ void  test_unwindStack_given_2_operators_1_higher_precedence_operator_inside_ope
   freeStack(operandStack, free); 
   freeStack(operatorStack, free); 
 }
-*/

@@ -36,6 +36,10 @@ typedef enum{
   GREATER_EQ,
   SHIFT_LEFT,
   SHIFT_RIGHT,
+  BITWISE_AND,
+  LOGICAL_AND,
+  BITWISE_AND_ASSIGN,
+  
   
 }OperationType;
 
