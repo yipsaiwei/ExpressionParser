@@ -77,7 +77,7 @@ void  test_infixAddition_given_2_integer_45_n_11_expect_result_with_56_returned(
   Integer  *number2 = createInteger(11);
   StackStruct *stack = createStack();
   
-  Integer  *result = (Integer *)infixAddition((Number *)number1, (Number *)number2);
+  Integer  *result = (Integer *)infixAdd((Number *)number1, (Number *)number2);
   
   TEST_ASSERT_EQUAL(56, result->value);
   TEST_ASSERT_EQUAL(INTEGER_NUMBER, result->type);
@@ -91,7 +91,7 @@ void  test_infixAddition_given_2_floating_pt_56point555_n_11point683_expect_resu
   Double  *number1 = createDouble(56.555);
   Double  *number2 = createDouble(11.683);
   
-  Double  *result = (Double *)infixAddition((Number *)number1, (Number *)number2);
+  Double  *result = (Double *)infixAdd((Number *)number1, (Number *)number2);
   
   TEST_ASSERT_EQUAL_FLOAT(68.238, result->value);
   TEST_ASSERT_EQUAL(FLOAT_NUMBER, result->type);
@@ -105,7 +105,7 @@ void  test_infixAddition_given_1_floating_pt_1_int_39point18_n_90_expect_result_
   Integer  *number1 = createInteger(90);
   Double  *number2 = createDouble(39.18);
 
-  Double  *result = (Double *)infixAddition((Number *)number1, (Number *)number2);
+  Double  *result = (Double *)infixAdd((Number *)number1, (Number *)number2);
   
   TEST_ASSERT_EQUAL_FLOAT(129.18, result->value);
   TEST_ASSERT_EQUAL(FLOAT_NUMBER, result->type);
@@ -118,7 +118,7 @@ void  test_infixSubtraction_given_2_integer688_n_300_expect_result_with_388_retu
   Integer  *number1 = createInteger(688);
   Integer  *number2 = createInteger(300);
   
-  Integer *result = (Integer  *)infixSubtraction((Number *)number1, (Number *)number2);
+  Integer *result = (Integer  *)infixMinus((Number *)number1, (Number *)number2);
 
   TEST_ASSERT_EQUAL(388, result->value);
   TEST_ASSERT_EQUAL(INTEGER_NUMBER, result->type);
@@ -131,7 +131,7 @@ void  test_infixSubtraction_given_2_integer__67_n_99_expect_result_with_negative
   Integer  *number1 = createInteger(67);
   Integer  *number2 = createInteger(99);
   
-  Integer *result = (Integer  *)infixSubtraction((Number *)number1, (Number *)number2);
+  Integer *result = (Integer  *)infixMinus((Number *)number1, (Number *)number2);
 
   TEST_ASSERT_EQUAL(-32, result->value);
   TEST_ASSERT_EQUAL(INTEGER_NUMBER, result->type);
@@ -144,7 +144,7 @@ void  test_infixSubtraction_given_2_floating_pt_1point567_n_0point632_expect_res
   Double  *number1 = createDouble(1.567);
   Double  *number2 = createDouble(0.632);
 
-  Double  *result = (Double  *)infixSubtraction((Number *)number1, (Number *)number2);
+  Double  *result = (Double  *)infixMinus((Number *)number1, (Number *)number2);
   
   TEST_ASSERT_EQUAL_FLOAT(0.935, result->value);
   TEST_ASSERT_EQUAL(FLOAT_NUMBER, result->type);
@@ -157,7 +157,7 @@ void  test_infixMultiplication_given_2_integer__8_n_12_expect_result_with_96_ret
   Integer  *number1 = createInteger(8);
   Integer  *number2 = createInteger(12);
 
-  Integer *result = (Integer *)infixMultiplication((Number *)number1, (Number *)number2);
+  Integer *result = (Integer *)infixMultiply((Number *)number1, (Number *)number2);
 
   TEST_ASSERT_EQUAL(96, result->value);
   TEST_ASSERT_EQUAL(INTEGER_NUMBER, result->type);
@@ -170,7 +170,7 @@ void  test_infixMultiplication_given_2_floating_pt_12point67_n_3point1_expect_re
   Double  *number1 = createDouble(12.67);
   Double  *number2 = createDouble(39.277);
   
-  Double *result = (Double *)infixMultiplication((Number *)number1, (Number *)number2);
+  Double *result = (Double *)infixMultiply((Number *)number1, (Number *)number2);
 
   TEST_ASSERT_EQUAL_FLOAT(497.63959, result->value);
   TEST_ASSERT_EQUAL(FLOAT_NUMBER, result->type);
@@ -183,7 +183,7 @@ void  test_infixDivision_given_2_integer_144_n_12_expect_result_with_12_returned
   Integer  *number1 = createInteger(144);
   Integer  *number2 = createInteger(12);
 
-  Integer *result = (Integer  *)infixDivision((Number *)number1, (Number *)number2);
+  Integer *result = (Integer  *)infixDivide((Number *)number1, (Number *)number2);
 
   TEST_ASSERT_EQUAL(12, result->value);
   TEST_ASSERT_EQUAL(INTEGER_NUMBER, result->type);
@@ -196,7 +196,7 @@ void  test_infixDivision_given_2_floating_pt_4point375_n_1point25_expect_result_
   Double  *number1 = createDouble(4.375);
   Double  *number2 = createDouble(1.25);
 
-  Double *result = (Double  *)infixDivision((Number *)number1, (Number *)number2);
+  Double *result = (Double  *)infixDivide((Number *)number1, (Number *)number2);
 
   TEST_ASSERT_EQUAL_FLOAT(3.5, result->value);
   TEST_ASSERT_EQUAL(FLOAT_NUMBER, result->type);
@@ -209,7 +209,7 @@ void  test_infixDivision_given_1_floating_pt_1_int_6point333_n_3_expect_result_w
   Double  *number1 = createDouble(6.333);
   Integer  *number2 = createInteger(3);
 
-  Double *result = (Double  *)infixDivision((Number *)number1, (Number *)number2);
+  Double *result = (Double  *)infixDivide((Number *)number1, (Number *)number2);
 
   TEST_ASSERT_EQUAL_FLOAT(2.111, result->value);
   TEST_ASSERT_EQUAL(FLOAT_NUMBER, result->type);
@@ -223,7 +223,7 @@ void  test_handleInfix_given_two_operand_Integers_1_infix_add_expect_the_values_
   Integer *number1 = createInteger(13);
   Integer  *number2 = createInteger(77);
   
-  Operator  *operator = createOperator("+", 4, BINARY);
+  Operator  *operator = createOperator("+", 4, ADD);
   
   StackStruct *operandStack = createStack();
   StackStruct *operatorStack = createStack();
@@ -247,7 +247,7 @@ void  test_handleInfix_given_two_operand_Integer_Double_1_infix_mult_expect_the_
   Integer *number1 = createInteger(34);
   Double  *number2 = createDouble(4.888);
   
-  Operator  *operator = createOperator("*", 3, BINARY);
+  Operator  *operator = createOperator("*", 3, MULTIPLY);
   
   StackStruct *operandStack = createStack();
   StackStruct *operatorStack = createStack();
@@ -271,7 +271,7 @@ void  test_handleInfix_given_two_operand_Doubles_1_infix_division_expect_the_val
   Double  *number1 = createDouble(9.57434);
   Double  *number2 = createDouble(4.888);
   
-  Operator  *operator = createOperator("/", 3, BINARY);
+  Operator  *operator = createOperator("/", 3, DIVIDE);
   
   StackStruct *operandStack = createStack();
   StackStruct *operatorStack = createStack();
@@ -286,6 +286,28 @@ void  test_handleInfix_given_two_operand_Doubles_1_infix_division_expect_the_val
   
   TEST_ASSERT_EQUAL_FLOAT(1.958743863, getItemDouble(peekItem));
   TEST_ASSERT_EQUAL(FLOAT_NUMBER, getItemDataType(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free); 
+}
+
+void  test_handlePrefix_given_operand_bitwise_not_expect_the_value_able_to_be_returned(){
+  Integer *number = createInteger(13);
+  
+  Operator  *operator = createOperator("~", 2, BITWISE_NOT);
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  pushToStack(operandStack, (void*)number);
+  pushToStack(operatorStack, (void*)operator);
+  
+  handlePrefix(operandStack, operatorStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL_FLOAT(-14, getItemInteger(peekItem));
+  TEST_ASSERT_EQUAL(INTEGER_NUMBER, getItemDataType(peekItem));
   
   freeStack(operandStack, free); 
   freeStack(operatorStack, free); 

@@ -1,17 +1,17 @@
 #include "ExpressionParser.h"
 
 OperatorTableStruct  operatorPrecedenceTable[] = {
-  ['('] = {1, NULL, NULL},  
-  [')'] = {1, NULL, NULL},  
-  ['['] = {1, NULL, NULL},  
-  [']'] = {1, NULL, NULL},  
-  ['~'] = {2, NULL, NULL},  
-  ['!'] = {2, NULL, NULL},  
-  ['*'] = {3, infixMultiplication, handleInfix},  
-  ['/'] = {3, infixDivision, handleInfix},  
-  ['%'] = {3, NULL, NULL},  
-  ['+'] = {4, infixAddition, handleInfix},  
-  ['-'] = {4, infixSubtraction, handleInfix},  
+  [OPEN_PAREN]        = {1, NULL, NULL},  
+  [CLOSE_PAREN]       = {1, NULL, NULL},  
+  [OPEN_SQ_BRACKET]   = {1, NULL, NULL},  
+  [CLOSE_SQ_BRACKET]  = {1, NULL, NULL},  
+  [BITWISE_NOT]       = {2, prefixBitwiseNot, handlePrefix},  
+  [LOGICAL_NOT]       = {2, NULL, handlePrefix},  
+  [MULTIPLY]          = {3, infixMultiply, handleInfix},  
+  [DIVIDE]            = {3, infixDivide, handleInfix},  
+  [REMAINDER]         = {3, NULL, NULL},  
+  [ADD]               = {4, infixAdd, handleInfix},  
+  [MINUS]             = {4, infixMinus, handleInfix},  
 };
 
 /*
@@ -71,7 +71,7 @@ void  handleInfix(StackStruct *operandStack, StackStruct *operatorStack){
   ListItem *operand1 = popFromStack(operandStack);
   ListItem *operator = popFromStack(operatorStack);
   Number  *result;
-  OperatorTableStruct instruction = operatorPrecedenceTable[getItemOperator(operator)];
+  OperatorTableStruct instruction = operatorPrecedenceTable[getItemOperatorId(operator)];
   result = instruction.arithmeticHandler(getItemNumber(operand1), getItemNumber(operand2));
   pushToStack(operandStack, (void *)result);
   linkedListFreeListItem(operand1);                         
@@ -79,29 +79,25 @@ void  handleInfix(StackStruct *operandStack, StackStruct *operatorStack){
   linkedListFreeListItem(operator);
 }
 
-Number  *infixAddition(Number  *operand1, Number *operand2){
+void  handlePrefix(StackStruct *operandStack, StackStruct *operatorStack){
+  ListItem *operand = popFromStack(operandStack);
+  ListItem *operator = popFromStack(operatorStack);
   Number  *result;
-  arithmeticCalculation(operand1, operand2, +);
-  return  result;
+  OperatorTableStruct instruction = operatorPrecedenceTable[getItemOperatorId(operator)];
+  result = instruction.arithmeticHandler(getItemNumber(operand), NULL);
+  pushToStack(operandStack, (void *)result);
+  linkedListFreeListItem(operand); 
+  linkedListFreeListItem(operator);  
 }
 
-Number  *infixSubtraction(Number  *operand1, Number *operand2){
-  Number  *result;
-  arithmeticCalculation(operand1, operand2, -);
-  return  result;
-}
+createArithmeticFunction(infixAdd, +);
+createArithmeticFunction(infixMinus, -);
+createArithmeticFunction(infixMultiply, *);
+createArithmeticDivFunction(infixDivide, /);
 
-Number  *infixMultiplication(Number  *operand1, Number *operand2){
-  Number  *result;
-  arithmeticCalculation(operand1, operand2, *);
-  return  result;
-}
-
-Number  *infixDivision(Number  *operand1, Number *operand2){
-  Number  *result;
-  arithmeticDivisionCalculation(operand1, operand2, /);
-  return  result;
-}
+createInfixLogicFunction(infixModulus, %);
+createPrefixLogicFunction(prefixLogicNot, !);
+createPrefixLogicFunction(prefixBitwiseNot, ~);
 
 Integer *createInteger(int  value){
   Integer *newInteger = malloc(sizeof(Integer));

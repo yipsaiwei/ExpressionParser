@@ -97,3 +97,16 @@ void  test_extractOperatorFromToken_given_double_different_character_operator_ex
   
   freeTokenizer(tokenizer);
 }
+
+void  test_extractOperatorFromToken_given_double_not_vaild_operator_expect_single_operator_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("  +~  ");  
+  Token *token = getToken(tokenizer);
+  
+  Operator  *result = extractOperatorFromToken(token, tokenizer);
+  
+  TEST_ASSERT_EQUAL_STRING("+", result->str);
+  TEST_ASSERT_EQUAL(ADD, result->id);
+  
+  freeTokenizer(tokenizer);
+}

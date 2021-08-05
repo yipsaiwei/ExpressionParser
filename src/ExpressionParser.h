@@ -58,6 +58,7 @@ struct  OperatorTableStruct{
 #define getItemOperator(item)               *(((Operator  *)(*item).data)->str)
 #define getItemDataType(item)               (((Number *)(*item).data)->type)
 #define getItemOperatorPrecedence(item)     (((Operator *)(*item).data)->precedence)
+#define getItemOperatorId(item)             (((Operator *)(*item).data)->id)
 
 #define getItemInteger(item)                ((Integer  *)(*item).data)->value
 #define getNumberInteger(number)            ((Integer *)(number))->value
@@ -67,10 +68,6 @@ struct  OperatorTableStruct{
 
 int obtainOperatorPrecedence(Token  *token);
 int  checkOperator1PrecedenceGreater(Token  *operatorToken1, Token  *operatorToken2);
-Number  *infixAddition(Number  *operand1, Number *operand2);
-Number  *infixSubtraction(Number  *operand1, Number *operand2);
-Number  *infixMultiplication(Number  *operand1, Number *operand2);
-Number  *infixDivision(Number  *operand1, Number *operand2);
 int isOperandType(void    *number, OPERANDTYPE  type);
 Integer *createInteger(int  value);
 Double *createDouble(double  value);
@@ -78,5 +75,13 @@ Integer  *extractIntegerFromToken(Token *token);
 Double  *extractFloatingPointFromToken(Token *token);
 void  unwindStack(StackStruct *operatorStack, StackStruct *operandStack, Operator *currentOperator);
 void  handleInfix(StackStruct *operandStack, StackStruct *operatorStack);
+void  handlePrefix(StackStruct *operandStack, StackStruct *operatorStack);
 
+Number  *infixAdd(Number  *number1, Number  *number2);
+Number  *infixMinus(Number  *number1, Number  *number2);
+Number  *infixMultiply(Number  *number1, Number  *number2);
+Number  *infixDivide(Number  *number1, Number  *number2);
+Number  *infixModulus(Number  *number1, Number  *number2);
+Number  *prefixLogicNot(Number  *number1, Number *number2);
+Number  *prefixBitwiseNot(Number  *number1, Number  *number2);
 #endif // EXPRESSIONPARSER_H
