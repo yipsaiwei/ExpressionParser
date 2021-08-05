@@ -37,14 +37,20 @@ Operator  *extractOperatorFromToken(Token *token, Tokenizer *tokenizer){
   char  *operatorStr;
   Token *nextToken = peekToken(tokenizer);
   OperatorInformationTable  information = operatorInformationTable[*(token->str)];
-  if(isNextTokenAdjacentToCurrent(token, nextToken) || isNextTokenAOperator(nextToken))
+  if(isNextTokenAdjacentToCurrent(token, nextToken) && isNextTokenAOperator(nextToken)){
+    nextToken = getToken(tokenizer);
     operator = information.func(token, nextToken);
-  else
+  }
+  else{
     operator = createOperator(token->str, 0, information.type[0]); 
+    freeToken(token);
+  }
   return  operator;
 }
 
 void  freeOperator(Operator *operator){
+  if(operator->str)
+    free(operator->str);
   if(operator)
     free(operator);
 }
@@ -53,16 +59,21 @@ Operator  *returnDoubleCharacterOperator(Token *token, Token *nextToken){
   char  *operatorStr;
   Operator  *operator;
   OperatorInformationTable  information = operatorInformationTable[*(token->str)];
-  if(!isNextTokenAdjacentToCurrent(token, nextToken)){
-    //Throw Exception
-    throwException(ERROR_INVALID_OPERATOR,NULL, 0, "Invalid Operator!");
+  if(!isNextTokenAdjacentToCurrent(token, nextToken) || 
+  (!areTokenStringSame(token, nextToken) && *(nextToken->str) != '=')){
+    operator = createOperator(token->str, 0, information.type[0]); 
+    freeToken(token);
+  }else{
+    operatorStr = malloc(sizeof(char) * 3);
+    operatorStr = strdup(token->str);
+    strcat(operatorStr, nextToken->str);
+    if(areTwoCharSame(token->str, nextToken->str))
+      operator = createOperator(operatorStr, 0, information.type[1]);
+    else 
+      operator = createOperator(operatorStr, 0, information.type[2]);
+    freeToken(token);
+    freeToken(nextToken);
   }
-  strcat(token->str, nextToken->str);
-  operatorStr = strdup(token->str);
-  if(areTwoCharSame(token->str, nextToken->str))
-    operator = createOperator(operatorStr, 0, information.type[1]);
-  else 
-    operator = createOperator(operatorStr, 0, information.type[2]);
   return  operator;
 }
 

@@ -8,8 +8,8 @@
 #include <string.h>
 
 #define isTokenNull(token)                                      (token->type == NULL)
-#define isTokenStringSame(token1, token2)                       (*(token1->str) == *(token2->str))
-#define areTwoCharSame(str1, str2)                               *str1 == *str2                                                      
+#define areTokenStringSame(token1, token2)                       (*(token1->str) == *(token2->str))
+#define areTwoCharSame(str1, str2)                               *str1 == *str2                                                                    
 #define isNextTokenAOperator(token)                             (token->type == TOKEN_OPERATOR_TYPE)
 #define isNextTokenAdjacentToCurrent(token, nextToken)          ((token->startColumn + 1) == nextToken->startColumn)
 
