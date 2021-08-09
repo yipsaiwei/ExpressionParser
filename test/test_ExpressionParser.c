@@ -405,3 +405,24 @@ void  test_unwindStack_given_2_operators_1_higher_precedence_operator_inside_ope
   freeStack(operandStack, free); 
   freeStack(operatorStack, free); 
 }
+
+/*
+void  test_shuntingYard_given_1_operator_2_operands_expect_correct_value_121_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer(" 33+88");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  shuntingYard(tokenizer, operatorStack, operandStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL(121, getItemInteger(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free); 
+
+  freeTokenizer(tokenizer);  
+}
+*/

@@ -55,6 +55,9 @@ struct  OperatorTableStruct{
     int arity;
 };
 
+extern  OperatorInformationTable operatorInformationTable[];
+//extern  struct  Operator;
+
 #define getItemOperator(item)               *(((Operator  *)(*item).data)->str)
 #define getItemDataType(item)               (((Number *)(*item).data)->type)
 #define getItemOperatorPrecedence(item)     (((Operator *)(*item).data)->precedence)
@@ -71,11 +74,14 @@ int  checkOperator1PrecedenceGreater(Token  *operatorToken1, Token  *operatorTok
 int isOperandType(void    *number, OPERANDTYPE  type);
 Integer *createInteger(int  value);
 Double *createDouble(double  value);
+Operator  *extractOperatorFromToken(Token *token, Tokenizer *tokenizer);
+Number  *extractNumberFromToken(Token *token);
 Integer  *extractIntegerFromToken(Token *token);
 Double  *extractFloatingPointFromToken(Token *token);
-void  unwindStack(StackStruct *operatorStack, StackStruct *operandStack, Operator *currentOperator);
+void  shuntingYard(Tokenizer  *tokenizer, StackStruct *operatorStack, StackStruct *operandStack);
 void  handleInfix(StackStruct *operandStack, StackStruct *operatorStack);
 void  handlePrefix(StackStruct *operandStack, StackStruct *operatorStack);
+void  unwindStack(StackStruct *operatorStack, StackStruct *operandStack, Operator *currentOperator);
 
 Number  *infixAdd(Number  *number1, Number  *number2);
 Number  *infixMinus(Number  *number1, Number  *number2);

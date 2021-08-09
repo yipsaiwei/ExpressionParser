@@ -2,20 +2,20 @@
 
 //Change it to symbolTable
 OperatorInformationTable operatorInformationTable[] = {
-  ['('] = {{OPEN_PAREN, UND, UND}, NULL},  
-  [')'] = {{CLOSE_PAREN, UND, UND}, NULL},  
-  ['['] = {{OPEN_SQ_BRACKET, UND, UND}, NULL},  
-  [']'] = {{CLOSE_SQ_BRACKET, UND, UND}, NULL},  
-  ['~'] = {{BITWISE_NOT, UND, UND}, NULL},  
-  ['!'] = {{LOGICAL_NOT, UND, UND}, NULL},  
-  ['*'] = {{MULTIPLY, UND, UND}, NULL},  
-  ['/'] = {{DIVIDE, UND, UND}, NULL},  
-  ['%'] = {{REMAINDER, UND, UND}, NULL},  
-  ['+'] = {{ADD, INC, ADD_ASSIGN}, returnDoubleCharacterOperator},     //There are postfix infix inc, addition, +=?
-  ['-'] = {{MINUS, DEC, MINUS_ASSIGN}, returnDoubleCharacterOperator}, 
-  ['<'] = {{LESSER, SHIFT_LEFT, LESSER_EQ}, returnDoubleCharacterOperator}, 
-  ['>'] = {{GREATER, SHIFT_RIGHT, GREATER_EQ}, returnDoubleCharacterOperator}, 
-  ['&'] = {{BITWISE_AND, LOGICAL_AND, BITWISE_AND_ASSIGN},returnDoubleCharacterOperator},
+  ['('] = {{OPEN_PAREN, UND, UND, UND}, NULL},  
+  [')'] = {{CLOSE_PAREN, UND, UND, UND}, NULL},  
+  ['['] = {{OPEN_SQ_BRACKET, UND, UND, UND}, NULL},  
+  [']'] = {{CLOSE_SQ_BRACKET, UND, UND, UND}, NULL},  
+  ['~'] = {{BITWISE_NOT, UND, UND, UND}, NULL},  
+  ['!'] = {{LOGICAL_NOT, UND, UND, UND}, NULL},  
+  ['*'] = {{MULTIPLY, UND, UND, UND}, NULL},  
+  ['/'] = {{DIVIDE, UND, UND, UND}, NULL},  
+  ['%'] = {{REMAINDER, UND, UND, UND}, NULL},  
+  ['+'] = {{ADD,ADD_ASSIGN, INC, UND}, handleRepeatedSymbol},     //There are postfix infix inc, addition, +=?
+  ['-'] = {{MINUS, MINUS_ASSIGN, DEC, UND}, handleRepeatedSymbol}, 
+  ['<'] = {{LESSER, LESSER_EQ, SHIFT_LEFT, UND}, handleSymbol}, 
+  ['>'] = {{GREATER, GREATER_EQ, SHIFT_RIGHT, UND}, handleSymbol}, 
+  ['&'] = {{BITWISE_AND, BITWISE_AND_ASSIGN, LOGICAL_AND, UND},handleSymbol},
 };
 
 Operator  *createOperator(char  *str, int  precedence, OperationType id){
@@ -33,22 +33,6 @@ int returnStringSize(char *str){
   return  (ptr - str);
 }
 
-Operator  *extractOperatorFromToken(Token *token, Tokenizer *tokenizer){
-  Operator  *operator;
-  char  *operatorStr;
-  Token *nextToken = peekToken(tokenizer);
-  OperatorInformationTable  information = operatorInformationTable[*(token->str)];
-  if(isNextTokenAdjacentToCurrent(token, nextToken) && isNextTokenAOperator(nextToken)){
-    nextToken = getToken(tokenizer);
-    operator = information.func(token, nextToken);
-  }
-  else{
-    operator = createOperator(token->str, 0, information.type[0]); 
-    freeToken(token);
-  }
-  return  operator;
-}
-
 void  freeOperator(Operator *operator){
   if(operator->str)
     free(operator->str);
@@ -56,6 +40,49 @@ void  freeOperator(Operator *operator){
     free(operator);
 }
 
+Operator  *handleRepeatedSymbol(Token *token, Token *nextToken){
+  Operator  *operator;
+  OperatorInformationTable  information = operatorInformationTable[*(token->str)];
+  if(!isTokenNull(nextToken) && areTokenStringSame(token, nextToken) && isNextTokenAdjacentToCurrent(token, nextToken)){
+    operator = createOperator(concatenateTwoStrings(token->str, nextToken->str), 0, information.type[2]);
+    freeToken(nextToken); 
+    freeToken(token);    
+  }else{
+    operator = handleSymbol(token, nextToken);
+  }
+  return  operator;
+}
+
+Operator  *handleSymbol(Token *token, Token *nextToken){
+  Operator  *operator;
+  OperatorInformationTable  information = operatorInformationTable[*(token->str)]; 
+  if(!isTokenNull(nextToken) && *(nextToken->str) == '=' && isNextTokenAdjacentToCurrent(token, nextToken)){
+    operator = createOperator(concatenateTwoStrings(token->str, nextToken->str), 0, information.type[1]);
+    freeToken(nextToken);    
+  }else
+    operator = createOperator(token->str, 0, information.type[0]);
+  freeToken(token);
+  return  operator;
+}
+
+/*
+Operator  *handleShiftSymbol(Token *token, Token *nextToken){
+  Operator  *operator;
+  OperatorInformationTable  information = operatorInformationTable[*(token->str)]; 
+  if(!isTokenNull(nextToken) && areTokenStringSame(token, nextToken) && isNextTokenAdjacentToCurrent(token, nextToken)){
+    Token *
+  }  
+}
+*/
+
+char  *concatenateTwoStrings(char  *str1, char *str2){
+  char  *destination = malloc(sizeof(char) * (1 + strlen(str1) + strlen(str2)));
+  destination = strdup(str1);
+  strcat(destination, str2);
+  return  destination;
+}
+
+/*
 Operator  *returnDoubleCharacterOperator(Token *token, Token *nextToken){
   char  *operatorStr;
   Operator  *operator;
@@ -69,14 +96,16 @@ Operator  *returnDoubleCharacterOperator(Token *token, Token *nextToken){
     operatorStr = strdup(token->str);
     strcat(operatorStr, nextToken->str);
     if(areTwoCharSame(token->str, nextToken->str))
-      operator = createOperator(operatorStr, 0, information.type[1]);
-    else 
       operator = createOperator(operatorStr, 0, information.type[2]);
+    else 
+      operator = createOperator(operatorStr, 0, information.type[1]);
+    // Free operator
     freeToken(token);
     freeToken(nextToken);
   }
   return  operator;
 }
+*/
 
 Token *peekToken(Tokenizer  *tokenizer){
   int indexBeforeGetToken = tokenizer->index;

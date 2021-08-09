@@ -23,37 +23,49 @@ void tearDown(void)
 {
 }
 
-void  test_returnDoubleCharacterOperator_given_2_adjacent_token_expect_correct_double_char_operator_returned(){
+void  test_handleRepeatedSymbol_given_2_adjacent_plus_token_expect_INC_returned(){
   Tokenizer *tokenizer = NULL;
   tokenizer = createTokenizer("  ++  ");  
   Token *token1 = getToken(tokenizer);
   Token *token2 = getToken(tokenizer);
   
-  Operator  *result = returnDoubleCharacterOperator(token1, token2);
+  Operator  *result = handleRepeatedSymbol(token1, token2);
   
   TEST_ASSERT_EQUAL_STRING("++", result->str);
   TEST_ASSERT_EQUAL(INC, result->id);
 }
 
-void  test_returnDoubleCharacterOperator_given_2_adjacent_different_token_expect_correct_double_char_operator_returned(){
+void  test_handleRepeatedSymbol_given_1_plus_token_expect_ADD_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("     +  ");  
+  Token *token1 = getToken(tokenizer);
+  Token *token2 = getToken(tokenizer);
+  
+  Operator  *result = handleRepeatedSymbol(token1, token2);
+  
+  TEST_ASSERT_EQUAL_STRING("+", result->str);
+  TEST_ASSERT_EQUAL(ADD, result->id);
+}
+
+void  test_handleSymbol_given_2_adjacent_different_token_expect_correct_double_char_operator_returned(){
   Tokenizer *tokenizer = NULL;
   tokenizer = createTokenizer("  <=  ");  
   Token *token1 = getToken(tokenizer);
   Token *token2 = getToken(tokenizer);
   
-  Operator  *result = returnDoubleCharacterOperator(token1, token2);
+  Operator  *result = handleSymbol(token1, token2);
   
   TEST_ASSERT_EQUAL_STRING("<=", result->str);
   TEST_ASSERT_EQUAL(LESSER_EQ, result->id);
 }
 
-void  test_returnDoubleCharacterOperator_given_2_operators_separated_by_space_expect_single_character_returned(){
+void  test_handleSymbol_given_2_operators_separated_by_space_expect_single_character_returned(){
   Tokenizer *tokenizer = NULL;
   tokenizer = createTokenizer("  < =  ");  
   Token *token1 = getToken(tokenizer);
   Token *token2 = getToken(tokenizer);
 
-  Operator  *result = returnDoubleCharacterOperator(token1, token2);
+  Operator  *result = handleSymbol(token1, token2);
   
   TEST_ASSERT_EQUAL_STRING("<", result->str);
   TEST_ASSERT_EQUAL(LESSER, result->id);

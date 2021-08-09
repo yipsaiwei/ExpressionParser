@@ -17,34 +17,62 @@ OperatorTableStruct  operatorPrecedenceTable[] = {
 
 /*
 void  shuntingYard(Tokenizer  *tokenizer, StackStruct *operatorStack, StackStruct *operandStack){
-  Token *token = getToken(tokenizer);
   Number  *extractedNumber;
   Operator  *extractedOperator;
-  if(token->type == TOKEN_OPERATOR_TYPE){
-    if(peekTopOfStack == NULL){
-      extractedOperator = extractOperatorFromToken(token);
-      pushToStack(operatorStack, (void  *)extractedOperator);
-    }else
-      unwindStack(operatorStack, operandStack, currentOperator);
-    
-  }else{
-    extractedNumber = extractNumberFromToken(token);
-    pushToStack(operandStack, (void  *)extractedNumber);
+  Token *token = getToken(tokenizer);
+  ListItem  *popItem;
+  while(token->type != TOKEN_NULL_TYPE){
+    if(token->type == TOKEN_OPERATOR_TYPE){   //Check whether it is operator type
+      extractedOperator = extractOperatorFromToken(token, tokenizer);
+      if(peekTopOfStack(operatorStack) == NULL){
+        pushToStack(operatorStack, (void  *)extractedOperator);
+      }else
+        unwindStack(operatorStack, operandStack, extractedOperator);
+    }else{                                    //Integer type
+      extractedNumber = extractNumberFromToken(token);
+      pushToStack(operandStack, (void  *)extractedNumber);
+    }
+  token = getToken(tokenizer);
+  }
+  while(operatorStack->size < 1){
+    popItem = popFromStack(operatorStack);
+    OperatorTableStruct instruction = operatorPrecedenceTable[getItemOperatorId(popItem)];
+    instruction.arityHandler(operandStack, operatorStack);
+    unwindStack(operatorStack, operandStack, (Operator  *)popItem->data);  
   }
 }
 */
+
+Operator  *extractOperatorFromToken(Token *token, Tokenizer *tokenizer){
+  Operator  *operator;
+  char  *operatorStr;
+  Token *nextToken = peekToken(tokenizer);
+  OperatorInformationTable  information = operatorInformationTable[*(token->str)];
+  if(isNextTokenAOperator(nextToken) && isNextTokenAdjacentToCurrent(token, nextToken)){
+    nextToken = getToken(tokenizer);
+    operator = information.func(token, nextToken);
+  }
+  else{
+    operator = createOperator(token->str, 0, information.type[0]); 
+    freeToken(token);
+  }
+  
+  OperatorTableStruct operatorInfo = operatorPrecedenceTable[operator->id];
+  operator->precedence = operatorInfo.precedence;
+  return  operator;
+}
 
 //take the operator and operate on the operands
 //3 different scenarios " infix, prefix, suffix
 void  unwindStack(StackStruct *operatorStack, StackStruct *operandStack, Operator *currentOperator){
   ListItem *peekItem = peekTopOfStack(operatorStack);
-  if(getItemOperatorPrecedence(peekItem) <= currentOperator->precedence){
+  if(peekItem != NULL && (getItemOperatorPrecedence(peekItem) <= currentOperator->precedence)){
     while(!isStackEmpty(operatorStack) && (getItemOperatorPrecedence(peekItem) <= currentOperator->precedence)){
       OperatorTableStruct instruction = operatorPrecedenceTable[getItemOperatorId(peekItem)];
       instruction.arityHandler(operandStack, operatorStack);
       peekItem = peekTopOfStack(operatorStack);
   }  
-  pushToStack(operatorStack, (void  *)currentOperator);
+    pushToStack(operatorStack, (void  *)currentOperator);
   }else
     pushToStack(operatorStack, (void  *)currentOperator);
 }
@@ -104,6 +132,15 @@ char  *duplicateString(char *str, int length){
   strncpy(resultstr, str, length);
   resultstr[length] = '\0';
   return  resultstr;
+}
+
+Number  *extractNumberFromToken(Token *token){
+  Number  *result;
+  if(token->type == TOKEN_FLOAT_TYPE)
+    result = (Number  *)extractFloatingPointFromToken(token);
+  else
+    result = (Number  *)extractIntegerFromToken(token);
+  return  result;
 }
 
 Integer  *extractIntegerFromToken(Token *token){

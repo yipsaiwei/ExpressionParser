@@ -7,7 +7,7 @@
 #include  "Arity.h"
 #include <string.h>
 
-#define isTokenNull(token)                                      (token->type == NULL)
+#define isTokenNull(token)                                      (token->type == TOKEN_NULL_TYPE)
 #define areTokenStringSame(token1, token2)                       (*(token1->str) == *(token2->str))
 #define areTwoCharSame(str1, str2)                               *str1 == *str2                                                                    
 #define isNextTokenAOperator(token)                             (token->type == TOKEN_OPERATOR_TYPE)
@@ -54,16 +54,19 @@ typedef Operator *(*FuncPtr)(Token *token, Token *nextToken);
 
 typedef struct  OperatorInformationTable  OperatorInformationTable;
 struct  OperatorInformationTable{
-  OperationType type[3];
+  OperationType type[4];
   FuncPtr func;
 };
 
 Operator  *createOperator(char  *str, int  precedence, OperationType id);
-Operator  *extractOperatorFromToken(Token *token, Tokenizer *tokenizer);
 Operator  *returnDoubleCharacterOperator(Token *token, Token *nextToken);
 void  freeOperator(Operator *opt);
 int returnStringSize(char *str);
 void  checkDoubleCharacterOperator(Tokenizer  *tokenizer, Token *token);
 Token *peekToken(Tokenizer  *tokenizer);
+char  *concatenateTwoStrings(char  *str1, char *str2);
+Operator  *handleSymbol(Token *token, Token *nextToken);
+Operator  *handleRepeatedSymbol(Token *token, Token *nextToken);
+Operator  *handleShiftSymbol(Token *token, Token *nextToken);
 
 #endif // OPERATORTABLE_H
