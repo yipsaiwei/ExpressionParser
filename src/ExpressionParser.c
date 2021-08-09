@@ -49,8 +49,8 @@ Operator  *extractOperatorFromToken(Token *token, Tokenizer *tokenizer){
   Token *nextToken = peekToken(tokenizer);
   OperatorInformationTable  information = operatorInformationTable[*(token->str)];
   if(isNextTokenAOperator(nextToken) && isNextTokenAdjacentToCurrent(token, nextToken)){
-    nextToken = getToken(tokenizer);
-    operator = information.func(token, nextToken);
+    //nextToken = getToken(tokenizer);
+    operator = information.func(token, tokenizer);   
   }
   else{
     operator = createOperator(token->str, 0, information.type[0]); 

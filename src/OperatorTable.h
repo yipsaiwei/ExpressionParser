@@ -12,7 +12,8 @@
 #define areTwoCharSame(str1, str2)                               *str1 == *str2                                                                    
 #define isNextTokenAOperator(token)                             (token->type == TOKEN_OPERATOR_TYPE)
 #define isNextTokenAdjacentToCurrent(token, nextToken)          ((token->startColumn + 1) == nextToken->startColumn)
-
+#define isNextTokenSameAndAdjacentToCurrent(token, nextToken)   (areTokenStringSame(token, nextToken) && isNextTokenAdjacentToCurrent(token, nextToken))
+#define isNextAdjacentTokenStringEqual(token, nextToken)        (isNextTokenAdjacentToCurrent(token, nextToken) && *(nextToken->str) == '=')
 typedef enum{
   UND,
   ADD,
@@ -39,8 +40,8 @@ typedef enum{
   BITWISE_AND,
   LOGICAL_AND,
   BITWISE_AND_ASSIGN,
-  
-  
+  SHIFT_LEFT_ASSIGN,
+  SHIFT_RIGHT_ASSIGN,
 }OperationType;
 
 typedef struct  Operator  Operator;
@@ -50,7 +51,7 @@ struct  Operator{
   OperationType id;
 };
 
-typedef Operator *(*FuncPtr)(Token *token, Token *nextToken);
+typedef Operator *(*FuncPtr)(Token *token, Tokenizer *tokenizer);
 
 typedef struct  OperatorInformationTable  OperatorInformationTable;
 struct  OperatorInformationTable{
@@ -65,8 +66,8 @@ int returnStringSize(char *str);
 void  checkDoubleCharacterOperator(Tokenizer  *tokenizer, Token *token);
 Token *peekToken(Tokenizer  *tokenizer);
 char  *concatenateTwoStrings(char  *str1, char *str2);
-Operator  *handleSymbol(Token *token, Token *nextToken);
-Operator  *handleRepeatedSymbol(Token *token, Token *nextToken);
-Operator  *handleShiftSymbol(Token *token, Token *nextToken);
+Operator  *handleSymbol(Token *token, Tokenizer  *tokenizer);
+Operator  *handleRepeatedSymbol(Token *token, Tokenizer  *tokenizer);
+Operator  *handleShiftSymbol(Token *token, Tokenizer  *tokenizer);
 
 #endif // OPERATORTABLE_H

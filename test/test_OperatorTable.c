@@ -26,10 +26,9 @@ void tearDown(void)
 void  test_handleRepeatedSymbol_given_2_adjacent_plus_token_expect_INC_returned(){
   Tokenizer *tokenizer = NULL;
   tokenizer = createTokenizer("  ++  ");  
-  Token *token1 = getToken(tokenizer);
-  Token *token2 = getToken(tokenizer);
+  Token *token1 = getToken(tokenizer);;
   
-  Operator  *result = handleRepeatedSymbol(token1, token2);
+  Operator  *result = handleRepeatedSymbol(token1, tokenizer);
   
   TEST_ASSERT_EQUAL_STRING("++", result->str);
   TEST_ASSERT_EQUAL(INC, result->id);
@@ -39,9 +38,8 @@ void  test_handleRepeatedSymbol_given_1_plus_token_expect_ADD_returned(){
   Tokenizer *tokenizer = NULL;
   tokenizer = createTokenizer("     +  ");  
   Token *token1 = getToken(tokenizer);
-  Token *token2 = getToken(tokenizer);
   
-  Operator  *result = handleRepeatedSymbol(token1, token2);
+  Operator  *result = handleRepeatedSymbol(token1, tokenizer);
   
   TEST_ASSERT_EQUAL_STRING("+", result->str);
   TEST_ASSERT_EQUAL(ADD, result->id);
@@ -51,9 +49,8 @@ void  test_handleSymbol_given_2_adjacent_different_token_expect_correct_double_c
   Tokenizer *tokenizer = NULL;
   tokenizer = createTokenizer("  <=  ");  
   Token *token1 = getToken(tokenizer);
-  Token *token2 = getToken(tokenizer);
   
-  Operator  *result = handleSymbol(token1, token2);
+  Operator  *result = handleSymbol(token1, tokenizer);
   
   TEST_ASSERT_EQUAL_STRING("<=", result->str);
   TEST_ASSERT_EQUAL(LESSER_EQ, result->id);
@@ -63,12 +60,44 @@ void  test_handleSymbol_given_2_operators_separated_by_space_expect_single_chara
   Tokenizer *tokenizer = NULL;
   tokenizer = createTokenizer("  < =  ");  
   Token *token1 = getToken(tokenizer);
-  Token *token2 = getToken(tokenizer);
 
-  Operator  *result = handleSymbol(token1, token2);
+  Operator  *result = handleSymbol(token1, tokenizer);
   
   TEST_ASSERT_EQUAL_STRING("<", result->str);
   TEST_ASSERT_EQUAL(LESSER, result->id);
+}
+
+void  test_handleSymbol_given_3_operators_left_shift_assign_expect_3_characters_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("  <<=  ");  
+  Token *token1 = getToken(tokenizer);
+
+  Operator  *result = handleShiftSymbol(token1, tokenizer);
+  
+  TEST_ASSERT_EQUAL_STRING("<<=", result->str);
+  TEST_ASSERT_EQUAL(SHIFT_LEFT_ASSIGN, result->id);
+}
+
+void  test_handleSymbol_given_3_operators_right_shift_assign_expect_3_characters_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("  >>=  ");  
+  Token *token1 = getToken(tokenizer);
+
+  Operator  *result = handleShiftSymbol(token1, tokenizer);
+  
+  TEST_ASSERT_EQUAL_STRING(">>=", result->str);
+  TEST_ASSERT_EQUAL(SHIFT_RIGHT_ASSIGN, result->id);
+}
+
+void  test_handleSymbol_given_3_operators_right_shift_space_assign_expect_right_shift_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("  >> =  ");  
+  Token *token1 = getToken(tokenizer);
+
+  Operator  *result = handleShiftSymbol(token1, tokenizer);
+  
+  TEST_ASSERT_EQUAL_STRING(">>", result->str);
+  TEST_ASSERT_EQUAL(SHIFT_RIGHT, result->id);
 }
 
 void  test_extractOperatorFromToken_given_single_character_operator_expect_single_operator_returned(){
