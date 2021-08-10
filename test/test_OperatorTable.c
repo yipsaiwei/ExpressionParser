@@ -67,7 +67,20 @@ void  test_handleSymbol_given_2_operators_separated_by_space_expect_single_chara
   TEST_ASSERT_EQUAL(LESSER, result->id);
 }
 
-void  test_handleSymbol_given_3_operators_left_shift_assign_expect_3_characters_returned(){
+/*
+void  test_handleSymbol_given_bitwise_or_expect_bitwise_or_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer(" |  ");  
+  Token *token1 = getToken(tokenizer);
+
+  Operator  *result = handleSymbol(token1, tokenizer);
+  
+  TEST_ASSERT_EQUAL_STRING("|", result->str);
+  TEST_ASSERT_EQUAL(BITWISE_OR, result->id);
+}
+*/
+
+void  test_handleShiftSymbol_given_3_operators_left_shift_assign_expect_3_characters_returned(){
   Tokenizer *tokenizer = NULL;
   tokenizer = createTokenizer("  <<=  ");  
   Token *token1 = getToken(tokenizer);
@@ -78,7 +91,7 @@ void  test_handleSymbol_given_3_operators_left_shift_assign_expect_3_characters_
   TEST_ASSERT_EQUAL(SHIFT_LEFT_ASSIGN, result->id);
 }
 
-void  test_handleSymbol_given_3_operators_right_shift_assign_expect_3_characters_returned(){
+void  test_handleShiftSymbol_given_3_operators_right_shift_assign_expect_3_characters_returned(){
   Tokenizer *tokenizer = NULL;
   tokenizer = createTokenizer("  >>=  ");  
   Token *token1 = getToken(tokenizer);
@@ -89,7 +102,7 @@ void  test_handleSymbol_given_3_operators_right_shift_assign_expect_3_characters
   TEST_ASSERT_EQUAL(SHIFT_RIGHT_ASSIGN, result->id);
 }
 
-void  test_handleSymbol_given_3_operators_right_shift_space_assign_expect_right_shift_returned(){
+void  test_handleShiftSymbol_given_3_operators_right_shift_space_assign_expect_right_shift_returned(){
   Tokenizer *tokenizer = NULL;
   tokenizer = createTokenizer("  >> =  ");  
   Token *token1 = getToken(tokenizer);
@@ -148,6 +161,18 @@ void  test_extractOperatorFromToken_given_double_not_vaild_operator_expect_singl
   
   TEST_ASSERT_EQUAL_STRING("+", result->str);
   TEST_ASSERT_EQUAL(ADD, result->id);
+  
+  freeTokenizer(tokenizer);
+}
+void  test_extractOperatorFromToken_given_bitwise_not_expect_single_operator_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("       ~  ");  
+  Token *token = getToken(tokenizer);
+  
+  Operator  *result = extractOperatorFromToken(token, tokenizer);
+  
+  TEST_ASSERT_EQUAL_STRING("~", result->str);
+  TEST_ASSERT_EQUAL(BITWISE_NOT, result->id);
   
   freeTokenizer(tokenizer);
 }

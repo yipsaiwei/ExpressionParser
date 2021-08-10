@@ -72,7 +72,7 @@ Number  *funcName(Number  *number1, Number *number2){                       \
  
   
 #define prefixLogicCalculation(operand, operator)                                                                   \
-  result = (Number  *)createInteger(operator getNumberInteger(operand));                                            \
+  result = (Number  *)createInteger(operator(getNumberInteger(operand)));                                            \
   result->type = INTEGER_NUMBER;                                                                                                                                                                                                
 
 #endif // ARITHMETIC_H

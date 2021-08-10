@@ -10,12 +10,15 @@ OperatorInformationTable operatorInformationTable[] = {
   ['!'] = {{LOGICAL_NOT, UND, UND, UND}, NULL},  
   ['*'] = {{MULTIPLY, UND, UND, UND}, NULL},  
   ['/'] = {{DIVIDE, UND, UND, UND}, NULL},  
-  ['%'] = {{REMAINDER, UND, UND, UND}, NULL},  
-  ['+'] = {{ADD,ADD_ASSIGN, INC, UND}, handleRepeatedSymbol},     //There are postfix infix inc, addition, +=?
-  ['-'] = {{MINUS, MINUS_ASSIGN, DEC, UND}, handleRepeatedSymbol}, 
-  ['<'] = {{LESSER, LESSER_EQ, SHIFT_LEFT, SHIFT_LEFT_ASSIGN}, handleShiftSymbol}, 
-  ['>'] = {{GREATER, GREATER_EQ, SHIFT_RIGHT, SHIFT_RIGHT_ASSIGN}, handleShiftSymbol}, 
-  ['&'] = {{BITWISE_AND, BITWISE_AND_ASSIGN, LOGICAL_AND, UND},handleSymbol},
+  ['%'] = {{REMAINDER, REMAINDER_ASSIGN, UND, UND}, NULL},  
+  ['+'] = {{ADD, ADD_ASSIGN, INC, UND}                            , handleRepeatedSymbol},     //There are postfix infix inc, addition, +=?
+  ['-'] = {{MINUS, MINUS_ASSIGN, DEC, UND}                        , handleRepeatedSymbol}, 
+  ['<'] = {{LESSER, LESSER_EQ, SHIFT_LEFT, SHIFT_LEFT_ASSIGN}     , handleShiftSymbol}, 
+  ['>'] = {{GREATER, GREATER_EQ, SHIFT_RIGHT, SHIFT_RIGHT_ASSIGN} , handleShiftSymbol}, 
+  ['|'] = {{BITWISE_OR, BITWISE_OR_ASSIGN, LOGICAL_OR, UND}       , handleSymbol},
+  ['&'] = {{BITWISE_AND, BITWISE_AND_ASSIGN, LOGICAL_AND, UND}    , handleSymbol},
+  ['^'] = {{BITWISE_XOR, BITWISE_XOR_ASSIGN, UND, UND}            , handleSymbol},
+  ['='] = {{ASSIGN, EQUAL, UND, UND}                              , handleSymbol},
 };
 
 Operator  *createOperator(char  *str, int  precedence, OperationType id){
@@ -44,7 +47,7 @@ Operator  *handleRepeatedSymbol(Token *token, Tokenizer *tokenizer){
   Operator  *operator;
   Token *nextToken = peekToken(tokenizer);
   OperatorInformationTable  information = operatorInformationTable[*(token->str)];
-  if(!isTokenNull(nextToken) && isNextTokenSameAndAdjacentToCurrent(token, nextToken)){
+  if(!isTokenNull(nextToken) && isNextAdjacentTokenSame(token, nextToken)){
     nextToken = getToken(tokenizer);
     operator = createOperator(concatenateTwoStrings(token->str, nextToken->str), 0, information.type[2]);
     freeToken(nextToken); 
@@ -73,7 +76,7 @@ Operator  *handleShiftSymbol(Token *token, Tokenizer *tokenizer){
   Operator  *operator;
   Token *nextToken = peekToken(tokenizer);
   OperatorInformationTable  information = operatorInformationTable[*(token->str)]; 
-  if(!isTokenNull(nextToken) && isNextTokenSameAndAdjacentToCurrent(token, nextToken)){
+  if(!isTokenNull(nextToken) && isNextAdjacentTokenSame(token, nextToken)){
     nextToken = getToken(tokenizer);
     Token *nextNextToken = peekToken(tokenizer);
     if(!isTokenNull(nextNextToken) && isNextAdjacentTokenStringEqual(nextToken, nextNextToken)){

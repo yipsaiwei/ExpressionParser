@@ -313,6 +313,28 @@ void  test_handlePrefix_given_operand_bitwise_not_expect_the_value_able_to_be_re
   freeStack(operatorStack, free); 
 }
 
+void  test_handlePrefix_given_operand_logic_not_expect_the_value_able_to_be_returned(){
+  Integer *number = createInteger(0);
+  
+  Operator  *operator = createOperator("!", 2, LOGICAL_NOT);
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  pushToStack(operandStack, (void*)number);
+  pushToStack(operatorStack, (void*)operator);
+  
+  handlePrefix(operandStack, operatorStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL(1, getItemInteger(peekItem));
+  TEST_ASSERT_EQUAL(INTEGER_NUMBER, getItemDataType(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free); 
+}
+
 void  test_unwindStack_given_2_operands_1_lower_precedence_operator_inside_operator_stack_expect_currentOperator_pushed_into_operator_stack(){
   Integer *number1 = createInteger(13);
   Double  *number2 = createDouble(54.452);

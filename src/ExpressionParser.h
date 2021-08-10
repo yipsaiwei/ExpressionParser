@@ -58,7 +58,8 @@ struct  OperatorTableStruct{
 extern  OperatorInformationTable operatorInformationTable[];
 //extern  struct  Operator;
 
-#define getItemOperator(item)               *(((Operator  *)(*item).data)->str)
+#define getItemOperator(item)               ((Operator  *)(*item).data)
+#define getItemOperatorStr(item)            *(((Operator  *)(*item).data)->str)
 #define getItemDataType(item)               (((Number *)(*item).data)->type)
 #define getItemOperatorPrecedence(item)     (((Operator *)(*item).data)->precedence)
 #define getItemOperatorId(item)             (((Operator *)(*item).data)->id)
@@ -68,6 +69,8 @@ extern  OperatorInformationTable operatorInformationTable[];
 #define getItemDouble(item)                 ((Double  *)(*item).data)->value
 #define getNumberDouble(number)             ((Double  *)(number))->value
 #define getItemNumber(item)                 ((Number  *)(*item).data)
+#define isCurrentOperatorPrecedenceLower(currentOp, nextOp)           \
+  nextOp->precedence <= currentOp->precedence
 
 int obtainOperatorPrecedence(Token  *token);
 int  checkOperator1PrecedenceGreater(Token  *operatorToken1, Token  *operatorToken2);

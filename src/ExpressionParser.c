@@ -6,12 +6,13 @@ OperatorTableStruct  operatorPrecedenceTable[] = {
   [OPEN_SQ_BRACKET]   = {1, NULL, NULL},  
   [CLOSE_SQ_BRACKET]  = {1, NULL, NULL},  
   [BITWISE_NOT]       = {2, prefixBitwiseNot, handlePrefix},  
-  [LOGICAL_NOT]       = {2, NULL, handlePrefix},  
+  [LOGICAL_NOT]       = {2, prefixLogicNot, handlePrefix},  
   [MULTIPLY]          = {3, infixMultiply, handleInfix},  
   [DIVIDE]            = {3, infixDivide, handleInfix},  
   [REMAINDER]         = {3, NULL, NULL},  
   [ADD]               = {4, infixAdd, handleInfix},  
   [MINUS]             = {4, infixMinus, handleInfix},  
+  
   [BITWISE_AND]       = {8, NULL, NULL},
 };
 
@@ -48,10 +49,8 @@ Operator  *extractOperatorFromToken(Token *token, Tokenizer *tokenizer){
   char  *operatorStr;
   Token *nextToken = peekToken(tokenizer);
   OperatorInformationTable  information = operatorInformationTable[*(token->str)];
-  if(isNextTokenAOperator(nextToken) && isNextTokenAdjacentToCurrent(token, nextToken)){
-    //nextToken = getToken(tokenizer);
+  if(isNextTokenAOperator(nextToken) && isNextTokenAdjacentToCurrent(token, nextToken))
     operator = information.func(token, tokenizer);   
-  }
   else{
     operator = createOperator(token->str, 0, information.type[0]); 
     freeToken(token);
@@ -66,8 +65,8 @@ Operator  *extractOperatorFromToken(Token *token, Tokenizer *tokenizer){
 //3 different scenarios " infix, prefix, suffix
 void  unwindStack(StackStruct *operatorStack, StackStruct *operandStack, Operator *currentOperator){
   ListItem *peekItem = peekTopOfStack(operatorStack);
-  if(peekItem != NULL && (getItemOperatorPrecedence(peekItem) <= currentOperator->precedence)){
-    while(!isStackEmpty(operatorStack) && (getItemOperatorPrecedence(peekItem) <= currentOperator->precedence)){
+  if(peekItem != NULL && isCurrentOperatorPrecedenceLower(currentOperator, getItemOperator(peekItem))){
+    while(!isStackEmpty(operatorStack) && isCurrentOperatorPrecedenceLower(currentOperator, getItemOperator(peekItem))){
       OperatorTableStruct instruction = operatorPrecedenceTable[getItemOperatorId(peekItem)];
       instruction.arityHandler(operandStack, operatorStack);
       peekItem = peekTopOfStack(operatorStack);
