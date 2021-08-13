@@ -69,8 +69,13 @@ extern  OperatorInformationTable operatorInformationTable[];
 #define getItemDouble(item)                 ((Double  *)(*item).data)->value
 #define getNumberDouble(number)             ((Double  *)(number))->value
 #define getItemNumber(item)                 ((Number  *)(*item).data)
+
 #define isCurrentOperatorPrecedenceLower(currentOp, nextOp)           \
   nextOp->precedence <= currentOp->precedence
+  
+#define isTokenOperatorType(token)        token->type == TOKEN_OPERATOR_TYPE
+#define isTokenNULLType(token)            token->type == TOKEN_NULL_TYPE
+#define isLastOperatorInStack(stack)      stack->size == 1
 
 int obtainOperatorPrecedence(Token  *token);
 int  checkOperator1PrecedenceGreater(Token  *operatorToken1, Token  *operatorToken2);

@@ -428,7 +428,6 @@ void  test_unwindStack_given_2_operators_1_higher_precedence_operator_inside_ope
   freeStack(operatorStack, free); 
 }
 
-/*
 void  test_shuntingYard_given_1_operator_2_operands_expect_correct_value_121_returned(){
   Tokenizer *tokenizer = NULL;
   tokenizer = createTokenizer(" 33+88");
@@ -441,6 +440,45 @@ void  test_shuntingYard_given_1_operator_2_operands_expect_correct_value_121_ret
   ListItem  *peekItem = peekTopOfStack(operandStack);
   
   TEST_ASSERT_EQUAL(121, getItemInteger(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free); 
+
+  freeTokenizer(tokenizer);  
+}
+
+void  test_shuntingYard_given_2_operator_4_operands_expect_correct_value_42_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer(" 12+41-11");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  shuntingYard(tokenizer, operatorStack, operandStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL(42, getItemInteger(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free); 
+
+  freeTokenizer(tokenizer);  
+}
+
+/*
+void  test_shuntingYard_given_2_operator_4_operands_with_ftpoint_expect_correct_value_31point777_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("    19.777  +4 * 3");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  shuntingYard(tokenizer, operatorStack, operandStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL_FLOAT(31.777, getItemDouble(peekItem));
   
   freeStack(operandStack, free); 
   freeStack(operatorStack, free); 

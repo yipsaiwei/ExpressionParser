@@ -16,18 +16,17 @@ OperatorTableStruct  operatorPrecedenceTable[] = {
   [BITWISE_AND]       = {8, NULL, NULL},
 };
 
-/*
 void  shuntingYard(Tokenizer  *tokenizer, StackStruct *operatorStack, StackStruct *operandStack){
   Number  *extractedNumber;
   Operator  *extractedOperator;
   Token *token = getToken(tokenizer);
   ListItem  *popItem;
-  while(token->type != TOKEN_NULL_TYPE){
-    if(token->type == TOKEN_OPERATOR_TYPE){   //Check whether it is operator type
+  while(!(isTokenNULLType(token))){
+    if(isTokenOperatorType(token)){   //Check whether it is operator type
       extractedOperator = extractOperatorFromToken(token, tokenizer);
-      if(peekTopOfStack(operatorStack) == NULL){
+      if(peekTopOfStack(operatorStack) == NULL)
         pushToStack(operatorStack, (void  *)extractedOperator);
-      }else
+      else
         unwindStack(operatorStack, operandStack, extractedOperator);
     }else{                                    //Integer type
       extractedNumber = extractNumberFromToken(token);
@@ -35,14 +34,13 @@ void  shuntingYard(Tokenizer  *tokenizer, StackStruct *operatorStack, StackStruc
     }
   token = getToken(tokenizer);
   }
-  while(operatorStack->size < 1){
-    popItem = popFromStack(operatorStack);
-    OperatorTableStruct instruction = operatorPrecedenceTable[getItemOperatorId(popItem)];
-    instruction.arityHandler(operandStack, operatorStack);
-    unwindStack(operatorStack, operandStack, (Operator  *)popItem->data);  
+  while(operatorStack->size > 0){
+    //popItem = popFromStack(operatorStack);
+    //OperatorTableStruct instruction = operatorPrecedenceTable[getItemOperatorId(popItem)];
+    //instruction.arityHandler(operandStack, operatorStack);
+    unwindStack(operatorStack, operandStack, NULL);  
   }
 }
-*/
 
 Operator  *extractOperatorFromToken(Token *token, Tokenizer *tokenizer){
   Operator  *operator;
@@ -65,14 +63,16 @@ Operator  *extractOperatorFromToken(Token *token, Tokenizer *tokenizer){
 //3 different scenarios " infix, prefix, suffix
 void  unwindStack(StackStruct *operatorStack, StackStruct *operandStack, Operator *currentOperator){
   ListItem *peekItem = peekTopOfStack(operatorStack);
-  if(peekItem != NULL && isCurrentOperatorPrecedenceLower(currentOperator, getItemOperator(peekItem))){
-    while(!isStackEmpty(operatorStack) && isCurrentOperatorPrecedenceLower(currentOperator, getItemOperator(peekItem))){
+  if(!currentOperator)
+    printf("hello world");
+  if(peekItem != NULL && (isLastOperatorInStack(operatorStack) || isCurrentOperatorPrecedenceLower(currentOperator, getItemOperator(peekItem)))){
+    while(!isStackEmpty(operatorStack) && (isLastOperatorInStack(operatorStack)|| isCurrentOperatorPrecedenceLower(currentOperator, getItemOperator(peekItem)))){
       OperatorTableStruct instruction = operatorPrecedenceTable[getItemOperatorId(peekItem)];
       instruction.arityHandler(operandStack, operatorStack);
       peekItem = peekTopOfStack(operatorStack);
-  }  
-    pushToStack(operatorStack, (void  *)currentOperator);
-  }else
+    }  
+  }
+  if(currentOperator != NULL)
     pushToStack(operatorStack, (void  *)currentOperator);
 }
 
