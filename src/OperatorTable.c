@@ -8,9 +8,9 @@ OperatorInformationTable operatorInformationTable[] = {
   [']'] = {{CLOSE_SQ_BRACKET, UND, UND, UND}, NULL},  
   ['~'] = {{BITWISE_NOT, UND, UND, UND}, NULL},  
   ['!'] = {{LOGICAL_NOT, UND, UND, UND}, NULL},  
-  ['*'] = {{MULTIPLY, UND, UND, UND}, NULL},  
-  ['/'] = {{DIVIDE, UND, UND, UND}, NULL},  
-  ['%'] = {{REMAINDER, REMAINDER_ASSIGN, UND, UND}, NULL},  
+  ['*'] = {{MULTIPLY, UND, UND, UND}                              , handleSymbol},  
+  ['/'] = {{DIVIDE, UND, UND, UND}                                , handleSymbol},  
+  ['%'] = {{REMAINDER, REMAINDER_ASSIGN, UND, UND}                , handleSymbol},  
   ['+'] = {{ADD, ADD_ASSIGN, INC, UND}                            , handleRepeatedSymbol},     //There are postfix infix inc, addition, +=?
   ['-'] = {{MINUS, MINUS_ASSIGN, DEC, UND}                        , handleRepeatedSymbol}, 
   ['<'] = {{LESSER, LESSER_EQ, SHIFT_LEFT, SHIFT_LEFT_ASSIGN}     , handleShiftSymbol}, 

@@ -52,8 +52,8 @@ Number  *funcName(Number  *number1, Number *number2){                       \
       result = (Number  *)createInteger(getNumberInteger(operand1) operator getNumberInteger(operand2));            \
       result->type = INTEGER_NUMBER;                                                                                \
     }else{                                                                                                          \
-      result = (Number  *)createDouble(getNumberInteger(operand1) operator getNumberInteger(operand2));             \
-      result->type = INTEGER_NUMBER;                                                                                \
+      result = (Number  *)createDouble((double)getNumberInteger(operand1) operator getNumberInteger(operand2));     \
+      result->type = FLOAT_NUMBER;                                                                                  \
     }                                                                                                               \
   }else                                                                                                             \
     {                                                                                                               \
@@ -72,7 +72,8 @@ Number  *funcName(Number  *number1, Number *number2){                       \
  
   
 #define prefixLogicCalculation(operand, operator)                                                                   \
-  result = (Number  *)createInteger(operator(getNumberInteger(operand)));                                            \
+  int i = getNumberInteger(operand);                                                                                \
+  result = (Number  *)createInteger(operator(i));                                                                   \
   result->type = INTEGER_NUMBER;                                                                                                                                                                                                
 
 #endif // ARITHMETIC_H

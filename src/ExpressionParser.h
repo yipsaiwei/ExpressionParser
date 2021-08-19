@@ -45,19 +45,22 @@ struct  Double{
 
 //typedef void (*Operation)(StackStruct *operandStack);
 typedef Number  *(*ArithmeticOperation)(Number  *number1, Number  *number2);
-typedef void    (*ArityHandler)(StackStruct *operandStack, StackStruct *operatorStack);
+typedef void    (*postHandleOperator)(StackStruct *operandStack, StackStruct *operatorStack);
+typedef void    (*preHandleOperator)(StackStruct *operandStack, StackStruct *operatorStack, Operator  *operator);
 
 typedef struct  OperatorTableStruct  OperatorTableStruct;
 struct  OperatorTableStruct{
     int precedence;
     ArithmeticOperation arithmeticHandler;
-    ArityHandler  arityHandler;
+    postHandleOperator  arityHandler;
+    preHandleOperator   arityAssign;
     int arity;
 };
 
 extern  OperatorInformationTable operatorInformationTable[];
 //extern  struct  Operator;
 
+#define UNEXPECTED_OPERATOR                 0x10
 #define getItemOperator(item)               ((Operator  *)(*item).data)
 #define getItemOperatorStr(item)            *(((Operator  *)(*item).data)->str)
 #define getItemDataType(item)               (((Number *)(*item).data)->type)
@@ -70,8 +73,7 @@ extern  OperatorInformationTable operatorInformationTable[];
 #define getNumberDouble(number)             ((Double  *)(number))->value
 #define getItemNumber(item)                 ((Number  *)(*item).data)
 
-#define isCurrentOperatorPrecedenceLower(currentOp, nextOp)           \
-  nextOp->precedence <= currentOp->precedence
+#define comparePrecedence(currentOp, nextOp) nextOp->precedence >= currentOp->precedence
   
 #define isTokenOperatorType(token)        token->type == TOKEN_OPERATOR_TYPE
 #define isTokenNULLType(token)            token->type == TOKEN_NULL_TYPE
@@ -89,7 +91,12 @@ Double  *extractFloatingPointFromToken(Token *token);
 void  shuntingYard(Tokenizer  *tokenizer, StackStruct *operatorStack, StackStruct *operandStack);
 void  handleInfix(StackStruct *operandStack, StackStruct *operatorStack);
 void  handlePrefix(StackStruct *operandStack, StackStruct *operatorStack);
-void  unwindStack(StackStruct *operatorStack, StackStruct *operandStack, Operator *currentOperator);
+void  unwindStack(StackStruct *operatorStack, StackStruct *operandStack);
+void  unwindStackUntil(StackStruct *operandStack, StackStruct *operatorStack, OperationType type);
+void  operateOperatorInOperatorStack(StackStruct  *operandStack, StackStruct  *operatorStack);
+void  evaluateExpressionWithinBrackets(StackStruct *operandStack, StackStruct *operatorStack);
+int pushOperator(StackStruct *operatorStack, StackStruct *operandStack, Operator  *operatorToPush);
+void  forcePush(StackStruct *operandStack, StackStruct *operatorStack, Operator *operator);
 
 Number  *infixAdd(Number  *number1, Number  *number2);
 Number  *infixMinus(Number  *number1, Number  *number2);
