@@ -24,6 +24,7 @@ void tearDown(void)
 {
 }
 
+/*
 void  test_extractIntegerFromToken_given_1_IntToken_expect_correct_number_with_integer_type_returned(){
   Token *token1 = (Token *)createIntToken(999, 0, "999", "999", TOKEN_INTEGER_TYPE);
   Integer *integer = extractIntegerFromToken(token1);
@@ -42,7 +43,6 @@ void  test_extractNumberFromToken_given_1_FloatToken_expect_correct_number_with_
   free(floatingPt);
 }
 
-/*
 void  test_extractOperatorFromToken_given_1_OpToken_expect_correct_operator_returned_precedence_not_yet_stored(){
   Token *token1 = (Token *)createOperatorToken("+", 0, "+++",TOKEN_OPERATOR_TYPE);
   Operator  *extractedOperator = NULL;
@@ -53,6 +53,7 @@ void  test_extractOperatorFromToken_given_1_OpToken_expect_correct_operator_retu
   freeOperator(extractedOperator);
 }
 */
+
 
 void  test_getItemDataInteger_n_getItemDataType_macro_with_listItem_pointing_to_number_expect_value_and_type_able_to_extract(){
   Integer *integer = createInteger(12);
@@ -72,171 +73,363 @@ void  test_createDouble_n_getItemDouble_macro_with_listItem_pointing_to_number_e
   linkedListFreeListItem(itemWithNumber);
 }
 
+void  test_ftoa_given_a_double_value_expect_it_converted_to_string(){
+  double  number = (double)67.6666;
+  char  *str = malloc(sizeof(char) * countDoubleDigitNumber(number, 6) + 2);
+  
+  ftoa(number, str, 4);
+  
+  TEST_ASSERT_EQUAL_STRING("67.6666", str);
+  
+  free(str);
+}
+
+void  test_ftoa_given_a_double_value_with_afterpoint_more_expect_it_converted_to_string(){
+  double  number = (double)67.6666;
+  int doubleDigit = countDoubleDigitNumber(number, 6);
+  char  *str = malloc(sizeof(char) * (doubleDigit + 2));
+  
+  ftoa(number, str, 5);
+  
+  TEST_ASSERT_EQUAL_STRING("67.66660", str);
+  
+  free(str);
+}
+
+void  test_ftoa_given_a_double_value_with_afterpoint_less_expect_it_converted_to_string(){
+  double  number = (double)12.1345523;
+  char  *str = malloc(sizeof(char) * countDoubleDigitNumber(number, 6) + 2);
+  
+  ftoa(number, str, 4);
+  
+  TEST_ASSERT_EQUAL_STRING("12.1345", str);
+  
+  free(str);
+}
+
+void  test_createResultString_given_a_number_expect_correct_string_returned(){
+  int number = 1304;
+  
+  char  *str = createResultString((void  *)&number, INTEGER);
+  
+  TEST_ASSERT_EQUAL_STRING("1304", str);
+  
+  free(str);
+}
+
+void  test_createResultString_given_a_doubl_expect_correct_string_returned(){
+  double number = 18.946565377337;
+  
+  char  *str = createResultString((void  *)&number, DOUBLE);
+  
+  TEST_ASSERT_EQUAL_STRING("18.946565", str);
+  
+  free(str);
+}
+
+/*
+void  test_countDoubleDigitNumber_given_a_double_number_expect_correct_2_digit_number_returned(){
+  double  number = 4.1;
+  int count = countDoubleDigitNumber(number, 6);
+    
+  TEST_ASSERT_EQUAL(2, count);  
+}
+
+void  test_countDoubleDigitNumber_given_a_double_number_beyond_limit_expect_correct_8_digit_number_returned(){
+  double  number = 12.30966568;
+  int count = countDoubleDigitNumber(number, 6);
+    
+  TEST_ASSERT_EQUAL(8, count);  
+}
+*/
+
 void  test_infixAddition_given_2_integer_45_n_11_expect_result_with_56_returned(){
-  Integer  *number1 = createInteger(45);
-  Integer  *number2 = createInteger(11);
-  StackStruct *stack = createStack();
+  Tokenizer *tokenizer = createTokenizer("45+11");
+  Token *operandToken1 = getToken(tokenizer);
+  Token *operatorToken = getToken(tokenizer);
+  Token *operandToken2 = getToken(tokenizer);
   
-  Integer  *result = (Integer *)infixAdd((Number *)number1, (Number *)number2);
+  Symbol  *number1 = createSymbol(operandToken1, OPERAND, INTEGER);
+  Symbol  *number2 = createSymbol(operandToken2, OPERAND, INTEGER);
   
-  TEST_ASSERT_EQUAL(56, result->value);
-  TEST_ASSERT_EQUAL(INTEGER_NUMBER, result->type);
+  Symbol  *result = infixAdd(number1, number2);
   
-  free(number1);
-  free(number2);
- 
+  TEST_ASSERT_EQUAL(56, getSymbolInteger(result));
+  TEST_ASSERT_EQUAL(INTEGER, result->id);
+  
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(result);
+  freeToken(operatorToken);
+  freeTokenizer(tokenizer);
 }
 
 void  test_infixAddition_given_2_floating_pt_56point555_n_11point683_expect_result_with_68point238_returned(){
-  Double  *number1 = createDouble(56.555);
-  Double  *number2 = createDouble(11.683);
+  Tokenizer *tokenizer = createTokenizer("56.555 +   11.683");
+  Token *operandToken1 = getToken(tokenizer);
+  Token *operatorToken = getToken(tokenizer);
+  Token *operandToken2 = getToken(tokenizer);
+
+  Symbol  *number1 = createSymbol(operandToken1, OPERAND, DOUBLE);
+  Symbol  *number2 = createSymbol(operandToken2, OPERAND, DOUBLE);  
   
-  Double  *result = (Double *)infixAdd((Number *)number1, (Number *)number2);
+  Symbol  *result = infixAdd(number1, number2);
   
-  TEST_ASSERT_EQUAL_FLOAT(68.238, result->value);
-  TEST_ASSERT_EQUAL(FLOAT_NUMBER, result->type);
+  TEST_ASSERT_EQUAL_FLOAT(68.238, getSymbolDouble(result));
+  TEST_ASSERT_EQUAL(DOUBLE, result->id);
   
-  free(number1);
-  free(number2);
-  
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(result);
+  freeToken(operatorToken);
+  freeTokenizer(tokenizer);
 }
 
 void  test_infixAddition_given_1_floating_pt_1_int_39point18_n_90_expect_result_with_129point18_returned(){
-  Integer  *number1 = createInteger(90);
-  Double  *number2 = createDouble(39.18);
+  Tokenizer *tokenizer = createTokenizer("  90 +  39.18");
+  Token *operandToken1 = getToken(tokenizer);
+  Token *operatorToken = getToken(tokenizer);
+  Token *operandToken2 = getToken(tokenizer);
 
-  Double  *result = (Double *)infixAdd((Number *)number1, (Number *)number2);
+  Symbol  *number1 = createSymbol(operandToken1, OPERAND, INTEGER);
+  Symbol  *number2 = createSymbol(operandToken2, OPERAND, DOUBLE);  
   
-  TEST_ASSERT_EQUAL_FLOAT(129.18, result->value);
-  TEST_ASSERT_EQUAL(FLOAT_NUMBER, result->type);
+  Symbol  *result = infixAdd(number1, number2);
   
-  free(number1);
-  free(number2);
+  TEST_ASSERT_EQUAL_FLOAT(129.18, getSymbolDouble(result));
+  TEST_ASSERT_EQUAL(DOUBLE, result->id);
+  
+  
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(result);
+  freeToken(operatorToken);
+  freeTokenizer(tokenizer);
 }
 
 void  test_infixSubtraction_given_2_integer688_n_300_expect_result_with_388_returned(){
-  Integer  *number1 = createInteger(688);
-  Integer  *number2 = createInteger(300);
+  Tokenizer *tokenizer = createTokenizer("  688- 300");
+  Token *operandToken1 = getToken(tokenizer);
+  Token *operatorToken = getToken(tokenizer);
+  Token *operandToken2 = getToken(tokenizer);
   
-  Integer *result = (Integer  *)infixMinus((Number *)number1, (Number *)number2);
+  Symbol  *number1 = createSymbol(operandToken1, OPERAND, INTEGER);
+  Symbol  *number2 = createSymbol(operandToken2, OPERAND, INTEGER); 
+  
+  Symbol  *result = infixMinus(number1, number2);
 
-  TEST_ASSERT_EQUAL(388, result->value);
-  TEST_ASSERT_EQUAL(INTEGER_NUMBER, result->type);
+  TEST_ASSERT_EQUAL(388, getSymbolInteger(result));
+
+  TEST_ASSERT_EQUAL(INTEGER, result->id);
   
-  free(number1);
-  free(number2);
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(result);
+  freeToken(operatorToken);
+  freeTokenizer(tokenizer);
 }
 
 void  test_infixSubtraction_given_2_integer__67_n_99_expect_result_with_negative_32_returned(){
-  Integer  *number1 = createInteger(67);
-  Integer  *number2 = createInteger(99);
+  Tokenizer *tokenizer = createTokenizer("  67   -99");
+  Token *operandToken1 = getToken(tokenizer);
+  Token *operatorToken = getToken(tokenizer);
+  Token *operandToken2 = getToken(tokenizer);
   
-  Integer *result = (Integer  *)infixMinus((Number *)number1, (Number *)number2);
+  Symbol  *number1 = createSymbol(operandToken1, OPERAND, INTEGER);
+  Symbol  *number2 = createSymbol(operandToken2, OPERAND, INTEGER); 
+  
+  Symbol  *result = infixMinus(number1, number2);
 
-  TEST_ASSERT_EQUAL(-32, result->value);
-  TEST_ASSERT_EQUAL(INTEGER_NUMBER, result->type);
+  TEST_ASSERT_EQUAL(-32, getSymbolInteger(result));
+
+  TEST_ASSERT_EQUAL(INTEGER, result->id);
   
-  free(number1);
-  free(number2);
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(result);
+  freeToken(operatorToken);
+  freeTokenizer(tokenizer);
 }
 
 void  test_infixSubtraction_given_2_floating_pt_1point567_n_0point632_expect_result_with_0point935_returned(){
-  Double  *number1 = createDouble(1.567);
-  Double  *number2 = createDouble(0.632);
+  Tokenizer *tokenizer = createTokenizer("  1.567   -  0.632");
+  Token *operandToken1 = getToken(tokenizer);
+  Token *operatorToken = getToken(tokenizer);
+  Token *operandToken2 = getToken(tokenizer);
+  
+  Symbol  *number1 = createSymbol(operandToken1, OPERAND, DOUBLE);
+  Symbol  *number2 = createSymbol(operandToken2, OPERAND, DOUBLE); 
+  
+  Symbol  *result = infixMinus(number1, number2);
 
-  Double  *result = (Double  *)infixMinus((Number *)number1, (Number *)number2);
+  TEST_ASSERT_EQUAL(0.935, getSymbolDouble(result));
+
+  TEST_ASSERT_EQUAL(DOUBLE, result->id);
   
-  TEST_ASSERT_EQUAL_FLOAT(0.935, result->value);
-  TEST_ASSERT_EQUAL(FLOAT_NUMBER, result->type);
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(result);
+  freeToken(operatorToken);
+  freeTokenizer(tokenizer);
+}
+
+void  test_infixSubtraction_given_2_floating_pt_5point6832_9point8_expect_result_with_negative__returned(){
+  Tokenizer *tokenizer = createTokenizer("    5.6832-9.8");
+  Token *operandToken1 = getToken(tokenizer);
+  Token *operatorToken = getToken(tokenizer);
+  Token *operandToken2 = getToken(tokenizer);
   
-  free(number1);
-  free(number2);
+  Symbol  *number1 = createSymbol(operandToken1, OPERAND, DOUBLE);
+  Symbol  *number2 = createSymbol(operandToken2, OPERAND, DOUBLE); 
+  
+  Symbol  *result = infixMinus(number1, number2);
+
+  TEST_ASSERT_EQUAL(-4.1168, getSymbolDouble(result));
+
+  TEST_ASSERT_EQUAL(DOUBLE, result->id);
+  
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(result);
+  freeToken(operatorToken);
+  freeTokenizer(tokenizer);
 }
 
 void  test_infixMultiplication_given_2_integer__8_n_12_expect_result_with_96_returned(){
-  Integer  *number1 = createInteger(8);
-  Integer  *number2 = createInteger(12);
+  Tokenizer *tokenizer = createTokenizer("  8*12");
+  Token *operandToken1 = getToken(tokenizer);
+  Token *operatorToken = getToken(tokenizer);
+  Token *operandToken2 = getToken(tokenizer);
 
-  Integer *result = (Integer *)infixMultiply((Number *)number1, (Number *)number2);
-
-  TEST_ASSERT_EQUAL(96, result->value);
-  TEST_ASSERT_EQUAL(INTEGER_NUMBER, result->type);
+  Symbol  *number1 = createSymbol(operandToken1, OPERAND, INTEGER);
+  Symbol  *number2 = createSymbol(operandToken2, OPERAND, INTEGER); 
   
-  free(number1);
-  free(number2);
+  Symbol  *result = infixMultiply(number1, number2);
+
+  TEST_ASSERT_EQUAL(96, getSymbolInteger(result));
+  TEST_ASSERT_EQUAL(INTEGER, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(result);
+  freeToken(operatorToken);
+  freeTokenizer(tokenizer);
 }
 
 void  test_infixMultiplication_given_2_floating_pt_12point67_n_3point1_expect_result_39point277_returned(){
-  Double  *number1 = createDouble(12.67);
-  Double  *number2 = createDouble(39.277);
-  
-  Double *result = (Double *)infixMultiply((Number *)number1, (Number *)number2);
+  Tokenizer *tokenizer = createTokenizer("12.67  * 39.277");
+  Token *operandToken1 = getToken(tokenizer);
+  Token *operatorToken = getToken(tokenizer);
+  Token *operandToken2 = getToken(tokenizer);
 
-  TEST_ASSERT_EQUAL_FLOAT(497.63959, result->value);
-  TEST_ASSERT_EQUAL(FLOAT_NUMBER, result->type);
+  Symbol  *number1 = createSymbol(operandToken1, OPERAND, DOUBLE);
+  Symbol  *number2 = createSymbol(operandToken2, OPERAND, DOUBLE); 
   
-  free(number1);
-  free(number2);
+  Symbol  *result = infixMultiply(number1, number2);
+
+  TEST_ASSERT_EQUAL(497.63959, getSymbolDouble(result));
+  TEST_ASSERT_EQUAL(DOUBLE, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(result);
+  freeToken(operatorToken);
+  freeTokenizer(tokenizer);
 }
 
 void  test_infixDivision_given_2_integer_144_n_12_expect_result_with_12_returned(){
-  Integer  *number1 = createInteger(144);
-  Integer  *number2 = createInteger(12);
+  Tokenizer *tokenizer = createTokenizer("144/12");
+  Token *operandToken1 = getToken(tokenizer);
+  Token *operatorToken = getToken(tokenizer);
+  Token *operandToken2 = getToken(tokenizer);
 
-  Integer *result = (Integer  *)infixDivide((Number *)number1, (Number *)number2);
+  Symbol  *number1 = createSymbol(operandToken1, OPERAND, INTEGER);
+  Symbol  *number2 = createSymbol(operandToken2, OPERAND, INTEGER); 
 
-  TEST_ASSERT_EQUAL(12, result->value);
-  TEST_ASSERT_EQUAL(INTEGER_NUMBER, result->type);
-  
-  free(number1);
-  free(number2);
+  Symbol  *result = infixDivide(number1, number2);
+
+  TEST_ASSERT_EQUAL(12, getSymbolInteger(result));
+  TEST_ASSERT_EQUAL(INTEGER, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(result);
+  freeToken(operatorToken);
+  freeTokenizer(tokenizer);
 }
 
 void  test_infixDivision_given_2_floating_pt_4point375_n_1point25_expect_result_with_3point5_returned(){
-  Double  *number1 = createDouble(4.375);
-  Double  *number2 = createDouble(1.25);
+  Tokenizer *tokenizer = createTokenizer("  4.375/ 1.25");
+  Token *operandToken1 = getToken(tokenizer);
+  Token *operatorToken = getToken(tokenizer);
+  Token *operandToken2 = getToken(tokenizer);
 
-  Double *result = (Double  *)infixDivide((Number *)number1, (Number *)number2);
+  Symbol  *number1 = createSymbol(operandToken1, OPERAND, DOUBLE);
+  Symbol  *number2 = createSymbol(operandToken2, OPERAND, DOUBLE); 
 
-  TEST_ASSERT_EQUAL_FLOAT(3.5, result->value);
-  TEST_ASSERT_EQUAL(FLOAT_NUMBER, result->type);
-  
-  free(number1);
-  free(number2);
+  Symbol  *result = infixDivide(number1, number2);
+
+  TEST_ASSERT_EQUAL(3.5, getSymbolDouble(result));
+  TEST_ASSERT_EQUAL(DOUBLE, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(result);
+  freeToken(operatorToken);
+  freeTokenizer(tokenizer);
 }
 
 void  test_infixDivision_given_1_floating_pt_1_int_6point333_n_3_expect_result_with_2point111_returned(){
-  Double  *number1 = createDouble(6.333);
-  Integer  *number2 = createInteger(3);
+  Tokenizer *tokenizer = createTokenizer(" 6.333  / 3");
+  Token *operandToken1 = getToken(tokenizer);
+  Token *operatorToken = getToken(tokenizer);
+  Token *operandToken2 = getToken(tokenizer);
 
-  Double *result = (Double  *)infixDivide((Number *)number1, (Number *)number2);
+  Symbol  *number1 = createSymbol(operandToken1, OPERAND, DOUBLE);
+  Symbol  *number2 = createSymbol(operandToken2, OPERAND, INTEGER); 
 
-  TEST_ASSERT_EQUAL_FLOAT(2.111, result->value);
-  TEST_ASSERT_EQUAL(FLOAT_NUMBER, result->type);
-  
-  free(number1);
-  free(number2);
+  Symbol  *result = infixDivide(number1, number2);
+
+  TEST_ASSERT_EQUAL(2.111, getSymbolDouble(result));
+  TEST_ASSERT_EQUAL(DOUBLE, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(result);
+  freeToken(operatorToken);
+  freeTokenizer(tokenizer);
 }
 
-void  test_infixDivision_given_2_intt_expect_result_with_1point55_returned(){
-  Integer  *number1 = createInteger(7);
-  Integer  *number2 = createInteger(4);
+void  test_infixDivision_given_2_int_expect_result_with_1point55_returned(){
+  Tokenizer *tokenizer = createTokenizer(" 7/4");
+  Token *operandToken1 = getToken(tokenizer);
+  Token *operatorToken = getToken(tokenizer);
+  Token *operandToken2 = getToken(tokenizer);
 
-  Double *result = (Double  *)infixDivide((Number *)number1, (Number *)number2);
+  Symbol  *number1 = createSymbol(operandToken1, OPERAND, DOUBLE);
+  Symbol  *number2 = createSymbol(operandToken2, OPERAND, INTEGER); 
 
-  TEST_ASSERT_EQUAL(FLOAT_NUMBER, result->type);
-  TEST_ASSERT_EQUAL_FLOAT(1.75, result->value);
-  
-  free(number1);
-  free(number2);
+  Symbol  *result = infixDivide(number1, number2);
+
+  TEST_ASSERT_EQUAL(1.75, getSymbolDouble(result));
+  TEST_ASSERT_EQUAL(DOUBLE, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(result);
+  freeToken(operatorToken);
+  freeTokenizer(tokenizer);
 }
-
 
 void  test_handleInfix_given_two_operand_Integers_1_infix_add_expect_the_values_able_to_be_returned(){
-  Integer *number1 = createInteger(13);
-  Integer  *number2 = createInteger(77);
-  
-  Operator  *operator = createOperator("+", 4, ADD);
+  Tokenizer *tokenizer = createTokenizer(" 13+77");
+  Token *operandToken1 = getToken(tokenizer);
+  Token *operatorToken = getToken(tokenizer);
+  Token *operandToken2 = getToken(tokenizer);
+
+  Symbol  *number1 = createSymbol(operandToken1, OPERAND, INTEGER);
+  Symbol  *number2 = createSymbol(operandToken2, OPERAND, INTEGER); 
+  Symbol  *operator = createSymbol(operatorToken, OPERATOR, ADD);
   
   StackStruct *operandStack = createStack();
   StackStruct *operatorStack = createStack();
@@ -249,18 +442,24 @@ void  test_handleInfix_given_two_operand_Integers_1_infix_add_expect_the_values_
   
   ListItem  *peekItem = peekTopOfStack(operandStack);
   
-  TEST_ASSERT_EQUAL(90, getItemInteger(peekItem));
-  TEST_ASSERT_EQUAL(INTEGER_NUMBER, getItemDataType(peekItem));
+  TEST_ASSERT_EQUAL(90, getItemSymbolInteger(peekItem));
+  TEST_ASSERT_EQUAL(OPERAND, getItemSymbolType(peekItem));
+  TEST_ASSERT_EQUAL(INTEGER, getItemSymbolId(peekItem));
   
   freeStack(operandStack, free); 
   freeStack(operatorStack, free); 
+  freeTokenizer(tokenizer);
 }
 
 void  test_handleInfix_given_two_operand_Integer_Double_1_infix_mult_expect_the_values_able_to_be_returned(){
-  Integer *number1 = createInteger(34);
-  Double  *number2 = createDouble(4.888);
-  
-  Operator  *operator = createOperator("*", 3, MULTIPLY);
+  Tokenizer *tokenizer = createTokenizer("34*4.888");
+  Token *operandToken1 = getToken(tokenizer);
+  Token *operatorToken = getToken(tokenizer);
+  Token *operandToken2 = getToken(tokenizer);
+
+  Symbol  *number1 = createSymbol(operandToken1, OPERAND, INTEGER);
+  Symbol  *number2 = createSymbol(operandToken2, OPERAND, DOUBLE); 
+  Symbol  *operator = createSymbol(operatorToken, OPERATOR, MULTIPLY);
   
   StackStruct *operandStack = createStack();
   StackStruct *operatorStack = createStack();
@@ -273,18 +472,54 @@ void  test_handleInfix_given_two_operand_Integer_Double_1_infix_mult_expect_the_
   
   ListItem  *peekItem = peekTopOfStack(operandStack);
   
-  TEST_ASSERT_EQUAL_FLOAT(166.192, getItemDouble(peekItem));
-  TEST_ASSERT_EQUAL(FLOAT_NUMBER, getItemDataType(peekItem));
+  TEST_ASSERT_EQUAL_FLOAT(166.192, getItemSymbolDouble(peekItem));
+  TEST_ASSERT_EQUAL(OPERAND, getItemSymbolType(peekItem));
+  TEST_ASSERT_EQUAL(DOUBLE, getItemSymbolId(peekItem));
   
   freeStack(operandStack, free); 
   freeStack(operatorStack, free); 
+  freeTokenizer(tokenizer);
+}
+
+void  test_handleInfix_given_two_operand_Integers_1_infix_mult_expect_double_value_able_to_be_returned(){
+  Tokenizer *tokenizer = createTokenizer("7/4");
+  Token *operandToken1 = getToken(tokenizer);
+  Token *operatorToken = getToken(tokenizer);
+  Token *operandToken2 = getToken(tokenizer);
+
+  Symbol  *number1 = createSymbol(operandToken1, OPERAND, INTEGER);
+  Symbol  *number2 = createSymbol(operandToken2, OPERAND, INTEGER); 
+  Symbol  *operator = createSymbol(operatorToken, OPERATOR, DIVIDE);
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  pushToStack(operandStack, (void*)number1);
+  pushToStack(operandStack, (void*)number2);
+  pushToStack(operatorStack, (void*)operator);
+  
+  handleInfix(operandStack, operatorStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL_FLOAT(1.75, getItemSymbolDouble(peekItem));
+  TEST_ASSERT_EQUAL(OPERAND, getItemSymbolType(peekItem));
+  TEST_ASSERT_EQUAL(DOUBLE, getItemSymbolId(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free); 
+  freeTokenizer(tokenizer);
 }
 
 void  test_handleInfix_given_two_operand_Doubles_1_infix_division_expect_the_values_able_to_be_returned(){
-  Double  *number1 = createDouble(9.57434);
-  Double  *number2 = createDouble(4.888);
-  
-  Operator  *operator = createOperator("/", 3, DIVIDE);
+  Tokenizer *tokenizer = createTokenizer("9.57434/4.888");
+  Token *operandToken1 = getToken(tokenizer);
+  Token *operatorToken = getToken(tokenizer);
+  Token *operandToken2 = getToken(tokenizer);
+
+  Symbol  *number1 = createSymbol(operandToken1, OPERAND, DOUBLE);
+  Symbol  *number2 = createSymbol(operandToken2, OPERAND, DOUBLE); 
+  Symbol  *operator = createSymbol(operatorToken, OPERATOR, DIVIDE);
   
   StackStruct *operandStack = createStack();
   StackStruct *operatorStack = createStack();
@@ -297,17 +532,22 @@ void  test_handleInfix_given_two_operand_Doubles_1_infix_division_expect_the_val
   
   ListItem  *peekItem = peekTopOfStack(operandStack);
   
-  TEST_ASSERT_EQUAL_FLOAT(1.958743863, getItemDouble(peekItem));
-  TEST_ASSERT_EQUAL(FLOAT_NUMBER, getItemDataType(peekItem));
+  TEST_ASSERT_EQUAL_FLOAT(1.958743863, getItemSymbolDouble(peekItem));
+  TEST_ASSERT_EQUAL(OPERAND, getItemSymbolType(peekItem));
+  TEST_ASSERT_EQUAL(DOUBLE, getItemSymbolId(peekItem));
   
   freeStack(operandStack, free); 
   freeStack(operatorStack, free); 
+  freeTokenizer(tokenizer);
 }
 
 void  test_handlePrefix_given_operand_bitwise_not_expect_the_value_able_to_be_returned(){
-  Integer *number = createInteger(13);
-  
-  Operator  *operator = createOperator("~", 2, BITWISE_NOT);
+  Tokenizer *tokenizer = createTokenizer("~13");
+  Token *operatorToken = getToken(tokenizer);
+  Token *operandToken = getToken(tokenizer);
+
+  Symbol  *number = createSymbol(operandToken, OPERAND, DOUBLE); 
+  Symbol  *operator = createSymbol(operatorToken, OPERATOR, BITWISE_NOT);
   
   StackStruct *operandStack = createStack();
   StackStruct *operatorStack = createStack();
@@ -319,17 +559,22 @@ void  test_handlePrefix_given_operand_bitwise_not_expect_the_value_able_to_be_re
   
   ListItem  *peekItem = peekTopOfStack(operandStack);
   
-  TEST_ASSERT_EQUAL_FLOAT(-14, getItemInteger(peekItem));
-  TEST_ASSERT_EQUAL(INTEGER_NUMBER, getItemDataType(peekItem));
+  TEST_ASSERT_EQUAL_FLOAT(-14, getItemSymbolInteger(peekItem));
+  TEST_ASSERT_EQUAL(OPERAND, getItemSymbolType(peekItem));
+  TEST_ASSERT_EQUAL(INTEGER, getItemSymbolId(peekItem));
   
   freeStack(operandStack, free); 
   freeStack(operatorStack, free); 
+  freeTokenizer(tokenizer);
 }
 
 void  test_handlePrefix_given_operand_logic_not_expect_the_value_able_to_be_returned(){
-  Integer *number = createInteger(0);
-  
-  Operator  *operator = createOperator("!", 2, LOGICAL_NOT);
+  Tokenizer *tokenizer = createTokenizer("!0");
+  Token *operatorToken = getToken(tokenizer);
+  Token *operandToken = getToken(tokenizer);
+
+  Symbol  *number = createSymbol(operandToken, OPERAND, DOUBLE); 
+  Symbol  *operator = createSymbol(operatorToken, OPERATOR, LOGICAL_NOT);
   
   StackStruct *operandStack = createStack();
   StackStruct *operatorStack = createStack();
@@ -341,18 +586,22 @@ void  test_handlePrefix_given_operand_logic_not_expect_the_value_able_to_be_retu
   
   ListItem  *peekItem = peekTopOfStack(operandStack);
   
-  TEST_ASSERT_EQUAL(1, getItemInteger(peekItem));
-  TEST_ASSERT_EQUAL(INTEGER_NUMBER, getItemDataType(peekItem));
+  TEST_ASSERT_EQUAL_FLOAT(1, getItemSymbolInteger(peekItem));
+  TEST_ASSERT_EQUAL(OPERAND, getItemSymbolType(peekItem));
+  TEST_ASSERT_EQUAL(INTEGER, getItemSymbolId(peekItem));
   
   freeStack(operandStack, free); 
   freeStack(operatorStack, free); 
+  freeTokenizer(tokenizer);
 }
 
 void  test_unwindStack_given_2_operands_1_operator_inside_operator_stack_expect_operator_computed(){
-  Integer *number1 = createInteger(13);
-  Double  *number2 = createDouble(54.452);
+  Tokenizer *tokenizer = createTokenizer("13 + 54.542");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
 
-  Operator  *operator = createOperator("+", 4, ADD);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
   
   StackStruct *operandStack = createStack();
   StackStruct *operatorStack = createStack();
@@ -367,18 +616,21 @@ void  test_unwindStack_given_2_operands_1_operator_inside_operator_stack_expect_
   
   peekItem = peekTopOfStack(operandStack);
   TEST_ASSERT_EQUAL(0, operatorStack->size);
-  TEST_ASSERT_EQUAL_FLOAT(67.452, getItemDouble(peekItem));
+  TEST_ASSERT_EQUAL_FLOAT(67.542, getItemSymbolDouble(peekItem));
   
   freeStack(operandStack, free); 
   freeStack(operatorStack, free); 
+  freeSymbolizer(symbolizer);
 }
 
 void  test_unwindStack_given_2_operands_1_lower_precedence_operator_inside_operator_stack_expect_currentOperator_pushed_into_operator_stack(){
-  Integer *number1 = createInteger(13);
-  Double  *number2 = createDouble(54.452);
+  Tokenizer *tokenizer = createTokenizer("13 + 54.452 /");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
 
-  Operator  *operator1 = createOperator("+", 4, ADD);
-  Operator  *operator2 = createOperator("/", 3, DIVIDE);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator1 = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+  Symbol  *operator2 = getSymbol(symbolizer);
   
   StackStruct *operandStack = createStack();
   StackStruct *operatorStack = createStack();
@@ -392,55 +644,52 @@ void  test_unwindStack_given_2_operands_1_lower_precedence_operator_inside_opera
   
   ListItem  *peekItem = peekTopOfStack(operatorStack);
   
-  TEST_ASSERT_EQUAL_STRING("+", ((Operator  *)(*peekItem).data)->str);
+  TEST_ASSERT_EQUAL(ADD, ((Symbol  *)(*peekItem).data)->id);
   
   peekItem = peekTopOfStack(operandStack);
   TEST_ASSERT_EQUAL(1, operatorStack->size);
-  TEST_ASSERT_EQUAL_FLOAT(0.2387424, getItemDouble(peekItem));
+  TEST_ASSERT_EQUAL_FLOAT(0.2387424, getItemSymbolDouble(peekItem));
   
   freeStack(operandStack, free); 
   freeStack(operatorStack, free); 
+  freeSymbolizer(symbolizer);
 }
 
-/*
-void  test_unwindStack_given_2_operands_1_higher_precedence_operator_inside_operator_stack_expect_higher_operator_computed(){
-  Integer *number1 = createInteger(13);
-  Integer  *number2 = createInteger(3);
+void  test_unwindStack_given_2_operands_1_operator_inside_operator_stack_expect_multiply_computed(){
+  Tokenizer *tokenizer = createTokenizer("13 * 3");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
 
-  Operator  *currentOperator = createOperator("+", 4, ADD);
-  Operator  *operator = createOperator("*", 3, MULTIPLY);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator1 = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
   
   StackStruct *operandStack = createStack();
   StackStruct *operatorStack = createStack();
   
   pushToStack(operandStack, (void*)number1);
   pushToStack(operandStack, (void*)number2);
-  pushToStack(operatorStack, (void*)operator);
+  pushToStack(operatorStack, (void*)operator1);
   
-  unwindStack(operatorStack, operandStack, currentOperator);
+  unwindStack(operatorStack, operandStack);
   
-  ListItem  *peekItem = peekTopOfStack(operatorStack);
-  
-  TEST_ASSERT_EQUAL_STRING("+", ((Operator  *)(*peekItem).data)->str);
-  peekItem = peekTopOfStack(operandStack);
-  TEST_ASSERT_EQUAL(39, getItemInteger(peekItem));
-  TEST_ASSERT_EQUAL(INTEGER_NUMBER, getItemDataType(peekItem));
-  
-  free(number1);                    
-  free(number2);                      
-  //free(currentOperator);        //This operator is inside the operator stack, thus don't free it
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  TEST_ASSERT_EQUAL(39, getItemSymbolInteger(peekItem));
+  TEST_ASSERT_EQUAL(OPERAND, getItemSymbolType(peekItem));
+  TEST_ASSERT_EQUAL(INTEGER, getItemSymbolId(peekItem));
   
   freeStack(operandStack, free); 
   freeStack(operatorStack, free); 
+  freeSymbolizer(symbolizer);
 }
-*/
 
 void  test_forcePush_given_open_bracket_operator_expect_the_bracket_able_to_be_pushed(){
-  Integer *number1 = createInteger(13);
-  Double  *number2 = createDouble(54.452);
+  Tokenizer *tokenizer = createTokenizer("13 *54.452 (");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
 
-  Operator  *currentOperator = createOperator("(", 1, OPEN_PAREN);
-  Operator  *operator = createOperator("*", 3, MULTIPLY);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+  Symbol  *currentOperator = getSymbol(symbolizer);
   
   StackStruct *operandStack = createStack();
   StackStruct *operatorStack = createStack();
@@ -454,18 +703,21 @@ void  test_forcePush_given_open_bracket_operator_expect_the_bracket_able_to_be_p
   ListItem  *peekItem = peekTopOfStack(operatorStack);
   
   TEST_ASSERT_EQUAL(2, operatorStack->size);
-  TEST_ASSERT_EQUAL_STRING("(", ((Operator  *)(*peekItem).data)->str);  
+  TEST_ASSERT_EQUAL(OPEN_PAREN, getItemSymbolId(peekItem));  
   
   freeStack(operandStack, free); 
   freeStack(operatorStack, free); 
+  freeSymbolizer(symbolizer);
 }
 
 void  test_pushOperator_given_2_operands_1_lower_precedence_operator_inside_operator_stack_expect_currentOperator_pushed_into_operator_stack(){
-  Integer *number1 = createInteger(13);
-  Double  *number2 = createDouble(54.452);
+  Tokenizer *tokenizer = createTokenizer("13 +54.452 /");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
 
-  Operator  *currentOperator = createOperator("/", 3, DIVIDE);
-  Operator  *operator = createOperator("+", 4, ADD);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+  Symbol  *currentOperator = getSymbol(symbolizer);
   
   StackStruct *operandStack = createStack();
   StackStruct *operatorStack = createStack();
@@ -474,30 +726,30 @@ void  test_pushOperator_given_2_operands_1_lower_precedence_operator_inside_oper
   pushToStack(operandStack, (void*)number2);
   pushToStack(operatorStack, (void*)operator);
   
-  int result = pushOperator(operandStack, operatorStack, currentOperator);
+  pushOperator(operandStack, operatorStack, currentOperator);
   
   ListItem  *peekItem = peekTopOfStack(operatorStack);
   
-  TEST_ASSERT_EQUAL(1, result);
-  TEST_ASSERT_EQUAL_STRING("/", ((Operator  *)(*peekItem).data)->str);
-  
-  //free(number1);                    //Since no arithmetic is performed, the numbers still belong to stack
-  //free(number2);                    //Thus let freeStack do the number1 and number2 freeing
-  //free(currentOperator);
+  TEST_ASSERT_EQUAL(2, operatorStack->size);
+  TEST_ASSERT_EQUAL(2, operandStack->size);
+  TEST_ASSERT_EQUAL(DIVIDE, getItemSymbolId(peekItem));
   
   freeStack(operandStack, free); 
   freeStack(operatorStack, free); 
+  freeSymbolizer(symbolizer);
 }
 
+//13-3*6+8
 void  test_pushOperator_given_2_operators_1_higher_precedence_operator_inside_operator_stack_expect_higher_operator_computed(){
-  Integer *number1 = createInteger(13);
-  Integer  *number2 = createInteger(3);
-  Integer  *number3 = createInteger(6);
-  Integer  *number4 = createInteger(8);
+  Tokenizer *tokenizer = createTokenizer(" 13-3*6+8 ");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
 
-  Operator  *currentOperator = createOperator("+", 4, ADD);
-  Operator  *operator1 = createOperator("-", 4, MINUS);
-  Operator  *operator2 = createOperator("*", 3, MULTIPLY);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator1 = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+  Symbol  *operator2 = getSymbol(symbolizer);
+  Symbol  *number3 = getSymbol(symbolizer);
+  Symbol  *currentOperator = getSymbol(symbolizer);
   
   StackStruct *operandStack = createStack();
   StackStruct *operatorStack = createStack();
@@ -505,33 +757,35 @@ void  test_pushOperator_given_2_operators_1_higher_precedence_operator_inside_op
   pushToStack(operandStack, (void*)number1);
   pushToStack(operandStack, (void*)number2);
   pushToStack(operandStack, (void*)number3);
-  pushToStack(operandStack, (void*)number4);
   pushToStack(operatorStack, (void*)operator1);
   pushToStack(operatorStack, (void*)operator2);
   
-  while(!pushOperator(operandStack, operatorStack, currentOperator));
+  pushOperator(operandStack, operatorStack, currentOperator);
   
   ListItem  *peekItem = peekTopOfStack(operatorStack);
   
-  TEST_ASSERT_EQUAL_STRING("+", ((Operator  *)(*peekItem).data)->str);
+  TEST_ASSERT_EQUAL(ADD, getItemSymbolId(peekItem));
+  
   peekItem = peekTopOfStack(operandStack);
-  TEST_ASSERT_EQUAL(48, getItemInteger(peekItem));
-  TEST_ASSERT_EQUAL(2, operatorStack->size);
-  TEST_ASSERT_EQUAL(INTEGER_NUMBER, getItemDataType(peekItem));
-
+  TEST_ASSERT_EQUAL(-5, getItemSymbolInteger(peekItem));
+  TEST_ASSERT_EQUAL(1, operatorStack->size);
+  TEST_ASSERT_EQUAL(OPERAND, getItemSymbolType(peekItem));
+  TEST_ASSERT_EQUAL(INTEGER, getItemSymbolId(peekItem));
   
   freeStack(operandStack, free); 
   freeStack(operatorStack, free); 
+  freeSymbolizer(symbolizer);
 }
-
 
 //(3+18)
 void  test_evaluateExpressionWithinBrackets_given_brackets_operators_operands(){
-  Integer *number1 = createInteger(3);
-  Integer *number2 = createInteger(18);
-  
-  Operator  *operator1 = createOperator("(", 1, OPEN_PAREN);
-  Operator  *operator2 = createOperator("+", 4, ADD);
+  Tokenizer *tokenizer = createTokenizer(" (3+18) ");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
+  Symbol  *operator1 = getSymbol(symbolizer);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator2 = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+  Symbol  *currentOperator = getSymbol(symbolizer);
   
   StackStruct *operandStack = createStack();
   StackStruct *operatorStack = createStack();  
@@ -542,27 +796,31 @@ void  test_evaluateExpressionWithinBrackets_given_brackets_operators_operands(){
   pushToStack(operandStack, (void*)number1);
   pushToStack(operandStack, (void*)number2);
   
-  evaluateExpressionWithinBrackets(operandStack, operatorStack);
+  evaluateExpressionWithinBrackets(operandStack, operatorStack, currentOperator);
   
   ListItem  *peekItem = peekTopOfStack(operandStack);
   
-  TEST_ASSERT_EQUAL(21, getItemInteger(peekItem));
+  TEST_ASSERT_EQUAL(21, getItemSymbolInteger(peekItem));
   
   freeStack(operandStack, free); 
-  freeStack(operatorStack, free);  
+  freeStack(operatorStack, free); 
+  freeSymbolizer(symbolizer);
 }
 
 //6*(200 -10/2)
 void  test_evaluateExpressionWithinBrackets_given_brackets_3operators_4operands(){
-  Integer *number1 = createInteger(6);
-  Integer *number2 = createInteger(200);
-  Integer *number3 = createInteger(10);
-  Integer *number4 = createInteger(2);
-  
-  Operator  *operator1 = createOperator("*", 3, MULTIPLY);
-  Operator  *operator2 = createOperator("(", 1, OPEN_PAREN);
-  Operator  *operator3 = createOperator("-", 4, MINUS);
-  Operator  *operator4 = createOperator("/", 3, DIVIDE);
+  Tokenizer *tokenizer = createTokenizer(" 6*(200 -10/2) ");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
+
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator1 = getSymbol(symbolizer);
+  Symbol  *operator2 = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+  Symbol  *operator3 = getSymbol(symbolizer);
+  Symbol  *number3 = getSymbol(symbolizer);
+  Symbol  *operator4 = getSymbol(symbolizer);
+  Symbol  *number4 = getSymbol(symbolizer);
+  Symbol  *currentOperator = getSymbol(symbolizer);
   
   StackStruct *operandStack = createStack();
   StackStruct *operatorStack = createStack();  
@@ -577,15 +835,88 @@ void  test_evaluateExpressionWithinBrackets_given_brackets_3operators_4operands(
   pushToStack(operandStack, (void*)number3);
   pushToStack(operandStack, (void*)number4);
   
-  evaluateExpressionWithinBrackets(operandStack, operatorStack);
+  evaluateExpressionWithinBrackets(operandStack, operatorStack, currentOperator);
   
   ListItem  *peekItem = peekTopOfStack(operandStack);
   
-  TEST_ASSERT_EQUAL(195, getItemInteger(peekItem));
+  TEST_ASSERT_EQUAL(195, getItemSymbolInteger(peekItem));
+  TEST_ASSERT_EQUAL(2, operandStack->size);
+  
+  peekItem = peekTopOfStack(operatorStack);
+  TEST_ASSERT_EQUAL(MULTIPLY, getItemSymbolId(peekItem));
+  TEST_ASSERT_EQUAL(1, operatorStack->size);
   
   freeStack(operandStack, free); 
-  freeStack(operatorStack, free);  
+  freeStack(operatorStack, free); 
+  freeSymbolizer(symbolizer); 
 }
+
+void  test_shuntingYard_given_1_operator_2_operands_expect_correct_value_121_returned(){
+  Tokenizer *tokenizer = createTokenizer(" 33+88");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  shuntingYard(tokenizer, operatorStack, operandStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL(121, getItemSymbolInteger(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free); 
+}
+
+void  test_shuntingYard_given_2_operator_4_operands_expect_correct_value_42_returned(){
+  Tokenizer *tokenizer = createTokenizer(" 12+41-11");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  shuntingYard(tokenizer, operatorStack, operandStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL(42, getItemSymbolInteger(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free); 
+}
+
+void  test_shuntingYard_given_2_operator_4_operands_with_ftpoint_expect_correct_value_31point777_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("    19.777  +4 * 3");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  shuntingYard(tokenizer, operatorStack, operandStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL_FLOAT(31.777, getItemSymbolDouble(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free); 
+}
+
+void  test_shuntingYard_given_3_operator_6_operands_with_ftpoint_expect_correct_value_5point5_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("   9-7  /4*2");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  shuntingYard(tokenizer, operatorStack, operandStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL_FLOAT(5.5, getItemSymbolDouble(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free); 
+}
+
 /*
 void  test_unwindStack_given_2_operators_1_higher_precedence_operator_inside_operator_stack_expect_higher_operator_computed(){
   Integer *number1 = createInteger(13);
@@ -619,25 +950,6 @@ void  test_unwindStack_given_2_operators_1_higher_precedence_operator_inside_ope
   
   freeStack(operandStack, free); 
   freeStack(operatorStack, free); 
-}
-
-void  test_shuntingYard_given_1_operator_2_operands_expect_correct_value_121_returned(){
-  Tokenizer *tokenizer = NULL;
-  tokenizer = createTokenizer(" 33+88");
-  
-  StackStruct *operandStack = createStack();
-  StackStruct *operatorStack = createStack();
-  
-  shuntingYard(tokenizer, operatorStack, operandStack);
-  
-  ListItem  *peekItem = peekTopOfStack(operandStack);
-  
-  TEST_ASSERT_EQUAL(121, getItemInteger(peekItem));
-  
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
-
-  freeTokenizer(tokenizer);  
 }
 
 void  test_operateExpressionBetweenBracket_given_brackets_operators_operands(){
@@ -689,63 +1001,6 @@ void  test_operateExpressionBetweenBracket_given_2_layer_brackets_between_expres
   ListItem  *peekItem = peekTopOfStack(operandStack);
   
   TEST_ASSERT_EQUAL(40, getItemInteger(peekItem));
-  
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
-
-  freeTokenizer(tokenizer);  
-}
-
-void  test_shuntingYard_given_2_operator_4_operands_expect_correct_value_42_returned(){
-  Tokenizer *tokenizer = NULL;
-  tokenizer = createTokenizer(" 12+41-11");
-  
-  StackStruct *operandStack = createStack();
-  StackStruct *operatorStack = createStack();
-  
-  shuntingYard(tokenizer, operatorStack, operandStack);
-  
-  ListItem  *peekItem = peekTopOfStack(operandStack);
-  
-  TEST_ASSERT_EQUAL(42, getItemInteger(peekItem));
-  
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
-
-  freeTokenizer(tokenizer);  
-}
-
-void  test_shuntingYard_given_2_operator_4_operands_with_ftpoint_expect_correct_value_31point777_returned(){
-  Tokenizer *tokenizer = NULL;
-  tokenizer = createTokenizer("    19.777  +4 * 3");
-  
-  StackStruct *operandStack = createStack();
-  StackStruct *operatorStack = createStack();
-  
-  shuntingYard(tokenizer, operatorStack, operandStack);
-  
-  ListItem  *peekItem = peekTopOfStack(operandStack);
-  
-  TEST_ASSERT_EQUAL_FLOAT(31.777, getItemDouble(peekItem));
-  
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
-
-  freeTokenizer(tokenizer);  
-}
-
-void  test_shuntingYard_given_3_operator_6_operands_with_ftpoint_expect_correct_value_5point5_returned(){
-  Tokenizer *tokenizer = NULL;
-  tokenizer = createTokenizer("   9-7  /4*2");
-  
-  StackStruct *operandStack = createStack();
-  StackStruct *operatorStack = createStack();
-  
-  shuntingYard(tokenizer, operatorStack, operandStack);
-  
-  ListItem  *peekItem = peekTopOfStack(operandStack);
-  
-  TEST_ASSERT_EQUAL_FLOAT(5.5, getItemDouble(peekItem));
   
   freeStack(operandStack, free); 
   freeStack(operatorStack, free); 

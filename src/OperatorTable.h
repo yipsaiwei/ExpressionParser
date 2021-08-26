@@ -8,12 +8,21 @@
 #include <string.h>
 
 #define isTokenNull(token)                                      (token->type == TOKEN_NULL_TYPE)
-#define areTokenStringSame(token1, token2)                       (*(token1->str) == *(token2->str))
+#define areTokenStringSame(token1, token2)                      (*(token1->str) == *(token2->str))
 #define areTwoCharSame(str1, str2)                               *str1 == *str2                                                                    
 #define isNextTokenAOperator(token)                             (token->type == TOKEN_OPERATOR_TYPE)
 #define isNextTokenAdjacentToCurrent(token, nextToken)          ((token->startColumn + 1) == nextToken->startColumn)
 #define isNextAdjacentTokenSame(token, nextToken)               (areTokenStringSame(token, nextToken) && isNextTokenAdjacentToCurrent(token, nextToken))
 #define isNextAdjacentTokenStringEqual(token, nextToken)        (isNextTokenAdjacentToCurrent(token, nextToken) && *(nextToken->str) == '=')
+#define isTokenOperatorType(token)                              token->type == TOKEN_OPERATOR_TYPE
+#define isTokenIntegerType(token)                               token->type == TOKEN_INTEGER_TYPE
+#define isTokenDoubleType(token)                                token->type == TOKEN_FLOAT_TYPE
+#define isTokenNullType(token)                                  token->type == TOKEN_NULL_TYPE
+
+#define isSymbolInteger(symbol)                                 symbol->id == INTEGER
+#define isSymbolDouble(symbol)                                  symbol->id == DOUBLE
+#define isSymbolNull(symbol)                                    symbol->id == _NULL
+#define isSymbolOperatorType(symbol)                            symbol->type == OPERATOR
 typedef enum{
   UND,
   ADD,
@@ -50,7 +59,29 @@ typedef enum{
   SHIFT_RIGHT_ASSIGN,
   ASSIGN, 
   EQUAL,
+  INTEGER,
+  DOUBLE,
+  _NULL,
 }OperationType;
+
+typedef enum{
+  OPERAND,
+  OPERATOR,
+  EMPTY,
+}AttributeType;
+
+typedef struct  Symbol  Symbol;
+struct  Symbol{
+  Token *token;
+  AttributeType type;
+  OperationType id;
+};
+
+typedef struct  Symbolizer  Symbolizer;
+struct  Symbolizer{
+  Tokenizer *tokenizer;
+  OperationType lastSymbolId;
+};
 
 typedef struct  Operator  Operator;
 struct  Operator{
@@ -59,7 +90,7 @@ struct  Operator{
   OperationType id;
 };
 
-typedef Operator *(*FuncPtr)(Token *token, Tokenizer *tokenizer);
+typedef Symbol *(*FuncPtr)(Symbolizer *symbolizer, Token  *token);
 
 typedef struct  OperatorInformationTable  OperatorInformationTable;
 struct  OperatorInformationTable{
@@ -74,8 +105,13 @@ int returnStringSize(char *str);
 void  checkDoubleCharacterOperator(Tokenizer  *tokenizer, Token *token);
 Token *peekToken(Tokenizer  *tokenizer);
 char  *concatenateTwoStrings(char  *str1, char *str2);
-Operator  *handleSymbol(Token *token, Tokenizer  *tokenizer);
-Operator  *handleRepeatedSymbol(Token *token, Tokenizer  *tokenizer);
-Operator  *handleShiftSymbol(Token *token, Tokenizer  *tokenizer);
+Symbol  *handleSymbol(Symbolizer *symbolizer, Token  *token);
+Symbol  *handleRepeatedSymbol(Symbolizer *symbolizer, Token  *token);
+Symbol  *handleShiftSymbol(Symbolizer *symbolizer, Token  *token);
 
+Symbolizer  *createSymbolizer(Tokenizer  *tokenizer);
+void  freeSymbolizer(Symbolizer *symbolizer);
+Symbol  *createSymbol(Token *token, AttributeType type, OperationType id);
+Symbol  *getSymbol(Symbolizer *symbolizer);
+void  freeSymbol(Symbol *symbol);
 #endif // OPERATORTABLE_H

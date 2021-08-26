@@ -2,8 +2,8 @@
 
 //Change it to symbolTable
 OperatorInformationTable operatorInformationTable[] = {
-  ['('] = {{OPEN_PAREN, UND, UND, UND}, NULL},  
-  [')'] = {{CLOSE_PAREN, UND, UND, UND}, NULL},  
+  ['('] = {{OPEN_PAREN, UND, UND, UND}                            , handleSymbol},  
+  [')'] = {{CLOSE_PAREN, UND, UND, UND}                           , handleSymbol},  
   ['['] = {{OPEN_SQ_BRACKET, UND, UND, UND}, NULL},  
   [']'] = {{CLOSE_SQ_BRACKET, UND, UND, UND}, NULL},  
   ['~'] = {{BITWISE_NOT, UND, UND, UND}, NULL},  
@@ -43,54 +43,96 @@ void  freeOperator(Operator *operator){
     free(operator);
 }
 
-Operator  *handleRepeatedSymbol(Token *token, Tokenizer *tokenizer){
-  Operator  *operator;
-  Token *nextToken = peekToken(tokenizer);
-  OperatorInformationTable  information = operatorInformationTable[*(token->str)];
-  if(!isTokenNull(nextToken) && isNextAdjacentTokenSame(token, nextToken)){
-    nextToken = getToken(tokenizer);
-    operator = createOperator(concatenateTwoStrings(token->str, nextToken->str), 0, information.type[2]);
-    freeToken(nextToken); 
-    freeToken(token);    
-  }else{
-    operator = handleSymbol(token, tokenizer);
-  }
-  return  operator;
+Symbolizer  *createSymbolizer(Tokenizer  *tokenizer){
+  Symbolizer  *symbolizer = malloc(sizeof(Symbolizer));
+  symbolizer->tokenizer = tokenizer;
+  symbolizer->lastSymbolId = UND;
+  return  symbolizer;
 }
 
-Operator  *handleSymbol(Token *token, Tokenizer *tokenizer){
-  Operator  *operator;
-  Token *nextToken = peekToken(tokenizer);
+void  freeSymbolizer(Symbolizer *symbolizer){
+  if(symbolizer->tokenizer)
+    freeTokenizer(symbolizer->tokenizer);
+  if(symbolizer)
+    free(symbolizer);
+}
+
+Symbol  *createSymbol(Token *token, AttributeType type, OperationType id){
+  Symbol  *symbol = malloc(sizeof(Symbol));
+  symbol->token = token;
+  symbol->type = type;
+  symbol->id = id;
+  return  symbol;
+}
+
+void  freeSymbol(Symbol *symbol){
+  if(symbol->token)
+    freeToken(symbol->token);
+  if(symbol)
+    free(symbol);
+}
+
+Symbol  *getSymbol(Symbolizer *symbolizer){
+  Token *token = getToken(symbolizer->tokenizer);
+  Symbol  *symbol;
+  if(isTokenOperatorType(token)){
+    OperatorInformationTable  information = operatorInformationTable[*(token->str)];
+    symbol = information.func(symbolizer, token);
+  }else if (isTokenIntegerType(token))
+    symbol = createSymbol(token, OPERAND, INTEGER);
+  else if (isTokenDoubleType(token))
+    symbol = createSymbol(token, OPERAND, DOUBLE);    //Later need to implement exception for operands other than double and int
+  else 
+    symbol = createSymbol(token, EMPTY, _NULL);
+  symbolizer->lastSymbolId = symbol->id;
+  return  symbol;
+}
+
+Symbol  *handleSymbol(Symbolizer *symbolizer, Token  *token){
+  Symbol  *symbol;
+  Token *nextToken = peekToken(symbolizer->tokenizer);
   OperatorInformationTable  information = operatorInformationTable[*(token->str)]; 
   if(!isTokenNull(nextToken) && isNextAdjacentTokenStringEqual(token, nextToken)){
-    nextToken = getToken(tokenizer);
-    operator = createOperator(concatenateTwoStrings(token->str, nextToken->str), 0, information.type[1]);
-    freeToken(nextToken);    
+    nextToken = getToken(symbolizer->tokenizer);
+    symbol = createSymbol(token, OPERATOR, information.type[1]);   
   }else
-    operator = createOperator(token->str, 0, information.type[0]);
-  freeToken(token);
-  return  operator;
+    symbol = createSymbol(token, OPERATOR, information.type[0]);
+  return  symbol;
 }
 
-Operator  *handleShiftSymbol(Token *token, Tokenizer *tokenizer){
-  Operator  *operator;
-  Token *nextToken = peekToken(tokenizer);
+Symbol  *handleRepeatedSymbol(Symbolizer *symbolizer, Token  *token){
+  Symbol  *symbol;
+  Token *nextToken = peekToken(symbolizer->tokenizer);
+  OperatorInformationTable  information = operatorInformationTable[*(token->str)];
+  if(!isTokenNull(nextToken) && isNextAdjacentTokenSame(token, nextToken)){
+    nextToken = getToken(symbolizer->tokenizer);
+    symbol = createSymbol(token, OPERATOR, information.type[2]); 
+    freeToken(nextToken); 
+  }else
+    symbol = handleSymbol(symbolizer, token);
+  return  symbol;
+}
+
+Symbol  *handleShiftSymbol(Symbolizer *symbolizer, Token  *token){
+  Symbol  *symbol;
+  Token *nextToken = peekToken(symbolizer->tokenizer);
   OperatorInformationTable  information = operatorInformationTable[*(token->str)]; 
   if(!isTokenNull(nextToken) && isNextAdjacentTokenSame(token, nextToken)){
-    nextToken = getToken(tokenizer);
-    Token *nextNextToken = peekToken(tokenizer);
+    nextToken = getToken(symbolizer->tokenizer);
+    Token *nextNextToken = peekToken(symbolizer->tokenizer);
     if(!isTokenNull(nextNextToken) && isNextAdjacentTokenStringEqual(nextToken, nextNextToken)){
-      nextNextToken = getToken(tokenizer);
+      nextNextToken = getToken(symbolizer->tokenizer);
       char  *strPtr = concatenateTwoStrings(token->str, nextToken->str);
-      operator = createOperator(concatenateTwoStrings(strPtr, nextNextToken->str), 0, information.type[3]);
+      symbol = createSymbol(token, OPERATOR, information.type[3]);
+      freeToken(nextToken);
       freeToken(nextNextToken);
     }else{
-      pushBackToken(tokenizer, nextToken);
-      operator = handleRepeatedSymbol(token, tokenizer);
+      pushBackToken(symbolizer->tokenizer, nextToken);
+      symbol = handleRepeatedSymbol(symbolizer, token);
     }
   }else
-    operator = handleSymbol(token, tokenizer);
-  return  operator;
+    symbol = handleSymbol(symbolizer, token);
+  return  symbol;
 }
 
 char  *concatenateTwoStrings(char  *str1, char *str2){

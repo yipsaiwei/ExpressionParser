@@ -4,76 +4,97 @@
 //#include  "ExpressionParser.h"
 
 #define createArithmeticFunction(funcName, operator)                        \
-Number  *funcName(Number  *number1, Number  *number2){                      \
-  Number  *result;                                                          \
+Symbol  *funcName(Symbol  *number1, Symbol  *number2){                      \
+  Symbol  *result;                                                          \
+  Token *resultToken;                                                       \
+  char  *resultStr;                                                         \
   infixArithmeticCalculation(number1, number2, operator);                   \
   return  result;                                                           \
 }
 
 #define createArithmeticDivFunction(funcName, operator)                     \
-Number  *funcName(Number  *number1, Number  *number2){                      \
-  Number  *result;                                                          \
+Symbol  *funcName(Symbol  *number1, Symbol  *number2){                      \
+  Symbol  *result;                                                          \
+  Token *resultToken;                                                       \
+  char  *resultStr;                                                         \
   infixArithmeticDivCalculation(number1, number2, operator);                \
   return  result;                                                           \
 }
 
 #define createPrefixLogicFunction(funcName, operator)                       \
-Number  *funcName(Number  *number, Number *number2){                        \
-  Number  *result;                                                          \
+Symbol  *funcName(Symbol  *number, Symbol *number2){                        \
+  Symbol  *result;                                                          \
+  Token *resultToken;                                                       \
+  char  *resultStr;                                                         \
   prefixLogicCalculation(number, operator);                                 \
   return  result;                                                           \
 }
 
 #define createInfixLogicFunction(funcName, operator)                        \
-Number  *funcName(Number  *number1, Number *number2){                       \
-  Number  *result;                                                          \
+Symbol  *funcName(Symbol  *number1, Symbol *number2){                       \
+  Symbol  *result;                                                          \
+  Token *resultToken;                                                       \
+  char  *resultStr;                                                         \
   infixLogicCalculation(number1, number2, operator)                         \
   return  result;                                                           \
 }
 
-#define infixArithmeticCalculation(operand1, operand2, operator)                                                    \
-  if(isOperandType(operand1, INTEGER_NUMBER) && isOperandType(operand2, INTEGER_NUMBER)){                           \
-    result = (Number  *)createInteger(getNumberInteger(operand1) operator getNumberInteger(operand2));              \
-    result->type = INTEGER_NUMBER;                                                                                  \
-  }else                                                                                                             \
-  {                                                                                                                 \
-    if(isOperandType(operand1, FLOAT_NUMBER) && isOperandType(operand2, INTEGER_NUMBER))                            \
-      result = (Number  *)createDouble(getNumberDouble(operand1) operator getNumberInteger(operand2));              \
-    else if (isOperandType(operand1, INTEGER_NUMBER) && isOperandType(operand2, FLOAT_NUMBER))                      \
-      result = (Number  *)createDouble(getNumberInteger(operand1) operator getNumberDouble(operand2));              \
-    else                                                                                                            \
-      result = (Number  *)createDouble(getNumberDouble(operand1) operator getNumberDouble(operand2));               \
-    result->type = FLOAT_NUMBER;                                                                                    \
-  }           
+#define infixArithmeticCalculation(operand1, operand2, operator)                                                                                \
+  if(isSymbolInteger(number1) && isSymbolInteger(number2)){                                                                             \
+    int resultNum = getSymbolInteger(number1) operator getSymbolInteger(number2);                                                               \
+    resultStr = createResultString((void  *)&resultNum, INTEGER);                                                                               \
+    resultToken = (Token  *)createIntToken(resultNum, number2->token->startColumn, number2->token->originalstr, resultStr, TOKEN_INTEGER_TYPE); \
+    result = createSymbol(resultToken,  OPERAND, INTEGER);                                                                                      \
+  }else{                                                                                                                                        \
+    double  resultNum;                                                                                                                          \
+    if(isSymbolDouble(number1) && isSymbolInteger(number2))                                                                             \
+      resultNum = getSymbolDouble(number1) operator getSymbolInteger(number2);                                                                  \
+    else if (isSymbolInteger(number1) && isSymbolDouble(number2))                                                                       \
+      resultNum = getSymbolInteger(number1) operator getSymbolDouble(number2);                                                                  \
+    else                                                                                                                                        \
+      resultNum = getSymbolDouble(number1) operator getSymbolDouble(number2);                                                                   \
+    resultStr = createResultString((void  *)&resultNum, DOUBLE);                                                                                \
+    resultToken = (Token  *)createFloatToken(resultNum, number2->token->startColumn, number2->token->originalstr, resultStr, TOKEN_FLOAT_TYPE); \
+    result = createSymbol(resultToken, OPERAND, DOUBLE);                                                                                        \
+  }                                                                                                                                                   
 
-#define infixArithmeticDivCalculation(operand1, operand2, operator)                                                 \
-  if(isOperandType(operand1, INTEGER_NUMBER) && isOperandType(operand2, INTEGER_NUMBER)){                           \
-    if(getNumberInteger(operand1) % getNumberInteger(operand2) == 0){                                               \
-      result = (Number  *)createInteger(getNumberInteger(operand1) operator getNumberInteger(operand2));            \
-      result->type = INTEGER_NUMBER;                                                                                \
-    }else{                                                                                                          \
-      result = (Number  *)createDouble((double)getNumberInteger(operand1) operator getNumberInteger(operand2));     \
-      result->type = FLOAT_NUMBER;                                                                                  \
-    }                                                                                                               \
-  }else                                                                                                             \
-    {                                                                                                               \
-    if(isOperandType(operand1, FLOAT_NUMBER) && isOperandType(operand2, INTEGER_NUMBER))                            \
-      result = (Number  *)createDouble(getNumberDouble(operand1) operator getNumberInteger(operand2));              \
-    else if (isOperandType(operand1, INTEGER_NUMBER) && isOperandType(operand2, FLOAT_NUMBER))                      \
-      result = (Number  *)createDouble(getNumberInteger(operand1) operator getNumberDouble(operand2));              \
-    else                                                                                                            \
-      result = (Number  *)createDouble(getNumberDouble(operand1) operator getNumberDouble(operand2));               \
-    result->type = FLOAT_NUMBER;                                                                                    \
-  }   
+#define infixArithmeticDivCalculation(operand1, operand2, operator)                                                                               \
+  if(isSymbolInteger(operand1) && isSymbolInteger(operand2)){                                                                                     \
+    if(getSymbolInteger(operand1) % getSymbolInteger(operand2) == 0){                                                                             \
+      int  resultNum = getSymbolInteger(number1) operator getSymbolInteger(number2);                                                              \
+      resultStr = createResultString((void  *)&resultNum, INTEGER);                                                                               \
+      resultToken = (Token  *)createIntToken(resultNum, number2->token->startColumn, number2->token->originalstr, resultStr, TOKEN_INTEGER_TYPE); \
+      result = createSymbol(resultToken,  OPERAND, INTEGER);                                                                                      \
+    }else{                                                                                                                                        \
+      double  resultNum = ((double)getSymbolInteger(number1) operator getSymbolInteger(number2));                                                 \
+      resultStr = createResultString((void  *)&resultNum, DOUBLE);                                                                                \
+      resultToken = (Token  *)createFloatToken(resultNum, number2->token->startColumn, number2->token->originalstr, resultStr, TOKEN_FLOAT_TYPE); \
+      result = createSymbol(resultToken, OPERAND, DOUBLE);                                                                                        \
+    }                                                                                                                                             \
+  }else{                                                                                                                                          \
+    double  resultNum;                                                                                                                            \
+    if(isSymbolDouble(number1) && isSymbolInteger(number2))                                                                                       \
+      resultNum = getSymbolDouble(number1) operator getSymbolInteger(number2);                                                                    \
+    else if (isSymbolInteger(number1) && isSymbolDouble(number2))                                                                                 \
+      resultNum = getSymbolInteger(number1) operator getSymbolDouble(number2);                                                                    \
+    else                                                                                                                                          \
+      resultNum = getSymbolDouble(number1) operator getSymbolDouble(number2);                                                                     \
+    resultStr = createResultString((void  *)&resultNum, DOUBLE);                                                                                  \
+    resultToken = (Token  *)createFloatToken(resultNum, number2->token->startColumn, number2->token->originalstr, resultStr, TOKEN_FLOAT_TYPE);   \
+    result = createSymbol(resultToken, OPERAND, DOUBLE);                                                                                          \
+  }             
   
-#define infixLogicCalculation(operand1, operand2, operator)                                                         \
-    result = (Number  *)createInteger(getNumberInteger(operand1) operator getNumberInteger(operand2));              \
-    result->type = INTEGER_NUMBER;                                                                                  \
+#define infixLogicCalculation(operand1, operand2, operator)                                                                                     \
+    int resultNum = getSymbolInteger(number1) operator getSymbolInteger(number2);                                                               \
+    resultStr = createResultString((void  *)&resultNum, INTEGER);                                                                               \
+    resultToken = (Token  *)createIntToken(resultNum, number2->token->startColumn, number2->token->originalstr, resultStr, TOKEN_INTEGER_TYPE); \
+    result = createSymbol(resultToken,  OPERAND, INTEGER);                                                                                      
  
   
-#define prefixLogicCalculation(operand, operator)                                                                   \
-  int i = getNumberInteger(operand);                                                                                \
-  result = (Number  *)createInteger(operator(i));                                                                   \
-  result->type = INTEGER_NUMBER;                                                                                                                                                                                                
+#define prefixLogicCalculation(operand, operator)                                                                                               \
+    int resultNum = operator(getSymbolInteger(operand));                                                                                        \
+    resultStr = createResultString((void  *)&resultNum, INTEGER);                                                                               \
+    resultToken = (Token  *)createIntToken(resultNum, operand->token->startColumn, operand->token->originalstr, resultStr, TOKEN_INTEGER_TYPE); \
+    result = createSymbol(resultToken,  OPERAND, INTEGER);      
 
 #endif // ARITHMETIC_H
