@@ -29,23 +29,9 @@ void  test_createSymbolizer_given_tokenizer_expect_correct_symbolizer_returned()
   Symbolizer  *symbolizer = createSymbolizer(tokenizer);
   
   TEST_ASSERT_EQUAL_PTR(tokenizer, symbolizer->tokenizer);
-  TEST_ASSERT_EQUAL(UND, symbolizer->lastSymbolId);
+  TEST_ASSERT_EQUAL(_NULL, symbolizer->lastSymbolId);
   
   freeSymbolizer(symbolizer);
-}
-
-void  test_createSymbol_given_symbol_datas_expect_correct_symbol_returned(){
-  char  *str = malloc(sizeof(char));
-  char  staticStr = '+';
-  *str = staticStr;
-  Token *token = (Token *)createOperatorToken(str, 3, "   + ()()()(", TOKEN_OPERATOR_TYPE);
-  Symbol  *symbol = createSymbol(token, OPERATOR, ADD);
-  
-  TEST_ASSERT_EQUAL_PTR(token, symbol->token);
-  TEST_ASSERT_EQUAL(OPERATOR, symbol->type);
-  TEST_ASSERT_EQUAL(ADD, symbol->id);
-  
-  freeSymbol(symbol);
 }
 
 void  test_handleSymbol_given_2_adjacent_different_token_expect_correct_double_char_operator_returned(){

@@ -21,14 +21,6 @@ OperatorInformationTable operatorInformationTable[] = {
   ['='] = {{ASSIGN, EQUAL, UND, UND}                              , handleSymbol},
 };
 
-Operator  *createOperator(char  *str, int  precedence, OperationType id){
-  Operator  *newOperator = malloc(sizeof(Operator));
-  newOperator->precedence = precedence;
-  newOperator->id = id;
-  newOperator->str = duplicateSubstring(str, returnStringSize(str));
-  return  newOperator;
-}
-
 int returnStringSize(char *str){
   char  *ptr = str;
   while(*ptr != '\0')
@@ -36,17 +28,10 @@ int returnStringSize(char *str){
   return  (ptr - str);
 }
 
-void  freeOperator(Operator *operator){
-  if(operator->str)
-    free(operator->str);
-  if(operator)
-    free(operator);
-}
-
 Symbolizer  *createSymbolizer(Tokenizer  *tokenizer){
   Symbolizer  *symbolizer = malloc(sizeof(Symbolizer));
   symbolizer->tokenizer = tokenizer;
-  symbolizer->lastSymbolId = UND;
+  symbolizer->lastSymbolId = _NULL;
   return  symbolizer;
 }
 
@@ -84,7 +69,6 @@ Symbol  *getSymbol(Symbolizer *symbolizer){
     symbol = createSymbol(token, OPERAND, DOUBLE);    //Later need to implement exception for operands other than double and int
   else 
     symbol = createSymbol(token, EMPTY, _NULL);
-  symbolizer->lastSymbolId = symbol->id;
   return  symbol;
 }
 
@@ -133,6 +117,13 @@ Symbol  *handleShiftSymbol(Symbolizer *symbolizer, Token  *token){
   }else
     symbol = handleSymbol(symbolizer, token);
   return  symbol;
+}
+
+AttributeType getLastSymbolType(Symbolizer  *symbolizer){
+  if(isPreviousSymbolId(symbolizer, INTEGER) || isPreviousSymbolId(symbolizer, DOUBLE))
+    return  OPERAND;
+  else
+    return  OPERATOR;
 }
 
 char  *concatenateTwoStrings(char  *str1, char *str2){

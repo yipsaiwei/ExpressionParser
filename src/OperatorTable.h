@@ -23,6 +23,12 @@
 #define isSymbolDouble(symbol)                                  symbol->id == DOUBLE
 #define isSymbolNull(symbol)                                    symbol->id == _NULL
 #define isSymbolOperatorType(symbol)                            symbol->type == OPERATOR
+
+#define isPreviousSymbolType(symbolizer, type)                  getLastSymbolType(symbolizer) == type
+#define isPreviousArity(symbolizer, arity)                      returnArityOfAnId(symbolizer->lastSymbolId) == arity
+#define isIdArity(symbolId, arity)                              returnArityOfAnId(symbolId) == arity
+#define isPreviousSymbolId(symbolizer, id)                      symbolizer->lastSymbolId== id
+
 typedef enum{
   UND,
   ADD,
@@ -34,7 +40,11 @@ typedef enum{
   REMAINDER,
   REMAINDER_ASSIGN,
   INC,
+  PRE_INC,
+  POST_INC,
   DEC,
+  PLUS_SIGN,
+  MINUS_SIGN,
   OPEN_PAREN,
   CLOSE_PAREN,
   OPEN_SQ_BRACKET,
@@ -75,19 +85,15 @@ struct  Symbol{
   Token *token;
   AttributeType type;
   OperationType id;
+  ARITY arity;
 };
 
 typedef struct  Symbolizer  Symbolizer;
 struct  Symbolizer{
   Tokenizer *tokenizer;
   OperationType lastSymbolId;
-};
-
-typedef struct  Operator  Operator;
-struct  Operator{
-  char  *str;
-  int precedence;
-  OperationType id;
+  //AttributeType lastSymbolType;   //macro
+  //ARITY lastSymbolArity;          //macro
 };
 
 typedef Symbol *(*FuncPtr)(Symbolizer *symbolizer, Token  *token);
@@ -98,9 +104,6 @@ struct  OperatorInformationTable{
   FuncPtr func;
 };
 
-Operator  *createOperator(char  *str, int  precedence, OperationType id);
-Operator  *returnDoubleCharacterOperator(Token *token, Token *nextToken);
-void  freeOperator(Operator *opt);
 int returnStringSize(char *str);
 void  checkDoubleCharacterOperator(Tokenizer  *tokenizer, Token *token);
 Token *peekToken(Tokenizer  *tokenizer);
@@ -114,4 +117,8 @@ void  freeSymbolizer(Symbolizer *symbolizer);
 Symbol  *createSymbol(Token *token, AttributeType type, OperationType id);
 Symbol  *getSymbol(Symbolizer *symbolizer);
 void  freeSymbol(Symbol *symbol);
+
+AttributeType getLastSymbolType(Symbolizer  *symbolizer);
+
+ARITY returnArityOfAnId(OperationType type);
 #endif // OPERATORTABLE_H

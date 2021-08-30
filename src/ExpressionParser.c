@@ -1,37 +1,63 @@
 #include "ExpressionParser.h"
 
-OperatorTableStruct  operatorPrecedenceTable[] = {
-  [OPEN_PAREN]        = {1, NULL, NULL, forcePush},  
-  [CLOSE_PAREN]       = {1000, NULL, NULL, evaluateExpressionWithinBrackets},  //Call unwind until '('  
-  [OPEN_SQ_BRACKET]   = {1000, NULL, NULL, NULL},  
-  [CLOSE_SQ_BRACKET]  = {1000, NULL, NULL, NULL},  
-  [BITWISE_NOT]       = {2000, prefixBitwiseNot, handlePrefix, NULL},  
-  [LOGICAL_NOT]       = {2000, prefixLogicNot, handlePrefix, NULL},  
-  [MULTIPLY]          = {3000, infixMultiply, handleInfix, NULL},  
-  [DIVIDE]            = {3000, infixDivide, handleInfix, NULL},  
-  [REMAINDER]         = {3000, NULL, NULL, NULL},  
-  [ADD]               = {4000, infixAdd, handleInfix, NULL},  
-  [MINUS]             = {4000, infixMinus, handleInfix, NULL},  
-  
-  [BITWISE_AND]       = {8000, NULL, NULL},
+//SymbolTableStruct   symbolTable
+SymbolTableStruct  operatorPrecedenceTable[] = {
+  [OPEN_PAREN]        = {10000, PREFIX, NULL,             NULL,         forcePush},  
+  [CLOSE_PAREN]       = {1000 , SUFFIX, NULL,             NULL,         evaluateExpressionWithinBrackets},  //Call unwind until '('  
+  [OPEN_SQ_BRACKET]   = {1000 , PREFIX, NULL,             NULL,         forcePush},  
+  [CLOSE_SQ_BRACKET]  = {1000 , SUFFIX, NULL,             NULL,         evaluateExpressionWithinBrackets},  
+  [BITWISE_NOT]       = {2000 , PREFIX, prefixBitwiseNot, handlePrefix, NULL},  
+  [LOGICAL_NOT]       = {2000 , PREFIX, prefixLogicNot,   handlePrefix, NULL},  
+  [MULTIPLY]          = {3000 , INFIX , infixMultiply,    handleInfix,  NULL},  
+  [DIVIDE]            = {3000 , INFIX , infixDivide,      handleInfix,  NULL},  
+  [REMAINDER]         = {3000 , INFIX , infixModulus,     handleInfix,  NULL},  //pushAccordingToPrecedence
+  [ADD]               = {4000 , INFIX , infixAdd,         handleInfix,  NULL},  //handleAddOrSub
+  [PRE_INC]           = {1000 , PREFIX, prefixInc,        handlePrefix, NULL},  //handleAddOrSub
+  [POST_INC]          = {1000 , SUFFIX, infixAdd,         NULL,         NULL},  //handleAddOrSub
+  [MINUS]             = {4000 , INFIX , infixMinus,       handleInfix,  NULL},    
+  [BITWISE_AND]       = {8000 , INFIX , infixBitwiseAnd,  handleInfix,  NULL},
+  [PLUS_SIGN]         = {2000 , PREFIX, prefixPlus,       handlePrefix, NULL}, 
+  [MINUS_SIGN]        = {2000 , PREFIX, prefixMinus,      handlePrefix, NULL}, 
+  [INTEGER]           = {0,     NUMBER, NULL,             NULL,         NULL},//0, NUMBER, NULL, NULL, pushToOperandStack
 };
 
 void  shuntingYard(Tokenizer  *tokenizer, StackStruct *operatorStack, StackStruct *operandStack){
   Number  *extractedNumber;
-  Operator  *extractedOperator;
   Symbolizer  *symbolizer = createSymbolizer(tokenizer);
-  Symbol  *symbol = getSymbol(symbolizer);
+  Symbol  *symbol = symbolizerGetSymbol(symbolizer);
   ListItem  *popItem;
   while(!(isSymbolNull(symbol))){
-    if(isSymbolOperatorType(symbol))
-      pushOperator(operandStack, operatorStack, symbol);
-    else                                   
-      pushToStack(operandStack, (void  *)symbol);
-  symbol = getSymbol(symbolizer);
+    pushSymbolToStack(operatorStack, operandStack, symbol);
+    symbolizerUpdateLastSymbol(symbol, symbolizer);
+    symbol = symbolizerGetSymbol(symbolizer);
   }
   while(operatorStack->size > 0)
     unwindStack(operatorStack, operandStack);
   freeSymbolizer(symbolizer);
+}
+
+Symbol  *symbolizerGetSymbol(Symbolizer  *symbolizer){
+  Symbol  *symbol = getSymbol(symbolizer);
+  symbol->arity = returnArityOfAnId(symbol->id);
+  //symbolizerUpdateLastSymbol(symbol, symbolizer);  
+  return  symbol;
+}
+
+void  symbolizerUpdateLastSymbol(Symbol *symbol, Symbolizer *symbolizer){
+  symbolizer->lastSymbolId = symbol->id;
+  //symbolizer->lastSymbolArity = symbol->arity;  
+}
+
+void  pushSymbolToStack(StackStruct *operatorStack, StackStruct *operandStack, Symbol *symbol){
+  if(isSymbolOperatorType(symbol))
+    pushOperator(operandStack, operatorStack, symbol);
+  else                                   
+    pushToStack(operandStack, (void  *)symbol);  
+}
+
+//typedef void    (*preHandleOperator)(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *operator);
+void  handleAddOrSub(Symbolizer *symbolizer, Symbol *symbol){
+  
 }
 
 //take the operator and operate on the operands
@@ -45,9 +71,13 @@ void  unwindStack(StackStruct *operatorStack, StackStruct *operandStack){
 }
 
 void  operateOperatorInOperatorStack(StackStruct  *operandStack, StackStruct  *operatorStack){
-    ListItem  *popItem = peekTopOfStack(operatorStack);
-    OperatorTableStruct instruction = operatorPrecedenceTable[getItemOperatorId(popItem)];
-    instruction.arityHandler(operandStack, operatorStack);  
+  ListItem  *popItem = peekTopOfStack(operatorStack);
+  SymbolTableStruct instruction = operatorPrecedenceTable[getItemSymbolId(popItem)];
+  instruction.arityHandler(operandStack, operatorStack);  
+}
+
+void  pushAccordingToPrecedence(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *symbol){
+  
 }
 
 void pushOperator(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *operatorToPush){
@@ -57,7 +87,7 @@ void pushOperator(StackStruct *operandStack, StackStruct *operatorStack, Symbol 
     peekItem = peekTopOfStack(operatorStack);
   }
   pushToStack(operatorStack, (void  *)operatorToPush);
-}  
+}
 
 ListItem  *popOperator(StackStruct *operatorStack, OperationType type){
   ListItem  *popItem = popFromStack(operatorStack);
@@ -93,40 +123,81 @@ void  unwindStackUntil(StackStruct *operandStack, StackStruct *operatorStack, Op
 //if previous is an operator :
     //if previous type is infix = prefix
     //if previous type is prefix = prefix
-int arityAllowable(StackStruct *operandStack, StackStruct *operatorStack, Operator *operator){
-  
+    
+//verifyArityAllowable
+int arityAllowable(OperationType  previousType, OperationType currentType){
+  switch(returnArityOfAnId(currentType)){
+    case  INFIX:
+      if(isIdArity(previousType, SUFFIX) || isIdArity(previousType, NUMBER))
+        return  1;
+      else
+        return  0;
+      break;
+    case  PREFIX:
+      if(isIdArity(previousType, INFIX) || isIdArity(previousType, PREFIX) || isIdArity(previousType, NONE))
+        return  1;
+      else
+        return  0;
+      break;
+    case  SUFFIX:
+      if(isIdArity(previousType, NUMBER))
+        return  1;
+      else
+        return  0;
+     break;
+    case  NUMBER:
+      if(isIdArity(previousType, NONE) || isIdArity(previousType, PREFIX) || isIdArity(previousType, INFIX))
+        return  1;
+      else
+        return  0;
+    break;
+    default:
+      return  0;
+  }  
+}
+
+int verifyArityAllowable(OperationType  previousType, OperationType currentType){
+  switch(returnArityOfAnId(currentType)){
+    case  INFIX:
+      if(isIdArity(previousType, SUFFIX) || isIdArity(previousType, NUMBER))
+        return  1;
+      else
+        return  0;
+      break;
+    case  PREFIX:
+      if(isIdArity(previousType, INFIX) || isIdArity(previousType, PREFIX) || isIdArity(previousType, NONE))
+        return  1;
+      else
+        return  0;
+      break;
+    case  SUFFIX:
+      if(isIdArity(previousType, NUMBER))
+        return  1;
+      else
+        return  0;
+     break;
+    case  NUMBER:
+      if(isIdArity(previousType, NONE) || isIdArity(previousType, PREFIX) || isIdArity(previousType, INFIX))
+        return  1;
+      else
+        return  0;
+    break;
+    default:
+      return  0;
+  }
 }
 
 int returnOperatorPrecedence(Symbol *symbol){
-  OperatorTableStruct instruction = operatorPrecedenceTable[symbol->id];
+  SymbolTableStruct instruction = operatorPrecedenceTable[symbol->id];
   return  instruction.precedence;
 }
-
-/*
-Operator  *extractOperatorFromToken(Token *token, Tokenizer *tokenizer){
-  Operator  *operator;
-  char  *operatorStr;
-  Token *nextToken = peekToken(tokenizer);
-  OperatorInformationTable  information = operatorInformationTable[*(token->str)];
-  if(isNextTokenAOperator(nextToken) && isNextTokenAdjacentToCurrent(token, nextToken))
-    operator = information.func(token, tokenizer);   
-  else{
-    operator = createOperator(token->str, 0, information.type[0]); 
-    freeToken(token);
-  }
-  
-  OperatorTableStruct operatorInfo = operatorPrecedenceTable[operator->id];
-  operator->precedence = operatorInfo.precedence;
-  return  operator;
-}
-*/
 
 void  handleInfix(StackStruct *operandStack, StackStruct *operatorStack){
   ListItem *operand2 = popFromStack(operandStack);
   ListItem *operand1 = popFromStack(operandStack);
   ListItem *operator = popFromStack(operatorStack);
   Symbol  *result;
-  OperatorTableStruct instruction = operatorPrecedenceTable[getItemSymbolId(operator)];
+  SymbolTableStruct instruction = operatorPrecedenceTable[getItemSymbolId(operator)];
   result = instruction.arithmeticHandler(getItemSymbol(operand1), getItemSymbol(operand2));
   pushToStack(operandStack, (void *)result);
   linkedListFreeListItem(operand1);                         
@@ -138,20 +209,34 @@ void  handlePrefix(StackStruct *operandStack, StackStruct *operatorStack){
   ListItem *operand = popFromStack(operandStack);
   ListItem *operator = popFromStack(operatorStack);
   Symbol  *result;
-  OperatorTableStruct instruction = operatorPrecedenceTable[getItemOperatorId(operator)];
+  SymbolTableStruct instruction = operatorPrecedenceTable[getItemSymbolId(operator)];
   result = instruction.arithmeticHandler(getItemSymbol(operand), NULL);
   pushToStack(operandStack, (void *)result);
   linkedListFreeListItem(operand); 
   linkedListFreeListItem(operator);  
 }
 
-createArithmeticFunction(infixAdd, +);
-createArithmeticFunction(infixMinus, -);
-createArithmeticFunction(infixMultiply, *);
+ARITY returnArityOfAnId(OperationType id){
+  if(id == INTEGER || id == DOUBLE)
+    return  NUMBER;
+  else{
+  SymbolTableStruct instruction = operatorPrecedenceTable[id];  
+  return  instruction.arity;
+  }
+}
+
+createInfixArithmeticFunction(infixAdd, +);
+createInfixArithmeticFunction(infixMinus, -);
+createInfixArithmeticFunction(infixMultiply, *);
 createArithmeticDivFunction(infixDivide, /);
 
+createPrefixArithmeticFunction(prefixPlus, +);
+createPrefixArithmeticFunction(prefixMinus, -);
+
 createInfixLogicFunction(infixModulus, %);
+createInfixLogicFunction(infixBitwiseAnd, &);
 createPrefixLogicFunction(prefixLogicNot, !);
+createPrefixLogicFunction(prefixInc, ++);
 createPrefixLogicFunction(prefixBitwiseNot, ~);
 
 Integer *createInteger(int  value){
@@ -176,31 +261,6 @@ char  *duplicateString(char *str, int length){
   strncpy(resultstr, str, length);
   resultstr[length] = '\0';
   return  resultstr;
-}
-
-Number  *extractNumberFromToken(Token *token){
-  Number  *result;
-  if(token->type == TOKEN_FLOAT_TYPE)
-    result = (Number  *)extractFloatingPointFromToken(token);
-  else
-    result = (Number  *)extractIntegerFromToken(token);
-  return  result;
-}
-
-Integer  *extractIntegerFromToken(Token *token){
-  Integer *newInteger = malloc(sizeof(Integer));
-  IntegerToken  *tokenPointer = (IntegerToken *)token;
-  newInteger->type = INTEGER_NUMBER;
-  newInteger->value = tokenPointer->value;
-  return  newInteger;
-}
-
-Double  *extractFloatingPointFromToken(Token *token){
-  Double *newFloat = malloc(sizeof(Double));
-  FloatToken  *tokenPointer = (FloatToken *)token;
-  newFloat->type = FLOAT_NUMBER;
-  newFloat->value = tokenPointer->value;
-  return  newFloat;
 }
 
 char  *createResultString(void  *result, OperationType type){
@@ -260,14 +320,4 @@ void ftoa(double n, char* res, int afterpoint){
     strPtr = (res + i + 1);
     itoa((int)fpart, strPtr, 10);
   }
-  /*
-  if(afterpoint != 0){
-    *(res + i) = '.';
-    strPtr = res + 1;
-    for(int j = 0; j < afterpoint; j++){
-      fpart *= 10;
-      itoa((int)fpart, strPtr + j, 
-    }
-  }
-  */
 }
