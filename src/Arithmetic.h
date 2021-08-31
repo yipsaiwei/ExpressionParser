@@ -13,11 +13,20 @@ Symbol  *funcName(Symbol  *number1, Symbol  *number2){                      \
 }
 
 #define createPrefixArithmeticFunction(funcName, operator)                  \
-Symbol  *funcName(Symbol  *number, Symbol  *number2){                      \
+Symbol  *funcName(Symbol  *number, Symbol  *number2){                       \
   Symbol  *result;                                                          \
   Token *resultToken;                                                       \
   char  *resultStr;                                                         \
   prefixArithmeticCalculation(number, operator);                            \
+  return  result;                                                           \
+}
+
+#define createSuffixArithmeticFunction(funcName, operator)                  \
+Symbol  *funcName(Symbol  *number, Symbol  *number2){                       \
+  Symbol  *result;                                                          \
+  Token *resultToken;                                                       \
+  char  *resultStr;                                                         \
+  suffixArithmeticCalculation(number, operator);                            \
   return  result;                                                           \
 }
 
@@ -101,6 +110,19 @@ Symbol  *funcName(Symbol  *number1, Symbol *number2){                       \
     result = createSymbol(resultToken,  OPERAND, INTEGER);                                                                                       \
   }else{                                                                                                                                         \
     double  resultNum = operator(getSymbolDouble(operand));                                                                                      \
+    resultStr = createResultString((void  *)&resultNum, DOUBLE);                                                                                 \
+    resultToken = (Token  *)createFloatToken(resultNum, number2->token->startColumn, number2->token->originalstr, resultStr, TOKEN_FLOAT_TYPE);  \
+    result = createSymbol(resultToken, OPERAND, DOUBLE);                                                                                         \
+  }    
+  
+#define suffixArithmeticCalculation(operand, operator)                                                                                           \
+  if(isSymbolInteger(operand)){                                                                                                                  \
+    int resultNum = (getSymbolInteger(operand))operator;                                                                                         \
+    resultStr = createResultString((void  *)&resultNum, INTEGER);                                                                                \
+    resultToken = (Token  *)createIntToken(resultNum, operand->token->startColumn, operand->token->originalstr, resultStr, TOKEN_INTEGER_TYPE);  \
+    result = createSymbol(resultToken,  OPERAND, INTEGER);                                                                                       \
+  }else{                                                                                                                                         \
+    double  resultNum = (getSymbolDouble(operand))operator;                                                                                      \
     resultStr = createResultString((void  *)&resultNum, DOUBLE);                                                                                 \
     resultToken = (Token  *)createFloatToken(resultNum, number2->token->startColumn, number2->token->originalstr, resultStr, TOKEN_FLOAT_TYPE);  \
     result = createSymbol(resultToken, OPERAND, DOUBLE);                                                                                         \

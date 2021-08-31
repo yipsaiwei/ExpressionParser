@@ -633,7 +633,7 @@ void  test_forcePush_given_open_bracket_operator_expect_the_bracket_able_to_be_p
   pushToStack(operandStack, (void*)number2);
   pushToStack(operatorStack, (void*)operator);  
   
-  forcePush(operandStack, operatorStack, currentOperator);
+  forcePush(operandStack, operatorStack, currentOperator, 0);
   
   ListItem  *peekItem = peekTopOfStack(operatorStack);
   
@@ -731,7 +731,7 @@ void  test_evaluateExpressionWithinBrackets_given_brackets_operators_operands(){
   pushToStack(operandStack, (void*)number1);
   pushToStack(operandStack, (void*)number2);
   
-  evaluateExpressionWithinBrackets(operandStack, operatorStack, currentOperator);
+  evaluateExpressionWithinBrackets(operandStack, operatorStack, currentOperator, 0);
   
   ListItem  *peekItem = peekTopOfStack(operandStack);
   
@@ -770,7 +770,7 @@ void  test_evaluateExpressionWithinBrackets_given_brackets_3operators_4operands(
   pushToStack(operandStack, (void*)number3);
   pushToStack(operandStack, (void*)number4);
   
-  evaluateExpressionWithinBrackets(operandStack, operatorStack, currentOperator);
+  evaluateExpressionWithinBrackets(operandStack, operatorStack, currentOperator, 0);
   
   ListItem  *peekItem = peekTopOfStack(operandStack);
   
@@ -891,6 +891,23 @@ void  test_shuntingYard_given_3_operator_6_operands_with_ftpoint_expect_correct_
   ListItem  *peekItem = peekTopOfStack(operandStack);
   
   TEST_ASSERT_EQUAL_FLOAT(5.5, getItemSymbolDouble(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free); 
+}
+
+void  test_shuntingYard_given_4_operator_5_operands_with_bracket_expect_correct_value_48_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("  6*(5+5-2/1)");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  shuntingYard(tokenizer, operatorStack, operandStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL(48, getItemSymbolInteger(peekItem));
   
   freeStack(operandStack, free); 
   freeStack(operatorStack, free); 
