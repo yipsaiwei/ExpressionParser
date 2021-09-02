@@ -71,6 +71,7 @@ Symbol  *symbolizerUpdateLastSymbolAndGetNewSymbol(Symbolizer  *symbolizer, Symb
 Symbol  *infixAdd(Symbol  *number1, Symbol  *number2);
 Symbol  *infixMinus(Symbol  *number1, Symbol  *number2);
 Symbol  *infixMultiply(Symbol  *number1, Symbol  *number2);
+Symbol  *infixEqual(Symbol  *number1, Symbol  *number2);
 Symbol  *infixDivide(Symbol  *number1, Symbol  *number2);
 Symbol  *infixModulus(Symbol  *number1, Symbol  *number2);
 Symbol  *infixShiftLeft(Symbol  *number1, Symbol  *number2);
@@ -79,10 +80,12 @@ Symbol  *infixLesser(Symbol  *number1, Symbol  *number2);
 Symbol  *infixLesserEq(Symbol  *number1, Symbol  *number2);
 Symbol  *infixGreater(Symbol  *number1, Symbol  *number2);
 Symbol  *infixGreaterEq(Symbol  *number1, Symbol  *number2);
+Symbol  *infixLogicalOr(Symbol  *number1, Symbol  *number2);
+Symbol  *infixLogicalAnd(Symbol  *number1, Symbol  *number2);
 Symbol  *prefixLogicNot(Symbol  *number1, Symbol *number2);
-Symbol  *prefixLogicInct(Symbol  *number1, Symbol *number2);
 Symbol  *prefixBitwiseNot(Symbol  *number1, Symbol  *number2);
 Symbol  *suffixInc(Symbol  *number1, Symbol  *number2);
+Symbol  *infixBitwiseOr(Symbol  *number1, Symbol  *number2);
 Symbol  *infixBitwiseAnd(Symbol  *number1, Symbol  *number2);
 ARITY returnArityOfAnId(OperationType type);
 

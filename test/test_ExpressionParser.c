@@ -603,6 +603,198 @@ void  test_infixGreaterEq_given_2_int_equal_condition_expect_result_with_1_retur
   freeSymbolizer(symbolizer);
 }
 
+void  test_infixLogicalOr_given_2_int_1_expect_result_with_1_returned(){
+  Tokenizer *tokenizer = createTokenizer(" 1  ||   1");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+
+  Symbol  *result = infixLogicalOr(number1, number2);
+
+  TEST_ASSERT_EQUAL(1, getSymbolInteger(result));
+  TEST_ASSERT_EQUAL(INTEGER, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(operator);
+  freeSymbol(result);
+  freeSymbolizer(symbolizer);
+}
+
+void  test_infixLogicalOr_given_2_int_0_expect_result_with_0_returned(){
+  Tokenizer *tokenizer = createTokenizer(" 0  ||   0");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+
+  Symbol  *result = infixLogicalOr(number1, number2);
+
+  TEST_ASSERT_EQUAL(0, getSymbolInteger(result));
+  TEST_ASSERT_EQUAL(INTEGER, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(operator);
+  freeSymbol(result);
+  freeSymbolizer(symbolizer);
+}
+
+void  test_infixLogicalOr_given_int_0_and_1_expect_result_with_1_returned(){
+  Tokenizer *tokenizer = createTokenizer(" 0  ||   1");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+
+  Symbol  *result = infixLogicalOr(number1, number2);
+
+  TEST_ASSERT_EQUAL(1, getSymbolInteger(result));
+  TEST_ASSERT_EQUAL(INTEGER, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(operator);
+  freeSymbol(result);
+  freeSymbolizer(symbolizer);
+}
+
+void  test_infixLogicalAnd_given_2_int_0__expect_result_with_0_returned(){
+  Tokenizer *tokenizer = createTokenizer(" 0  &&   0");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+
+  Symbol  *result = infixLogicalAnd(number1, number2);
+
+  TEST_ASSERT_EQUAL(0, getSymbolInteger(result));
+  TEST_ASSERT_EQUAL(INTEGER, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(operator);
+  freeSymbol(result);
+  freeSymbolizer(symbolizer);
+}
+
+void  test_infixLogicalAnd_given_int_1_and_0_expect_result_with_0_returned(){
+  Tokenizer *tokenizer = createTokenizer(" 1  &&   0");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+
+  Symbol  *result = infixLogicalAnd(number1, number2);
+
+  TEST_ASSERT_EQUAL(0, getSymbolInteger(result));
+  TEST_ASSERT_EQUAL(INTEGER, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(operator);
+  freeSymbol(result);
+  freeSymbolizer(symbolizer);
+}
+
+void  test_infixLogicalAnd_given_2_int_1_expect_result_with_1_returned(){
+  Tokenizer *tokenizer = createTokenizer(" 1  &&   1");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+
+  Symbol  *result = infixLogicalAnd(number1, number2);
+
+  TEST_ASSERT_EQUAL(1, getSymbolInteger(result));
+  TEST_ASSERT_EQUAL(INTEGER, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(operator);
+  freeSymbol(result);
+  freeSymbolizer(symbolizer);
+}
+
+void  test_infixBitwiseOr_given_2_int_12_and_55_expect_result_with_63_returned(){
+  Tokenizer *tokenizer = createTokenizer(" 12|55");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+
+  Symbol  *result = infixBitwiseOr(number1, number2);
+
+  TEST_ASSERT_EQUAL(63, getSymbolInteger(result));
+  TEST_ASSERT_EQUAL(INTEGER, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(operator);
+  freeSymbol(result);
+  freeSymbolizer(symbolizer);
+}
+
+void  test_infixEqual_given_2_equal_int_expect_1_returned(){
+  Tokenizer *tokenizer = createTokenizer(" 77==77");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+
+  Symbol  *result = infixEqual(number1, number2);
+
+  TEST_ASSERT_EQUAL(1, getSymbolInteger(result));
+  TEST_ASSERT_EQUAL(INTEGER, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(operator);
+  freeSymbol(result);
+  freeSymbolizer(symbolizer);
+}
+
+void  test_infixEqual_given_2_not_equal_int_expect_0_returned(){
+  Tokenizer *tokenizer = createTokenizer(" 71==77");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+
+  Symbol  *result = infixEqual(number1, number2);
+
+  TEST_ASSERT_EQUAL(0, getSymbolInteger(result));
+  TEST_ASSERT_EQUAL(INTEGER, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(operator);
+  freeSymbol(result);
+  freeSymbolizer(symbolizer);
+}
+
+/*
+void  test_infixEqual_given_2_equal_double_expect_0_returned(){
+  Tokenizer *tokenizer = createTokenizer(" 11.111==11.111");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+
+  Symbol  *result = infixEqual(number1, number2);
+
+  TEST_ASSERT_EQUAL(1, getSymbolInteger(result));
+  TEST_ASSERT_EQUAL(INTEGER, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(operator);
+  freeSymbol(result);
+  freeSymbolizer(symbolizer);
+}
+*/
+
 void  test_handleInfix_given_two_operand_Integers_1_infix_add_expect_the_values_able_to_be_returned(){
   Tokenizer *tokenizer = createTokenizer(" 13+77");
   Token *operandToken1 = getToken(tokenizer);
@@ -1194,6 +1386,23 @@ void  test_shuntingYard_given_post_INC_expect_correct_value_6_returned(){
   freeStack(operatorStack, free); 
 }
 
+
+void  test_shuntingYard_given_prefix_minus_pre_INC_expect_correct_value_minus_4_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("  -(++3)");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  shuntingYard(tokenizer, operatorStack, operandStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL(-4, getItemSymbolInteger(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free); 
+}
 void  test_verifyArityAllowable_given_previous_operand_current_suffix_expect_1_returned(){
   TEST_ASSERT_EQUAL(1, verifyArityAllowable(INTEGER, POST_INC));
 }
