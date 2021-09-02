@@ -356,6 +356,253 @@ void  test_infixDivision_given_2_int_expect_result_with_1point55_returned(){
   freeTokenizer(tokenizer);
 }
 
+void  test_infixShiftLeft_given_2_int_expect_result_with_hex_AC_returned(){
+  Tokenizer *tokenizer = createTokenizer(" 0x2B <<2");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+
+  Symbol  *result = infixShiftLeft(number1, number2);
+
+  TEST_ASSERT_EQUAL(0xAC, getSymbolInteger(result));
+  TEST_ASSERT_EQUAL(INTEGER, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(operator);
+  freeSymbol(result);
+  freeSymbolizer(symbolizer);
+}
+
+void  test_infixShiftLeft_given_2_int_expect_result_with_hex_1840_returned(){
+  Tokenizer *tokenizer = createTokenizer(" 0xC2 <<5");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+
+  Symbol  *result = infixShiftLeft(number1, number2);
+
+  TEST_ASSERT_EQUAL(0x1840, getSymbolInteger(result));
+  TEST_ASSERT_EQUAL(INTEGER, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(operator);
+  freeSymbol(result);
+  freeSymbolizer(symbolizer);
+}
+
+void  test_infixShiftRight_given_2_int_expect_result_with_hex_1840_returned(){
+  Tokenizer *tokenizer = createTokenizer(" 0x33>>2");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+
+  Symbol  *result = infixShiftRight(number1, number2);
+
+  TEST_ASSERT_EQUAL(0xC, getSymbolInteger(result));
+  TEST_ASSERT_EQUAL(INTEGER, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(operator);
+  freeSymbol(result);
+  freeSymbolizer(symbolizer);
+}
+
+void  test_infixLesser_given_2_int_lesser_condition_expect_result_with_1_returned(){
+  Tokenizer *tokenizer = createTokenizer(" 12<89");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+
+  Symbol  *result = infixLesser(number1, number2);
+
+  TEST_ASSERT_EQUAL(1, getSymbolInteger(result));
+  TEST_ASSERT_EQUAL(INTEGER, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(operator);
+  freeSymbol(result);
+  freeSymbolizer(symbolizer);
+}
+
+void  test_infixLesser_given_2_int_not_lesser_condition_expect_result_with_0_returned(){
+  Tokenizer *tokenizer = createTokenizer(" 422<89");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+
+  Symbol  *result = infixLesser(number1, number2);
+
+  TEST_ASSERT_EQUAL(0, getSymbolInteger(result));
+  TEST_ASSERT_EQUAL(INTEGER, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(operator);
+  freeSymbol(result);
+  freeSymbolizer(symbolizer);
+}
+
+void  test_infixLesserEq_given_2_int_not_lesser_condition_expect_result_with_0_returned(){
+  Tokenizer *tokenizer = createTokenizer(" 54  <= 12");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+
+  Symbol  *result = infixLesserEq(number1, number2);
+
+  TEST_ASSERT_EQUAL(0, getSymbolInteger(result));
+  TEST_ASSERT_EQUAL(INTEGER, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(operator);
+  freeSymbol(result);
+  freeSymbolizer(symbolizer);
+}
+
+void  test_infixLesserEq_given_2_int_equal_condition_expect_result_with_1_returned(){
+  Tokenizer *tokenizer = createTokenizer(" 66  <= 66");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+
+  Symbol  *result = infixLesserEq(number1, number2);
+
+  TEST_ASSERT_EQUAL(1, getSymbolInteger(result));
+  TEST_ASSERT_EQUAL(INTEGER, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(operator);
+  freeSymbol(result);
+  freeSymbolizer(symbolizer);
+}
+
+void  test_infixLesserEq_given_2_int_lesser_condition_expect_result_with_1_returned(){
+  Tokenizer *tokenizer = createTokenizer(" 65  <= 66");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+
+  Symbol  *result = infixLesserEq(number1, number2);
+
+  TEST_ASSERT_EQUAL(1, getSymbolInteger(result));
+  TEST_ASSERT_EQUAL(INTEGER, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(operator);
+  freeSymbol(result);
+  freeSymbolizer(symbolizer);
+}
+
+void  test_infixGreater_given_2_int_greater_condition_expect_result_with_1_returned(){
+  Tokenizer *tokenizer = createTokenizer(" 422>89");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+
+  Symbol  *result = infixGreater(number1, number2);
+
+  TEST_ASSERT_EQUAL(1, getSymbolInteger(result));
+  TEST_ASSERT_EQUAL(INTEGER, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(operator);
+  freeSymbol(result);
+  freeSymbolizer(symbolizer);
+}
+
+void  test_infixGreater_given_2_int_not_greater_condition_expect_result_with_0_returned(){
+  Tokenizer *tokenizer = createTokenizer(" 67  >     999");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+
+  Symbol  *result = infixGreater(number1, number2);
+
+  TEST_ASSERT_EQUAL(0, getSymbolInteger(result));
+  TEST_ASSERT_EQUAL(INTEGER, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(operator);
+  freeSymbol(result);
+  freeSymbolizer(symbolizer);
+}
+
+void  test_infixGreaterEq_given_2_int_greater_condition_expect_result_with_1_returned(){
+  Tokenizer *tokenizer = createTokenizer(" 11111>=1223");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+
+  Symbol  *result = infixGreaterEq(number1, number2);
+
+  TEST_ASSERT_EQUAL(1, getSymbolInteger(result));
+  TEST_ASSERT_EQUAL(INTEGER, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(operator);
+  freeSymbol(result);
+  freeSymbolizer(symbolizer);
+}
+
+void  test_infixGreaterEq_given_2_int_not_greater_condition_expect_result_with_0_returned(){
+  Tokenizer *tokenizer = createTokenizer(" 0X22 >=   355");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+
+  Symbol  *result = infixGreaterEq(number1, number2);
+
+  TEST_ASSERT_EQUAL(0, getSymbolInteger(result));
+  TEST_ASSERT_EQUAL(INTEGER, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(operator);
+  freeSymbol(result);
+  freeSymbolizer(symbolizer);
+}
+
+void  test_infixGreaterEq_given_2_int_equal_condition_expect_result_with_1_returned(){
+  Tokenizer *tokenizer = createTokenizer(" 0X55 >=   85");
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
+  Symbol  *number1 = getSymbol(symbolizer);
+  Symbol  *operator = getSymbol(symbolizer);
+  Symbol  *number2 = getSymbol(symbolizer);
+
+  Symbol  *result = infixGreaterEq(number1, number2);
+
+  TEST_ASSERT_EQUAL(1, getSymbolInteger(result));
+  TEST_ASSERT_EQUAL(INTEGER, result->id);
+
+  freeSymbol(number1);
+  freeSymbol(number2);
+  freeSymbol(operator);
+  freeSymbol(result);
+  freeSymbolizer(symbolizer);
+}
+
 void  test_handleInfix_given_two_operand_Integers_1_infix_add_expect_the_values_able_to_be_returned(){
   Tokenizer *tokenizer = createTokenizer(" 13+77");
   Token *operandToken1 = getToken(tokenizer);
@@ -908,6 +1155,40 @@ void  test_shuntingYard_given_4_operator_5_operands_with_bracket_expect_correct_
   ListItem  *peekItem = peekTopOfStack(operandStack);
   
   TEST_ASSERT_EQUAL(48, getItemSymbolInteger(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free); 
+}
+
+void  test_shuntingYard_given_pre_INC_expect_correct_value_6_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("  ++5");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  shuntingYard(tokenizer, operatorStack, operandStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL(6, getItemSymbolInteger(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free); 
+}
+
+void  test_shuntingYard_given_post_INC_expect_correct_value_6_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("  15++");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  shuntingYard(tokenizer, operatorStack, operandStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL(16, getItemSymbolInteger(peekItem));
   
   freeStack(operandStack, free); 
   freeStack(operatorStack, free); 

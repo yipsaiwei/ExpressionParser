@@ -2,23 +2,23 @@
 
 //Change it to symbolTable
 OperatorInformationTable operatorInformationTable[] = {
-  ['('] = {{OPEN_PAREN, UND, UND, UND}                            , handleSymbol},  
-  [')'] = {{CLOSE_PAREN, UND, UND, UND}                           , handleSymbol},  
-  ['['] = {{OPEN_SQ_BRACKET, UND, UND, UND}, NULL},  
-  [']'] = {{CLOSE_SQ_BRACKET, UND, UND, UND}, NULL},  
-  ['~'] = {{BITWISE_NOT, UND, UND, UND}, NULL},  
-  ['!'] = {{LOGICAL_NOT, UND, UND, UND}, NULL},  
-  ['*'] = {{MULTIPLY, UND, UND, UND}                              , handleSymbol},  
-  ['/'] = {{DIVIDE, UND, UND, UND}                                , handleSymbol},  
-  ['%'] = {{REMAINDER, REMAINDER_ASSIGN, UND, UND}                , handleSymbol},  
-  ['+'] = {{ADD, ADD_ASSIGN, INC, UND}                            , handleRepeatedSymbol},     //There are postfix infix inc, addition, +=?
-  ['-'] = {{MINUS, MINUS_ASSIGN, DEC, UND}                        , handleRepeatedSymbol}, 
-  ['<'] = {{LESSER, LESSER_EQ, SHIFT_LEFT, SHIFT_LEFT_ASSIGN}     , handleShiftSymbol}, 
-  ['>'] = {{GREATER, GREATER_EQ, SHIFT_RIGHT, SHIFT_RIGHT_ASSIGN} , handleShiftSymbol}, 
-  ['|'] = {{BITWISE_OR, BITWISE_OR_ASSIGN, LOGICAL_OR, UND}       , handleSymbol},
-  ['&'] = {{BITWISE_AND, BITWISE_AND_ASSIGN, LOGICAL_AND, UND}    , handleSymbol},
-  ['^'] = {{BITWISE_XOR, BITWISE_XOR_ASSIGN, UND, UND}            , handleSymbol},
-  ['='] = {{ASSIGN, EQUAL, UND, UND}                              , handleSymbol},
+  ['('] = {{OPEN_PAREN      , UND               , UND         , UND}                , handleSymbol},  
+  [')'] = {{CLOSE_PAREN     , UND               , UND         , UND}                , handleSymbol},  
+  ['['] = {{OPEN_SQ_BRACKET , UND               , UND         , UND}                , NULL},  
+  [']'] = {{CLOSE_SQ_BRACKET, UND               , UND         , UND}                , NULL},  
+  ['~'] = {{BITWISE_NOT     , UND               , UND         , UND}                , NULL},  
+  ['!'] = {{LOGICAL_NOT     , UND               , UND         , UND}                , NULL},  
+  ['*'] = {{MULTIPLY        , UND               , UND         , UND}                , handleSymbol},  
+  ['/'] = {{DIVIDE          , UND               , UND         , UND}                , handleSymbol},  
+  ['%'] = {{REMAINDER       , REMAINDER_ASSIGN  , UND         , UND}                , handleSymbol},  
+  ['+'] = {{ADD             , ADD_ASSIGN        , INC         , UND}                , handleRepeatedSymbol},     //There are postfix infix inc, addition, +=?
+  ['-'] = {{MINUS           , MINUS_ASSIGN      , DEC         , UND}                , handleRepeatedSymbol}, 
+  ['<'] = {{LESSER          , LESSER_EQ         , SHIFT_LEFT  , SHIFT_LEFT_ASSIGN}  , handleShiftSymbol}, 
+  ['>'] = {{GREATER         , GREATER_EQ        , SHIFT_RIGHT , SHIFT_RIGHT_ASSIGN} , handleShiftSymbol}, 
+  ['|'] = {{BITWISE_OR      , BITWISE_OR_ASSIGN , LOGICAL_OR  , UND}                , handleSymbol},
+  ['&'] = {{BITWISE_AND     , BITWISE_AND_ASSIGN, LOGICAL_AND , UND}                , handleSymbol},
+  ['^'] = {{BITWISE_XOR     , BITWISE_XOR_ASSIGN, UND         , UND}                , handleSymbol},
+  ['='] = {{ASSIGN          , EQUAL             , UND         , UND}                , handleSymbol},
 };
 
 int returnStringSize(char *str){

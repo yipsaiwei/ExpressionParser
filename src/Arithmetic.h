@@ -3,7 +3,7 @@
 
 //#include  "ExpressionParser.h"
 
-#define createInfixArithmeticFunction(funcName, operator)                        \
+#define createInfixArithmeticFunction(funcName, operator)                   \
 Symbol  *funcName(Symbol  *number1, Symbol  *number2){                      \
   Symbol  *result;                                                          \
   Token *resultToken;                                                       \
@@ -45,6 +45,15 @@ Symbol  *funcName(Symbol  *number, Symbol *number2){                        \
   Token *resultToken;                                                       \
   char  *resultStr;                                                         \
   prefixLogicCalculation(number, operator);                                 \
+  return  result;                                                           \
+}
+
+#define createSuffixLogicFunction(funcName, operator)                       \
+Symbol  *funcName(Symbol  *number, Symbol *number2){                        \
+  Symbol  *result;                                                          \
+  Token *resultToken;                                                       \
+  char  *resultStr;                                                         \
+  suffixLogicCalculation(number, operator);                                 \
   return  result;                                                           \
 }
 
@@ -117,7 +126,8 @@ Symbol  *funcName(Symbol  *number1, Symbol *number2){                       \
   
 #define suffixArithmeticCalculation(operand, operator)                                                                                           \
   if(isSymbolInteger(operand)){                                                                                                                  \
-    int resultNum = (getSymbolInteger(operand))operator;                                                                                         \
+    int resultNum = getSymbolInteger(operand);                                                                                                   \
+    resultNum = ((resultNum)operator);                                                                                                           \
     resultStr = createResultString((void  *)&resultNum, INTEGER);                                                                                \
     resultToken = (Token  *)createIntToken(resultNum, operand->token->startColumn, operand->token->originalstr, resultStr, TOKEN_INTEGER_TYPE);  \
     result = createSymbol(resultToken,  OPERAND, INTEGER);                                                                                       \
@@ -137,6 +147,12 @@ Symbol  *funcName(Symbol  *number1, Symbol *number2){                       \
   
 #define prefixLogicCalculation(operand, operator)                                                                                               \
     int resultNum = operator(getSymbolInteger(operand));                                                                                        \
+    resultStr = createResultString((void  *)&resultNum, INTEGER);                                                                               \
+    resultToken = (Token  *)createIntToken(resultNum, operand->token->startColumn, operand->token->originalstr, resultStr, TOKEN_INTEGER_TYPE); \
+    result = createSymbol(resultToken,  OPERAND, INTEGER);     
+
+#define suffixLogicCalculation(operand, operator)                                                                                               \
+    int resultNum = (getSymbolInteger(operand))operator;                                                                                        \
     resultStr = createResultString((void  *)&resultNum, INTEGER);                                                                               \
     resultToken = (Token  *)createIntToken(resultNum, operand->token->startColumn, operand->token->originalstr, resultStr, TOKEN_INTEGER_TYPE); \
     result = createSymbol(resultToken,  OPERAND, INTEGER);      

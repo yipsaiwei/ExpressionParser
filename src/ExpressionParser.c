@@ -5,21 +5,26 @@ SymbolTableStruct  operatorPrecedenceTable[] = {
   [OPEN_PAREN]        = {10000, PREFIX, NULL,             forcePush},  
   [CLOSE_PAREN]       = {1000 , SUFFIX, NULL,             evaluateExpressionWithinBrackets},  //Call unwind until '('  
   [OPEN_SQ_BRACKET]   = {1000 , PREFIX, NULL,             forcePush},  
-  [CLOSE_SQ_BRACKET]  = {1000 , SUFFIX, NULL,             evaluateExpressionWithinBrackets},  
+  [CLOSE_SQ_BRACKET]  = {1000 , SUFFIX, NULL,             evaluateExpressionWithinBrackets}, 
+  [INC]               = {1000 , PREFIX, prefixInc,        handlePreIncOrPostInc},  //handleAddOrSub
+  [POST_INC]          = {1000 , SUFFIX, suffixInc,        handlePreIncOrPostInc},  //handleAddOrSub  
   [BITWISE_NOT]       = {2000 , PREFIX, prefixBitwiseNot, pushAccordingToPrecedence},  
   [LOGICAL_NOT]       = {2000 , PREFIX, prefixLogicNot,   pushAccordingToPrecedence},  
+  [PLUS_SIGN]         = {2000 , PREFIX, prefixPlus,       pushAccordingToPrecedence}, 
+  [MINUS_SIGN]        = {2000 , PREFIX, prefixMinus,      pushAccordingToPrecedence}, 
   [MULTIPLY]          = {3000 , INFIX , infixMultiply,    pushAccordingToPrecedence},  
   [DIVIDE]            = {3000 , INFIX , infixDivide,      pushAccordingToPrecedence},  
   [REMAINDER]         = {3000 , INFIX , infixModulus,     pushAccordingToPrecedence},  //pushAccordingToPrecedence
   [ADD]               = {4000 , INFIX , infixAdd,         handleAddOrSub},  //handleAddOrSub
-  [PRE_INC]           = {1000 , PREFIX, prefixInc,        pushAccordingToPrecedence},  //handleAddOrSub
-  [POST_INC]          = {1000 , SUFFIX, infixAdd,         pushAccordingToPrecedence},  //handleAddOrSub
   [MINUS]             = {4000 , INFIX , infixMinus,       handleAddOrSub},    
+  [SHIFT_LEFT]        = {5000 , INFIX, infixShiftLeft,    pushAccordingToPrecedence}, 
+  [LESSER]            = {6000 , INFIX , infixLesser,      pushAccordingToPrecedence}, 
+  [LESSER_EQ]         = {6000 , INFIX , infixLesserEq,    pushAccordingToPrecedence}, 
+  [GREATER]           = {6000 , INFIX , infixGreater,     pushAccordingToPrecedence}, 
+  [GREATER_EQ]        = {6000 , INFIX , infixGreaterEq,   pushAccordingToPrecedence}, 
   [BITWISE_AND]       = {8000 , INFIX , infixBitwiseAnd,  pushAccordingToPrecedence},
-  [PLUS_SIGN]         = {2000 , PREFIX, prefixPlus,       pushAccordingToPrecedence}, 
-  [MINUS_SIGN]        = {2000 , PREFIX, prefixMinus,      pushAccordingToPrecedence}, 
-  [INTEGER]           = {0,     NUMBER, NULL,             forcePush},//0, NUMBER, NULL, NULL, pushToOperandStack
-  [DOUBLE]            = {0,     NUMBER, NULL,             forcePush},//0, NUMBER, NULL, NULL, pushToOperandStack
+  [INTEGER]           = {0,     NUMBER, NULL,             forcePush},
+  [DOUBLE]            = {0,     NUMBER, NULL,             forcePush},
 };
 
 ArityHandler  arityHandler[] = {
@@ -30,7 +35,6 @@ ArityHandler  arityHandler[] = {
 };
 
 void  shuntingYard(Tokenizer  *tokenizer, StackStruct *operatorStack, StackStruct *operandStack){
-  Number  *extractedNumber;
   SymbolTableStruct instruction;
   Symbolizer  *symbolizer = createSymbolizer(tokenizer);
   Symbol  *symbol = symbolizerUpdateLastSymbolAndGetNewSymbol(symbolizer, NULL);
@@ -70,17 +74,26 @@ void  pushSymbolToStack(StackStruct *operatorStack, StackStruct *operandStack, S
 //typedef void    (*preHandleOperator)(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *operator);
 void  handleAddOrSub(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, OperationType previousId){
   if(!arityAllowable(previousId, symbol->id)){
-    verifyArityAllowable(previousId, symbol->id);
-    if(symbol->type == ADD)
-      symbol->type = PLUS_SIGN;
+    verifyArityAllowable(previousId, PREFIX);
+    if(symbol->id == ADD)
+      symbol->id = PLUS_SIGN;
     else
-      symbol->type = MINUS_SIGN;
+      symbol->id = MINUS_SIGN;
+  }
+  pushAccordingToPrecedence(operandStack, operatorStack, symbol, previousId);
+}
+
+void  handlePreIncOrPostInc(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, OperationType previousId){
+  if(!arityAllowable(previousId, symbol->id)){
+    verifyArityAllowable(previousId, SUFFIX);
+    if(symbol->id == INC)
+      symbol->id = POST_INC;    
   }
   pushAccordingToPrecedence(operandStack, operatorStack, symbol, previousId);
 }
 
 void  pushAccordingToPrecedence(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *symbol, OperationType previousId){
-  verifyArityAllowable(previousId, symbol->type);
+  verifyArityAllowable(previousId, symbol->id);
   pushOperator(operandStack, operatorStack, symbol);
 }
 
@@ -268,30 +281,19 @@ createArithmeticDivFunction(infixDivide, /);
 createPrefixArithmeticFunction(prefixPlus, +);
 createPrefixArithmeticFunction(prefixMinus, -);
 
-createSuffixArithmeticFunction(suffixInc, ++);
+//createSuffixArithmeticFunction(suffixInc, ++);
 
 createInfixLogicFunction(infixModulus, %);
 createInfixLogicFunction(infixBitwiseAnd, &);
+createInfixLogicFunction(infixLesser, <);
+createInfixLogicFunction(infixLesserEq, <=);
+createInfixLogicFunction(infixGreater, >);
+createInfixLogicFunction(infixGreaterEq, >=);
+createInfixLogicFunction(infixShiftLeft, <<);
+createInfixLogicFunction(infixShiftRight, >>);
 createPrefixLogicFunction(prefixLogicNot, !);
 createPrefixLogicFunction(prefixInc, ++);
 createPrefixLogicFunction(prefixBitwiseNot, ~);
-
-Integer *createInteger(int  value){
-  Integer *newInteger = malloc(sizeof(Integer));
-  newInteger->type = INTEGER_NUMBER;
-  newInteger->value = value;
-  return  newInteger;
-}
-Double *createDouble(double  value){
-  Double *newDouble = malloc(sizeof(Double));
-  newDouble->type = FLOAT_NUMBER;
-  newDouble->value = value;
-  return  newDouble;
-}
-
-int isOperandType(void    *number, OPERANDTYPE  type){
-  return  (((Number *)number)->type == type);
-}
 
 char  *duplicateString(char *str, int length){
   char  *resultstr = memAlloc((length+1)*sizeof(char));
@@ -315,6 +317,28 @@ char  *createResultString(void  *result, OperationType type){
     return  resultStr;
   }
 }
+
+Symbol  *suffixInc(Symbol  *number1, Symbol  *number2){
+  Symbol  *result;
+  Token *resultToken;
+  char  *resultStr;
+  if(isSymbolInteger(number1)){
+    int resultNum = getSymbolInteger(number1);
+    resultNum++;
+    resultStr = createResultString((void  *)&resultNum, INTEGER);
+    resultToken = (Token  *)createIntToken(resultNum, number1->token->startColumn, number1->token->originalstr, resultStr, TOKEN_INTEGER_TYPE);
+    result = createSymbol(resultToken,  OPERAND, INTEGER);
+  }else{
+    double  resultNum = getSymbolDouble(number1);
+    resultNum++;
+    resultStr = createResultString((void  *)&resultNum, DOUBLE);
+    resultToken = (Token  *)createFloatToken(resultNum, number2->token->startColumn, number2->token->originalstr, resultStr, TOKEN_FLOAT_TYPE);
+    result = createSymbol(resultToken, OPERAND, DOUBLE);
+  } 
+  return  result;    
+}
+
+
 
 int countIntegerDigitNumber(int number){
   if(number < 0){
