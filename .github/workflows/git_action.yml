@@ -33,7 +33,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: [2.5,2.6]
+          ruby-version: 2.5,2.6
       - name: Install Ceedling
         run: gem install ceedling
       - name: Run Unit Tests
