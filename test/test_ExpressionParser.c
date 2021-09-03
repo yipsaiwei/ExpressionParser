@@ -1389,7 +1389,7 @@ void  test_shuntingYard_given_post_INC_expect_correct_value_6_returned(){
 
 void  test_shuntingYard_given_prefix_minus_pre_INC_expect_correct_value_minus_4_returned(){
   Tokenizer *tokenizer = NULL;
-  tokenizer = createTokenizer("  -(++3)");
+  tokenizer = createTokenizer("  -++3");
   
   StackStruct *operandStack = createStack();
   StackStruct *operatorStack = createStack();
@@ -1403,6 +1403,43 @@ void  test_shuntingYard_given_prefix_minus_pre_INC_expect_correct_value_minus_4_
   freeStack(operandStack, free); 
   freeStack(operatorStack, free); 
 }
+
+void  test_shuntingYard_given_prefix_plus_pre_INC_expect_correct_value_4_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("  + ++3");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  shuntingYard(tokenizer, operatorStack, operandStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL(4, getItemSymbolInteger(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free); 
+}
+
+/*
+void  test_shuntingYard_given_prefix_minus_pre_INC_expect_correct_value_minus_2_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("  -(--3)");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  shuntingYard(tokenizer, operatorStack, operandStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL(-2, getItemSymbolInteger(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free); 
+}
+*/
+
 void  test_verifyArityAllowable_given_previous_operand_current_suffix_expect_1_returned(){
   TEST_ASSERT_EQUAL(1, verifyArityAllowable(INTEGER, POST_INC));
 }

@@ -1,17 +1,18 @@
 #include "ExpressionParser.h"
 
 //SymbolTableStruct   symbolTable
-SymbolTableStruct  operatorPrecedenceTable[] = {
+SymbolTableStruct  symbolTable[] = {
   [OPEN_PAREN]        = {10000, PREFIX, NULL,             forcePush},  
   [CLOSE_PAREN]       = {1000 , SUFFIX, NULL,             evaluateExpressionWithinBrackets},  //Call unwind until '('  
   [OPEN_SQ_BRACKET]   = {1000 , PREFIX, NULL,             forcePush},  
   [CLOSE_SQ_BRACKET]  = {1000 , SUFFIX, NULL,             evaluateExpressionWithinBrackets}, 
-  [INC]               = {1000 , PREFIX, prefixInc,        handlePreIncOrPostInc},  
   [POST_INC]          = {1000 , SUFFIX, suffixInc,        handlePreIncOrPostInc},   
-  [BITWISE_NOT]       = {2000 , PREFIX, prefixBitwiseNot, pushAccordingToPrecedence},  
-  [LOGICAL_NOT]       = {2000 , PREFIX, prefixLogicNot,   pushAccordingToPrecedence},  
-  [PLUS_SIGN]         = {2000 , PREFIX, prefixPlus,       pushAccordingToPrecedence}, 
-  [MINUS_SIGN]        = {2000 , PREFIX, prefixMinus,      pushAccordingToPrecedence}, 
+  [INC]               = {2000 , PREFIX, prefixInc,        handlePreIncOrPostInc},       //Right to left
+  [DEC]               = {2000 , PREFIX, prefixDec,        handlePreIncOrPostInc},       //Right to left  separate function
+  [BITWISE_NOT]       = {2000 , PREFIX, prefixBitwiseNot, pushAccordingToPrecedence},   //Right to left
+  [LOGICAL_NOT]       = {2000 , PREFIX, prefixLogicNot,   pushAccordingToPrecedence},   //Right to left
+  [PLUS_SIGN]         = {2000 , PREFIX, prefixPlus,       pushAccordingToPrecedence},   //Right to left
+  [MINUS_SIGN]        = {2000 , PREFIX, prefixMinus,      pushAccordingToPrecedence},   //Right to left
   [MULTIPLY]          = {3000 , INFIX , infixMultiply,    pushAccordingToPrecedence},  
   [DIVIDE]            = {3000 , INFIX , infixDivide,      pushAccordingToPrecedence},  
   [REMAINDER]         = {3000 , INFIX , infixModulus,     pushAccordingToPrecedence},  
@@ -38,19 +39,36 @@ ArityHandler  arityHandler[] = {
   [NUMBER] = NULL,
 };
 
+/*
+To handle right to left associativity:
+  When right to left associativity symbol is detected, (5+-++3)
+  1) push 5 to operand stack
+  2) push infix + to operand stack
+  3) prefix - is detected, don't push it first, get another symbol
+  4) prefix ++ is detected, don't push it first, get another symbol
+  5) operand is detected, push into operand stack
+  6) push prefix ++ into operator stack
+  7) push prefix - into operator stack
+  8) after that just unwind the stack
+*/
+
 void  shuntingYard(Tokenizer  *tokenizer, StackStruct *operatorStack, StackStruct *operandStack){
-  SymbolTableStruct instruction;
+  //SymbolTableStruct instruction;
   Symbolizer  *symbolizer = createSymbolizer(tokenizer);
   Symbol  *symbol = symbolizerUpdateLastSymbolAndGetNewSymbol(symbolizer, NULL);
   ListItem  *popItem;
   while(!(isSymbolNull(symbol))){
-    instruction = operatorPrecedenceTable[symbol->id];
-    instruction.storeHandler(operandStack, operatorStack, symbol, symbolizer->lastSymbolId);
+    executeStoreHandler(operandStack, operatorStack, symbol, symbolizer);
     symbol = symbolizerUpdateLastSymbolAndGetNewSymbol(symbolizer, symbol);
   }
   while(operatorStack->size > 0)
     unwindStack(operatorStack, operandStack);
   freeSymbolizer(symbolizer);
+}
+
+void  executeStoreHandler(StackStruct  *operandStack, StackStruct  *operatorStack, Symbol  *symbol, Symbolizer *symbolizer){
+  SymbolTableStruct instruction = symbolTable[symbol->id];
+  instruction.storeHandler(operandStack, operatorStack, symbol, symbolizer);  
 }
 
 Symbol  *symbolizerUpdateLastSymbolAndGetNewSymbol(Symbolizer  *symbolizer, Symbol *symbol){
@@ -76,29 +94,43 @@ void  pushSymbolToStack(StackStruct *operatorStack, StackStruct *operandStack, S
 }
 
 //typedef void    (*preHandleOperator)(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *operator);
-void  handleAddOrSub(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, OperationType previousId){
-  if(!arityAllowable(previousId, symbol->id) || previousId == _NULL){
-    verifyArityAllowable(previousId, PLUS_SIGN);
+void  handleAddOrSub(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer){
+  if(!arityAllowable(symbolizer->lastSymbolId, symbol->id) || symbolizer->lastSymbolId == _NULL){
+    verifyArityAllowable(symbolizer->lastSymbolId, PLUS_SIGN);
     if(symbol->id == ADD)
       symbol->id = PLUS_SIGN;
     else
       symbol->id = MINUS_SIGN;
   }
-  pushAccordingToPrecedence(operandStack, operatorStack, symbol, previousId);
+  pushAccordingToPrecedence(operandStack, operatorStack, symbol, symbolizer);
 }
 
-void  handlePreIncOrPostInc(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, OperationType previousId){
-  if(!arityAllowable(previousId, symbol->id)){
-    verifyArityAllowable(previousId, SUFFIX);
+void  handlePreIncOrPostInc(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer){
+  if(!arityAllowable(symbolizer->lastSymbolId, symbol->id)){
+    verifyArityAllowable(symbolizer->lastSymbolId, POST_INC);
     if(symbol->id == INC)
       symbol->id = POST_INC;    
   }
-  pushAccordingToPrecedence(operandStack, operatorStack, symbol, previousId);
+  pushAccordingToPrecedence(operandStack, operatorStack, symbol, symbolizer);
 }
 
-void  pushAccordingToPrecedence(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *symbol, OperationType previousId){
-  verifyArityAllowable(previousId, symbol->id);
-  pushOperator(operandStack, operatorStack, symbol);
+void  pushAccordingToPrecedence(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *symbol, Symbolizer  *symbolizer){
+  verifyArityAllowable(symbolizer->lastSymbolId, symbol->id);
+  ListItem  *peekItem = peekTopOfStack(operatorStack);
+  if(isIdArity(symbol->id, PREFIX) && (!isStackEmpty(operatorStack) && areTwoIdPrecedenceSame(getItemSymbolId(peekItem), symbol->id)))
+    handleRightToLeftAssociativity(operandStack, operatorStack, symbol, symbolizer);
+  else
+    pushOperator(operandStack, operatorStack, symbol);
+}
+
+void  handleRightToLeftAssociativity(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *symbol, Symbolizer *symbolizer){
+  ListItem  *peekItem = peekTopOfStack(operatorStack);
+  while(isIdArity(symbol->id, PREFIX) && areTwoIdPrecedenceSame(getItemSymbolId(peekItem), symbol->id)){
+    pushToStack(operatorStack, symbol);
+    symbol = symbolizerUpdateLastSymbolAndGetNewSymbol(symbolizer, symbol);
+    peekItem = peekTopOfStack(operatorStack);
+  }
+  executeStoreHandler(operandStack, operatorStack, symbol, symbolizer);
 }
 
 void pushOperator(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *operatorToPush){
@@ -136,14 +168,14 @@ void  operateOperatorInOperatorStack(StackStruct  *operandStack, StackStruct  *o
 }
 
 
-void  forcePush(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, OperationType  previousType){
+void  forcePush(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer){
   if(symbol->type == OPERATOR)
     pushToStack(operatorStack, (void  *)symbol);
   else
     pushToStack(operandStack, (void  *)symbol);
 }
 
-void  evaluateExpressionWithinBrackets(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, OperationType  previousType){
+void  evaluateExpressionWithinBrackets(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer){
   unwindStackUntil(operandStack, operatorStack, OPEN_PAREN);
   ListItem  *operatorItem = popOperator(operatorStack, OPEN_PAREN);
   linkedListFreeListItem(operatorItem); 
@@ -229,8 +261,8 @@ int verifyArityAllowable(OperationType  previousType, OperationType currentType)
   }
 }
 
-int returnOperatorPrecedence(Symbol *symbol){
-  SymbolTableStruct instruction = operatorPrecedenceTable[symbol->id];
+int returnOperatorPrecedence(OperationType  type){
+  SymbolTableStruct instruction = symbolTable[type];
   return  instruction.precedence;
 }
 
@@ -239,7 +271,7 @@ void  handleInfix(StackStruct *operandStack, StackStruct *operatorStack){
   ListItem *operand1 = popFromStack(operandStack);
   ListItem *operator = popFromStack(operatorStack);
   Symbol  *result;
-  SymbolTableStruct instruction = operatorPrecedenceTable[getItemSymbolId(operator)];
+  SymbolTableStruct instruction = symbolTable[getItemSymbolId(operator)];
   result = instruction.arithmeticHandler(getItemSymbol(operand1), getItemSymbol(operand2));
   pushToStack(operandStack, (void *)result);
   linkedListFreeListItem(operand1);                         
@@ -251,7 +283,7 @@ void  handlePrefix(StackStruct *operandStack, StackStruct *operatorStack){
   ListItem *operand = popFromStack(operandStack);
   ListItem *operator = popFromStack(operatorStack);
   Symbol  *result;
-  SymbolTableStruct instruction = operatorPrecedenceTable[getItemSymbolId(operator)];
+  SymbolTableStruct instruction = symbolTable[getItemSymbolId(operator)];
   result = instruction.arithmeticHandler(getItemSymbol(operand), NULL);
   pushToStack(operandStack, (void *)result);
   linkedListFreeListItem(operand); 
@@ -262,7 +294,7 @@ void  handleSuffix(StackStruct *operandStack, StackStruct *operatorStack){
   ListItem *operand = popFromStack(operandStack);
   ListItem *operator = popFromStack(operatorStack);
   Symbol  *result;
-  SymbolTableStruct instruction = operatorPrecedenceTable[getItemSymbolId(operator)];
+  SymbolTableStruct instruction = symbolTable[getItemSymbolId(operator)];
   result = instruction.arithmeticHandler(getItemSymbol(operand), NULL);
   pushToStack(operandStack, (void *)result);
   linkedListFreeListItem(operand); 
@@ -272,7 +304,7 @@ ARITY returnArityOfAnId(OperationType id){
   if(id == INTEGER || id == DOUBLE)
     return  NUMBER;
   else{
-  SymbolTableStruct instruction = operatorPrecedenceTable[id];  
+  SymbolTableStruct instruction = symbolTable[id];  
   return  instruction.arity;
   }
 }
@@ -301,6 +333,7 @@ createInfixLogicFunction(infixBitwiseOr, |);
 createInfixLogicFunction(infixLogicalOr, ||);
 createPrefixLogicFunction(prefixLogicNot, !);
 createPrefixLogicFunction(prefixInc, ++);
+createPrefixLogicFunction(prefixDec, --);
 createPrefixLogicFunction(prefixBitwiseNot, ~);
 
 char  *duplicateString(char *str, int length){
