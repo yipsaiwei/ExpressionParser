@@ -1,4 +1,6 @@
 #include "ExpressionParser.h"
+#include  <math.h>
+#include  <stdlib.h>
 
 //SymbolTableStruct   symbolTable
 SymbolTableStruct  symbolTable[] = {
