@@ -21,8 +21,8 @@ jobs:
       matrix:
         os: [ubuntu-latest,windows-latest,macos-latest]
         compiler: [gcc-latest]
-        ruby-version: [2.6, 2.5]
-    runs-on: ${{ matrix.os }}
+        ruby-version: [2.5,2.6]
+    runs-on: ${{ matrixos }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -33,7 +33,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: ${{ matrix.ruby}}
+          ruby-version: [2.5,2.6]
       - name: Install Ceedling
         run: gem install ceedling
       - name: Run Unit Tests
