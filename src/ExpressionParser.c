@@ -408,6 +408,9 @@ int countDoubleDigitNumber(double number, int afterpoint){
 
 // Converts a floating-point/double number to a string.
 void ftoa(double n, char* res, int afterpoint){
+  int i = countIntegerDigitNumber((int)n);
+  snprintf(res, i + afterpoint + 2, "%f", n);
+  /*
   int ipart = (int)n;
   char  *strPtr;
   
@@ -415,13 +418,15 @@ void ftoa(double n, char* res, int afterpoint){
   
   if(fpart < 0)
     fpart *= (-1);
-  itoa(ipart, res, 10);
+  //itoa(ipart, res, 10);
+  snprintf(res, 10, "%d", ipart);
     
   int i = countIntegerDigitNumber(ipart);
   if (afterpoint != 0) {
     res[i] = '.'; 
     fpart = fpart * pow(10, afterpoint);
     strPtr = (res + i + 1);
-    itoa((int)fpart, strPtr, 10);
-  }
+    //itoa((int)fpart, strPtr, 10);
+    snprintf(strPtr, 10, "%d", fpart);
+    */
 }

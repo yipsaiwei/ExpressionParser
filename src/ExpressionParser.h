@@ -3,6 +3,7 @@
 
 #include  <math.h>
 #include  <stdlib.h>
+#include  <stdio.h>
 #include "OperatorTable.h"
 #include "DoubleLinkedList.h"
 #include "Stack.h"
