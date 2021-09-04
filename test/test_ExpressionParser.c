@@ -341,12 +341,12 @@ void  test_infixDivision_given_2_int_expect_result_with_1point55_returned(){
   Token *operatorToken = getToken(tokenizer);
   Token *operandToken2 = getToken(tokenizer);
 
-  Symbol  *number1 = createSymbol(operandToken1, OPERAND, DOUBLE);
+  Symbol  *number1 = createSymbol(operandToken1, OPERAND, INTEGER);
   Symbol  *number2 = createSymbol(operandToken2, OPERAND, INTEGER); 
 
   Symbol  *result = infixDivide(number1, number2);
 
-  TEST_ASSERT_EQUAL(1.75, getSymbolDouble(result));
+  TEST_ASSERT_EQUAL_FLOAT(1.75, getSymbolDouble(result));
   TEST_ASSERT_EQUAL(DOUBLE, result->id);
 
   freeSymbol(number1);
