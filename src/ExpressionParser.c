@@ -351,7 +351,8 @@ char  *createResultString(void  *result, OperationType type){
     int intNumber = *((int  *)result);
     int size = countIntegerDigitNumber(intNumber);
     resultStr = malloc(sizeof(char) * (countIntegerDigitNumber(intNumber) + 1));
-    itoa(intNumber, resultStr, 10);
+    //itoa(intNumber, resultStr, 10);
+    snprintf(resultStr, 10, "%d", intNumber);
     return  resultStr;
   }else{
     double  doubleNumber = *((double  *)result);
