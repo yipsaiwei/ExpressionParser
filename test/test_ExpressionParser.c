@@ -14,6 +14,7 @@
 #include  "Data.h"
 #include  "Arity.h"
 #include "ExcpetionThrowing.h"
+#include <stdarg.h>
 
 CEXCEPTION_T  ex;
 
