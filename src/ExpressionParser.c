@@ -4,34 +4,36 @@
 
 //SymbolTableStruct   symbolTable
 SymbolTableStruct  symbolTable[] = {
-  [OPEN_PAREN]        = {10000, PREFIX, NULL,             forcePush},  
-  [CLOSE_PAREN]       = {1000 , SUFFIX, NULL,             evaluateExpressionWithinBrackets},  //Call unwind until '('  
-  [OPEN_SQ_BRACKET]   = {1000 , PREFIX, NULL,             forcePush},  
-  [CLOSE_SQ_BRACKET]  = {1000 , SUFFIX, NULL,             evaluateExpressionWithinBrackets}, 
-  [POST_INC]          = {1000 , SUFFIX, suffixInc,        handlePreIncOrPostInc},   
-  [INC]               = {2000 , PREFIX, prefixInc,        handlePreIncOrPostInc},       //Right to left
-  [DEC]               = {2000 , PREFIX, prefixDec,        handlePreIncOrPostInc},       //Right to left  separate function
-  [BITWISE_NOT]       = {2000 , PREFIX, prefixBitwiseNot, pushAccordingToPrecedence},   //Right to left
-  [LOGICAL_NOT]       = {2000 , PREFIX, prefixLogicNot,   pushAccordingToPrecedence},   //Right to left
-  [PLUS_SIGN]         = {2000 , PREFIX, prefixPlus,       pushAccordingToPrecedence},   //Right to left
-  [MINUS_SIGN]        = {2000 , PREFIX, prefixMinus,      pushAccordingToPrecedence},   //Right to left
-  [MULTIPLY]          = {3000 , INFIX , infixMultiply,    pushAccordingToPrecedence},  
-  [DIVIDE]            = {3000 , INFIX , infixDivide,      pushAccordingToPrecedence},  
-  [REMAINDER]         = {3000 , INFIX , infixModulus,     pushAccordingToPrecedence},  
-  [ADD]               = {4000 , INFIX , infixAdd,         handleAddOrSub},  
-  [MINUS]             = {4000 , INFIX , infixMinus,       handleAddOrSub},    
-  [SHIFT_LEFT]        = {5000 , INFIX , infixShiftLeft,   pushAccordingToPrecedence}, 
-  [LESSER]            = {6000 , INFIX , infixLesser,      pushAccordingToPrecedence}, 
-  [LESSER_EQ]         = {6000 , INFIX , infixLesserEq,    pushAccordingToPrecedence}, 
-  [GREATER]           = {6000 , INFIX , infixGreater,     pushAccordingToPrecedence}, 
-  [GREATER_EQ]        = {6000 , INFIX , infixGreaterEq,   pushAccordingToPrecedence}, 
-  [EQUAL]             = {7000 , INFIX , infixEqual,       pushAccordingToPrecedence}, 
-  [BITWISE_AND]       = {8000 , INFIX , infixBitwiseAnd,  pushAccordingToPrecedence},
-  [BITWISE_OR]        = {8000 , INFIX , infixBitwiseOr,   pushAccordingToPrecedence},
-  [LOGICAL_AND]       = {12000, INFIX , infixLogicalAnd,  pushAccordingToPrecedence},
-  [LOGICAL_OR]        = {12000, INFIX , infixLogicalOr,   pushAccordingToPrecedence},
-  [INTEGER]           = {0,     NUMBER, NULL,             forcePush},
-  [DOUBLE]            = {0,     NUMBER, NULL,             forcePush},
+  [OPEN_PAREN]        = {10000, PREFIX, NULL,             forcePush,                        "("},  
+  [CLOSE_PAREN]       = {1000 , SUFFIX, NULL,             evaluateExpressionWithinBrackets, ")"},  //Call unwind until '('  
+  [OPEN_SQ_BRACKET]   = {1000 , PREFIX, NULL,             forcePush,                        "["},  
+  [CLOSE_SQ_BRACKET]  = {1000 , SUFFIX, NULL,             evaluateExpressionWithinBrackets, "]"}, 
+  [POST_INC]          = {1000 , SUFFIX, suffixInc,        handlePrefixSuffixIncOrDec,       "++"},   
+  [POST_DEC]          = {1000 , SUFFIX, suffixDec,        handlePrefixSuffixIncOrDec,       "--"},   
+  [INC]               = {2000 , PREFIX, prefixInc,        handlePrefixSuffixIncOrDec,       "++"},       //Right to left
+  [DEC]               = {2000 , PREFIX, prefixDec,        handlePrefixSuffixIncOrDec,       "--"},       //Right to left  separate function
+  [BITWISE_NOT]       = {2000 , PREFIX, prefixBitwiseNot, pushAccordingToPrecedence,        "~"},   //Right to left  (Change second func so that it will not take double
+  [LOGICAL_NOT]       = {2000 , PREFIX, prefixLogicNot,   pushAccordingToPrecedence,        "!"},   //Right to left
+  [PLUS_SIGN]         = {2000 , PREFIX, prefixPlus,       pushAccordingToPrecedence,        "+"},   //Right to left
+  [MINUS_SIGN]        = {2000 , PREFIX, prefixMinus,      pushAccordingToPrecedence,        "-"},   //Right to left
+  [MULTIPLY]          = {3000 , INFIX , infixMultiply,    pushAccordingToPrecedence,        "*"},  
+  [DIVIDE]            = {3000 , INFIX , infixDivide,      pushAccordingToPrecedence,        "/"},  
+  [REMAINDER]         = {3000 , INFIX , infixModulus,     pushAccordingToPrecedence,        "%"},  
+  [ADD]               = {4000 , INFIX , infixAdd,         handleAddOrSub,                   "+"},  
+  [MINUS]             = {4000 , INFIX , infixMinus,       handleAddOrSub,                   "-"},    
+  [SHIFT_LEFT]        = {5000 , INFIX , infixShiftLeft,   pushAccordingToPrecedence,        "<<"}, 
+  [SHIFT_RIGHT]       = {5000 , INFIX , infixShiftRight,  pushAccordingToPrecedence,        ">>"}, 
+  [LESSER]            = {6000 , INFIX , infixLesser,      pushAccordingToPrecedence,        "<"}, 
+  [LESSER_EQ]         = {6000 , INFIX , infixLesserEq,    pushAccordingToPrecedence,        "<="}, 
+  [GREATER]           = {6000 , INFIX , infixGreater,     pushAccordingToPrecedence,        ">"}, 
+  [GREATER_EQ]        = {6000 , INFIX , infixGreaterEq,   pushAccordingToPrecedence,        ">="}, 
+  [EQUAL]             = {7000 , INFIX , infixEqual,       pushAccordingToPrecedence,        "=="}, 
+  [BITWISE_AND]       = {8000 , INFIX , infixBitwiseAnd,  pushAccordingToPrecedence,        "&"},
+  [BITWISE_OR]        = {8000 , INFIX , infixBitwiseOr,   pushAccordingToPrecedence,        "|"},
+  [LOGICAL_AND]       = {12000, INFIX , infixLogicalAnd,  pushAccordingToPrecedence,        "&&"},
+  [LOGICAL_OR]        = {12000, INFIX , infixLogicalOr,   pushAccordingToPrecedence,        "||"},
+  [INTEGER]           = {0,     NUMBER, NULL,             forcePush,                        NULL},
+  [DOUBLE]            = {0,     NUMBER, NULL,             forcePush,                        NULL},
 };
 
 ArityHandler  arityHandler[] = {
@@ -40,19 +42,6 @@ ArityHandler  arityHandler[] = {
   [SUFFIX] = handleSuffix,
   [NUMBER] = NULL,
 };
-
-/*
-To handle right to left associativity:
-  When right to left associativity symbol is detected, (5+-++3)
-  1) push 5 to operand stack
-  2) push infix + to operand stack
-  3) prefix - is detected, don't push it first, get another symbol
-  4) prefix ++ is detected, don't push it first, get another symbol
-  5) operand is detected, push into operand stack
-  6) push prefix ++ into operator stack
-  7) push prefix - into operator stack
-  8) after that just unwind the stack
-*/
 
 void  shuntingYard(Tokenizer  *tokenizer, StackStruct *operatorStack, StackStruct *operandStack){
   //SymbolTableStruct instruction;
@@ -98,7 +87,7 @@ void  pushSymbolToStack(StackStruct *operatorStack, StackStruct *operandStack, S
 //typedef void    (*preHandleOperator)(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *operator);
 void  handleAddOrSub(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer){
   if(!arityAllowable(symbolizer->lastSymbolId, symbol->id) || symbolizer->lastSymbolId == _NULL){
-    verifyArityAllowable(symbolizer->lastSymbolId, PLUS_SIGN);
+    verifyArityAllowable(symbolizer->lastSymbolId, PLUS_SIGN, symbol);
     if(symbol->id == ADD)
       symbol->id = PLUS_SIGN;
     else
@@ -107,17 +96,19 @@ void  handleAddOrSub(StackStruct *operandStack, StackStruct *operatorStack, Symb
   pushAccordingToPrecedence(operandStack, operatorStack, symbol, symbolizer);
 }
 
-void  handlePreIncOrPostInc(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer){
+void  handlePrefixSuffixIncOrDec(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer){
   if(!arityAllowable(symbolizer->lastSymbolId, symbol->id)){
-    verifyArityAllowable(symbolizer->lastSymbolId, POST_INC);
+    verifyArityAllowable(symbolizer->lastSymbolId, POST_INC, symbol);
     if(symbol->id == INC)
-      symbol->id = POST_INC;    
+      symbol->id = POST_INC; 
+    else
+      symbol->id = POST_DEC; 
   }
   pushAccordingToPrecedence(operandStack, operatorStack, symbol, symbolizer);
 }
 
 void  pushAccordingToPrecedence(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *symbol, Symbolizer  *symbolizer){
-  verifyArityAllowable(symbolizer->lastSymbolId, symbol->id);
+  verifyArityAllowable(symbolizer->lastSymbolId, symbol->id, symbol);
   ListItem  *peekItem = peekTopOfStack(operatorStack);
   if(isIdArity(symbol->id, PREFIX) && (!isStackEmpty(operatorStack) && areTwoIdPrecedenceSame(getItemSymbolId(peekItem), symbol->id)))
     handleRightToLeftAssociativity(operandStack, operatorStack, symbol, symbolizer);
@@ -199,8 +190,6 @@ void  unwindStackUntil(StackStruct *operandStack, StackStruct *operatorStack, Op
 //if previous is an operator :
     //if previous type is infix = prefix
     //if previous type is prefix = prefix
-    
-//verifyArityAllowable
 int arityAllowable(OperationType  previousType, OperationType currentType){
   switch(returnArityOfAnId(currentType)){
     case  INFIX:
@@ -232,13 +221,17 @@ int arityAllowable(OperationType  previousType, OperationType currentType){
   }  
 }
 
-int verifyArityAllowable(OperationType  previousType, OperationType currentType){
+int verifyArityAllowable(OperationType  previousType, OperationType currentType, Symbol *symbol){
   switch(returnArityOfAnId(currentType)){
     case  INFIX:
       if(isIdArity(previousType, SUFFIX) || isIdArity(previousType, NUMBER))    //3++ +3 OR 2+3
         return  1;
-      else
-        throwException(UNEXPECTED_OPERATOR, NULL, 0, "ERROR code %x : Not the desired operator!", UNEXPECTED_OPERATOR);
+      else{
+        char  *charBefore = returnSymbolCharGivenId(previousType);
+        char  *charAfter = returnSymbolCharGivenId(symbol->id);
+        symbolThrowException(symbol, ERROR_INVALID_INFIX, "Invalid Infix '%s' before '%s'. Only numbers or suffix are allowed.", charAfter, charBefore);
+      }
+        //throwException(UNEXPECTED_OPERATOR, NULL, 0, "ERROR code %x : Not the desired operator!", UNEXPECTED_OPERATOR);
       break;
     case  PREFIX:
       if(isIdArity(previousType, INFIX) || isIdArity(previousType, PREFIX) || isIdArity(previousType, NONE))  //2+ ++3 OR -++3 OR -3
@@ -261,6 +254,11 @@ int verifyArityAllowable(OperationType  previousType, OperationType currentType)
     default:
       throwException(UNEXPECTED_OPERATOR, NULL, 0, "ERROR code %x : Not the desired operator!", UNEXPECTED_OPERATOR);
   }
+}
+
+char  *returnSymbolCharGivenId(OperationType  operationId){
+  SymbolTableStruct instruction = symbolTable[operationId];
+  return  instruction.idChar;
 }
 
 int returnOperatorPrecedence(OperationType  type){
@@ -314,19 +312,17 @@ ARITY returnArityOfAnId(OperationType id){
 createInfixArithmeticFunction(infixAdd, +);
 createInfixArithmeticFunction(infixMinus, -);
 createInfixArithmeticFunction(infixMultiply, *);
-createInfixArithmeticFunction(infixEqual, ==);
 createArithmeticDivFunction(infixDivide, /);
 
 createPrefixArithmeticFunction(prefixPlus, +);
 createPrefixArithmeticFunction(prefixMinus, -);
 
-//createSuffixArithmeticFunction(suffixInc, ++);
-
+createInfixLogicFunctionWithDouble(infixEqual, ==);
+createInfixLogicFunctionWithDouble(infixLesser, <);
+createInfixLogicFunctionWithDouble(infixLesserEq, <=);
+createInfixLogicFunctionWithDouble(infixGreater, >);
+createInfixLogicFunctionWithDouble(infixGreaterEq, >=);
 createInfixLogicFunction(infixModulus, %);
-createInfixLogicFunction(infixLesser, <);
-createInfixLogicFunction(infixLesserEq, <=);
-createInfixLogicFunction(infixGreater, >);
-createInfixLogicFunction(infixGreaterEq, >=);
 createInfixLogicFunction(infixShiftLeft, <<);
 createInfixLogicFunction(infixShiftRight, >>);
 createInfixLogicFunction(infixBitwiseAnd, &);
@@ -337,6 +333,9 @@ createPrefixLogicFunction(prefixLogicNot, !);
 createPrefixLogicFunction(prefixInc, ++);
 createPrefixLogicFunction(prefixDec, --);
 createPrefixLogicFunction(prefixBitwiseNot, ~);
+
+createSuffixIncDecFunction(suffixDec, --);
+createSuffixIncDecFunction(suffixInc, ++);
 
 char  *duplicateString(char *str, int length){
   char  *resultstr = memAlloc((length+1)*sizeof(char));
@@ -361,28 +360,6 @@ char  *createResultString(void  *result, OperationType type){
     return  resultStr;
   }
 }
-
-Symbol  *suffixInc(Symbol  *number1, Symbol  *number2){
-  Symbol  *result;
-  Token *resultToken;
-  char  *resultStr;
-  if(isSymbolInteger(number1)){
-    int resultNum = getSymbolInteger(number1);
-    resultNum++;
-    resultStr = createResultString((void  *)&resultNum, INTEGER);
-    resultToken = (Token  *)createIntToken(resultNum, number1->token->startColumn, number1->token->originalstr, resultStr, TOKEN_INTEGER_TYPE);
-    result = createSymbol(resultToken,  OPERAND, INTEGER);
-  }else{
-    double  resultNum = getSymbolDouble(number1);
-    resultNum++;
-    resultStr = createResultString((void  *)&resultNum, DOUBLE);
-    resultToken = (Token  *)createFloatToken(resultNum, number2->token->startColumn, number2->token->originalstr, resultStr, TOKEN_FLOAT_TYPE);
-    result = createSymbol(resultToken, OPERAND, DOUBLE);
-  } 
-  return  result;    
-}
-
-
 
 int countIntegerDigitNumber(int number){
   if(number < 0){
@@ -411,23 +388,4 @@ int countDoubleDigitNumber(double number, int afterpoint){
 void ftoa(double n, char* res, int afterpoint){
   int i = countIntegerDigitNumber((int)n);
   snprintf(res, i + afterpoint + 2, "%f", n);
-  /*
-  int ipart = (int)n;
-  char  *strPtr;
-  
-  double fpart = n - (double)ipart;
-  
-  if(fpart < 0)
-    fpart *= (-1);
-  //itoa(ipart, res, 10);
-  snprintf(res, 10, "%d", ipart);
-    
-  int i = countIntegerDigitNumber(ipart);
-  if (afterpoint != 0) {
-    res[i] = '.'; 
-    fpart = fpart * pow(10, afterpoint);
-    strPtr = (res + i + 1);
-    //itoa((int)fpart, strPtr, 10);
-    snprintf(strPtr, 10, "%d", fpart);
-    */
 }

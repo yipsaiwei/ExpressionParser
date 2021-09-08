@@ -13,6 +13,7 @@
 #include "TokenizerExceptionThrowing.h"
 #include  "Data.h"
 #include  "Arity.h"
+#include "ExcpetionThrowing.h"
 
 CEXCEPTION_T  ex;
 
@@ -774,7 +775,6 @@ void  test_infixEqual_given_2_not_equal_int_expect_0_returned(){
   freeSymbolizer(symbolizer);
 }
 
-/*
 void  test_infixEqual_given_2_equal_double_expect_0_returned(){
   Tokenizer *tokenizer = createTokenizer(" 11.111==11.111");
   Symbolizer  *symbolizer = createSymbolizer(tokenizer);
@@ -793,7 +793,6 @@ void  test_infixEqual_given_2_equal_double_expect_0_returned(){
   freeSymbol(result);
   freeSymbolizer(symbolizer);
 }
-*/
 
 void  test_handleInfix_given_two_operand_Integers_1_infix_add_expect_the_values_able_to_be_returned(){
   Tokenizer *tokenizer = createTokenizer(" 13+77");
@@ -1421,6 +1420,127 @@ void  test_shuntingYard_given_prefix_plus_pre_INC_expect_correct_value_4_returne
   freeStack(operatorStack, free); 
 }
 
+void  test_shuntingYard_given_multiply_plus_shift_left_expect_correct_value_7_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer(" 6* 5  + 1 >>2");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  shuntingYard(tokenizer, operatorStack, operandStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL(7, getItemSymbolInteger(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free); 
+}
+
+void  test_shuntingYard_given_prefix_inc_infix_minus_prefix_plus_multiply_expect_correct_value_0_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer(" ++5-+3*2");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  shuntingYard(tokenizer, operatorStack, operandStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL(0, getItemSymbolInteger(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free); 
+}
+
+void  test_shuntingYard_given_multiply_post_inc_infix_minus_pre_inc_expect_correct_value_seven_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("3*2++-++1");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  shuntingYard(tokenizer, operatorStack, operandStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL(7, getItemSymbolInteger(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free); 
+}
+
+void  test_shuntingYard_given_post_inc_infix_plus_prefix_minus_infix_minus_multiply_expect_correct_value_minus4_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("3+++-2-3*2");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  shuntingYard(tokenizer, operatorStack, operandStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL(-4, getItemSymbolInteger(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free); 
+} 
+
+void  test_shuntingYard_given_post_dec_infix_minus_divide_expect_correct_value_minus0_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("5---1/3");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  shuntingYard(tokenizer, operatorStack, operandStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL(0, getItemSymbolInteger(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free); 
+} 
+
+void  test_shuntingYard_given_infix_minus_bracket_prefix_dec_divide_expect_correct_value_5_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("5-(--1)/3");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  shuntingYard(tokenizer, operatorStack, operandStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL(5, getItemSymbolInteger(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free); 
+} 
+
+void  test_shuntingYard_given_multiply_divide_expect_exception_to_be_thrown(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("5*/3");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  Try{
+    shuntingYard(tokenizer, operatorStack, operandStack);
+    TEST_FAIL_MESSAGE("EXPECT ERROR_INVALID_INFIX TO BE THROWN, BUR UNRECEIVED");
+  }Catch(ex){
+    dumpSymbolErrorMessage(ex, 1); 
+    TEST_ASSERT_EQUAL(ERROR_INVALID_INFIX, ex->errorCode);
+    freeException(ex);
+  }
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free);   
+}
+
 /*
 void  test_shuntingYard_given_prefix_minus_pre_INC_expect_correct_value_minus_2_returned(){
   Tokenizer *tokenizer = NULL;
@@ -1441,7 +1561,7 @@ void  test_shuntingYard_given_prefix_minus_pre_INC_expect_correct_value_minus_2_
 */
 
 void  test_verifyArityAllowable_given_previous_operand_current_suffix_expect_1_returned(){
-  TEST_ASSERT_EQUAL(1, verifyArityAllowable(INTEGER, POST_INC));
+  TEST_ASSERT_EQUAL(1, verifyArityAllowable(INTEGER, POST_INC, NULL));
 }
 
 /*

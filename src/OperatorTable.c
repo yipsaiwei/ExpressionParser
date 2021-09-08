@@ -133,31 +133,6 @@ char  *concatenateTwoStrings(char  *str1, char *str2){
   return  destination;
 }
 
-/*
-Operator  *returnDoubleCharacterOperator(Token *token, Token *nextToken){
-  char  *operatorStr;
-  Operator  *operator;
-  OperatorInformationTable  information = operatorInformationTable[*(token->str)];
-  if(!isNextTokenAdjacentToCurrent(token, nextToken) || 
-  (!areTokenStringSame(token, nextToken) && *(nextToken->str) != '=')){
-    operator = createOperator(token->str, 0, information.type[0]); 
-    freeToken(token);
-  }else{
-    operatorStr = malloc(sizeof(char) * 3);
-    operatorStr = strdup(token->str);
-    strcat(operatorStr, nextToken->str);
-    if(areTwoCharSame(token->str, nextToken->str))
-      operator = createOperator(operatorStr, 0, information.type[2]);
-    else 
-      operator = createOperator(operatorStr, 0, information.type[1]);
-    // Free operator
-    freeToken(token);
-    freeToken(nextToken);
-  }
-  return  operator;
-}
-*/
-
 Token *peekToken(Tokenizer  *tokenizer){
   int indexBeforeGetToken = tokenizer->index;
   Token *token = getToken(tokenizer);

@@ -62,7 +62,16 @@ Symbol  *funcName(Symbol  *number1, Symbol *number2){                       \
   Symbol  *result;                                                          \
   Token *resultToken;                                                       \
   char  *resultStr;                                                         \
-  infixLogicCalculation(number1, number2, operator)                         \
+  infixLogicCalculation(number1, number2, operator);                        \
+  return  result;                                                           \
+}
+
+#define createInfixLogicFunctionWithDouble(funcName, operator)              \
+Symbol  *funcName(Symbol  *number1, Symbol *number2){                       \
+  Symbol  *result;                                                          \
+  Token *resultToken;                                                       \
+  char  *resultStr;                                                         \
+  infixLogicCalculationWithDouble(number1, number2, operator);              \
   return  result;                                                           \
 }
 
@@ -127,13 +136,13 @@ Symbol  *funcName(Symbol  *number1, Symbol *number2){                       \
 #define suffixIncDecCalculation(operand, operator)                                                                                               \
   if(isSymbolInteger(operand)){                                                                                                                  \
     int resultNum = getSymbolInteger(operand);                                                                                                   \
-    resultNum(operator);                                                                                                                         \
+    resultNum operator;                                                                                                                         \
     resultStr = createResultString((void  *)&resultNum, INTEGER);                                                                                \
     resultToken = (Token  *)createIntToken(resultNum, operand->token->startColumn, operand->token->originalstr, resultStr, TOKEN_INTEGER_TYPE);  \
     result = createSymbol(resultToken,  OPERAND, INTEGER);                                                                                       \
   }else{                                                                                                                                         \
     double  resultNum = getSymbolDouble(operand);                                                                                                \
-    resultNum(operator);                                                                                                                         \
+    resultNum operator;                                                                                                                         \
     resultStr = createResultString((void  *)&resultNum, DOUBLE);                                                                                 \
     resultToken = (Token  *)createFloatToken(resultNum, number2->token->startColumn, number2->token->originalstr, resultStr, TOKEN_FLOAT_TYPE);  \
     result = createSymbol(resultToken, OPERAND, DOUBLE);                                                                                         \
@@ -143,7 +152,21 @@ Symbol  *funcName(Symbol  *number1, Symbol *number2){                       \
     int resultNum = getSymbolInteger(number1) operator getSymbolInteger(number2);                                                               \
     resultStr = createResultString((void  *)&resultNum, INTEGER);                                                                               \
     resultToken = (Token  *)createIntToken(resultNum, number2->token->startColumn, number2->token->originalstr, resultStr, TOKEN_INTEGER_TYPE); \
-    result = createSymbol(resultToken,  OPERAND, INTEGER);                                                                                      
+    result = createSymbol(resultToken,  OPERAND, INTEGER);                  
+
+#define infixLogicCalculationWithDouble(operand1, operand2, operator)                                                                            \
+  int resultNum;                                                                                                                                 \
+  if(isSymbolInteger(number1) && isSymbolInteger(number2))                                                                                       \
+    resultNum = getSymbolInteger(number1) operator getSymbolInteger(number2);                                                                    \
+  else if(isSymbolDouble(number1) && isSymbolInteger(number2))                                                                                   \
+   resultNum = getSymbolDouble(number1) operator getSymbolInteger(number2);                                                                      \
+  else if(isSymbolInteger(number1) && isSymbolDouble(number2))                                                                                   \
+    resultNum = getSymbolInteger(number1) operator getSymbolDouble(number2);                                                                     \
+  else                                                                                                                                           \
+    resultNum = getSymbolDouble(number1) operator getSymbolDouble(number2);                                                                      \
+  resultStr = createResultString((void  *)&resultNum, INTEGER);                                                                                  \
+  resultToken = (Token  *)createIntToken(resultNum, number2->token->startColumn, number2->token->originalstr, resultStr, TOKEN_INTEGER_TYPE);    \
+  result = createSymbol(resultToken,  OPERAND, INTEGER);   
  
   
 #define prefixLogicCalculation(operand, operator)                                                                                               \

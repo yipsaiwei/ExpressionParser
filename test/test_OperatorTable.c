@@ -12,6 +12,7 @@
 #include  "Data.h"
 #include "ExpressionParser.h"
 #include  "OperatorTable.h"
+#include "ExcpetionThrowing.h"
 
 CEXCEPTION_T  ex;
 
@@ -237,68 +238,3 @@ void  test_get_symbol_given_symbolizer_with_float_expect_integer_symbol_returned
   freeSymbolizer(symbolizer);
   freeSymbol(symbol);   
 }
-/*
-void  test_extractOperatorFromToken_given_single_character_operator_expect_single_operator_returned(){
-  Tokenizer *tokenizer = NULL;
-  tokenizer = createTokenizer("  <  ");  
-  Token *token = getToken(tokenizer);
-  
-  Operator  *result = extractOperatorFromToken(token, tokenizer);
-  
-  TEST_ASSERT_EQUAL_STRING("<", result->str);
-  TEST_ASSERT_EQUAL(LESSER, result->id);
-  
-  freeTokenizer(tokenizer);
-}
-
-void  test_extractOperatorFromToken_given_double_same_character_operator_expect_double_operator_returned(){
-  Tokenizer *tokenizer = NULL;
-  tokenizer = createTokenizer("  ++  ");  
-  Token *token = getToken(tokenizer);
-  
-  Operator  *result = extractOperatorFromToken(token, tokenizer);
-  
-  TEST_ASSERT_EQUAL_STRING("++", result->str);
-  TEST_ASSERT_EQUAL(INC, result->id);
-  
-  freeTokenizer(tokenizer);
-}
-
-void  test_extractOperatorFromToken_given_double_different_character_operator_expect_double_operator_returned(){
-  Tokenizer *tokenizer = NULL;
-  tokenizer = createTokenizer("  -=  ");  
-  Token *token = getToken(tokenizer);
-  
-  Operator  *result = extractOperatorFromToken(token, tokenizer);
-  
-  TEST_ASSERT_EQUAL_STRING("-=", result->str);
-  TEST_ASSERT_EQUAL(MINUS_ASSIGN, result->id);
-  
-  freeTokenizer(tokenizer);
-}
-
-void  test_extractOperatorFromToken_given_double_not_vaild_operator_expect_single_operator_returned(){
-  Tokenizer *tokenizer = NULL;
-  tokenizer = createTokenizer("  +~  ");  
-  Token *token = getToken(tokenizer);
-  
-  Operator  *result = extractOperatorFromToken(token, tokenizer);
-  
-  TEST_ASSERT_EQUAL_STRING("+", result->str);
-  TEST_ASSERT_EQUAL(ADD, result->id);
-  
-  freeTokenizer(tokenizer);
-}
-void  test_extractOperatorFromToken_given_bitwise_not_expect_single_operator_returned(){
-  Tokenizer *tokenizer = NULL;
-  tokenizer = createTokenizer("       ~  ");  
-  Token *token = getToken(tokenizer);
-  
-  Operator  *result = extractOperatorFromToken(token, tokenizer);
-  
-  TEST_ASSERT_EQUAL_STRING("~", result->str);
-  TEST_ASSERT_EQUAL(BITWISE_NOT, result->id);
-  
-  freeTokenizer(tokenizer);
-}
-*/

@@ -13,6 +13,7 @@
 #include "Stack.h"
 #include  "Arithmetic.h"
 #include  "Arity.h"
+#include "ExcpetionThrowing.h"
 
 //typedef void (*Operation)(StackStruct *operandStack);
 typedef Symbol  *(*ArithmeticOperation)(Symbol  *number1, Symbol  *number2); 
@@ -23,7 +24,8 @@ struct  SymbolTableStruct{
     int precedence;
     ARITY arity;
     ArithmeticOperation arithmeticHandler;
-    operatorStoringOperation   storeHandler;       
+    operatorStoringOperation   storeHandler; 
+    char  *idChar;    
 };
 
 typedef void    (*arityHandleOperator)(StackStruct *operandStack, StackStruct *operatorStack);  
@@ -87,6 +89,7 @@ Symbol  *infixLogicalAnd(Symbol  *number1, Symbol  *number2);
 Symbol  *prefixLogicNot(Symbol  *number1, Symbol *number2);
 Symbol  *prefixBitwiseNot(Symbol  *number1, Symbol  *number2);
 Symbol  *suffixInc(Symbol  *number1, Symbol  *number2);
+Symbol  *suffixDec(Symbol  *number1, Symbol  *number2);
 Symbol  *infixBitwiseOr(Symbol  *number1, Symbol  *number2);
 Symbol  *infixBitwiseAnd(Symbol  *number1, Symbol  *number2);
 ARITY returnArityOfAnId(OperationType type);
@@ -97,12 +100,13 @@ Symbol  *prefixInc(Symbol  *number1, Symbol  *number2);
 Symbol  *prefixDec(Symbol  *number1, Symbol  *number2);
 
 int returnOperatorPrecedence(OperationType  type);
+char  *returnSymbolCharGivenId(OperationType  operationId);
 
-int verifyArityAllowable(OperationType  previousType, OperationType currentType);
+int verifyArityAllowable(OperationType  previousType, OperationType currentType, Symbol *symbol);
 int arityAllowable(OperationType  previousType, OperationType currentType);
 void  pushAccordingToPrecedence(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *symbol, Symbolizer  *symbolizer);
 void  handleAddOrSub(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer);
-void  handlePreIncOrPostInc(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer);
+void  handlePrefixSuffixIncOrDec(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer);
 void  handleRightToLeftAssociativity(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *symbol, Symbolizer *symbolizer);
 void  executeStoreHandler(StackStruct  *operandStack, StackStruct  *operatorStack, Symbol  *symbol, Symbolizer *symbolizer);
 
