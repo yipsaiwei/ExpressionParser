@@ -229,8 +229,7 @@ int verifyArityAllowable(OperationType  previousType, OperationType currentType,
       else{
         char  *charBefore = returnSymbolCharGivenId(previousType);
         char  *charAfter = returnSymbolCharGivenId(symbol->id);
-        //symbolThrowException(symbol, ERROR_INVALID_INFIX, "Invalid Infix '%s' before '%s'. Only numbers or suffix are allowed.", charAfter, charBefore);
-        throwException(UNEXPECTED_OPERATOR, NULL, 0, "ERROR code %x : Not the desired operator!", UNEXPECTED_OPERATOR);
+        symbolThrowInfixException(symbol, ERROR_INVALID_INFIX, charBefore, charAfter);
       }
       break;
     case  PREFIX:
