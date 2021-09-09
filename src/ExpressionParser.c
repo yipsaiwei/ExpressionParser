@@ -36,6 +36,8 @@ SymbolTableStruct  symbolTable[] = {
   [DOUBLE]            = {0,     NUMBER, NULL,             forcePush,                        NULL},
 };
 
+extern  ExceptionTable  exceptionTable[];
+
 ArityHandler  arityHandler[] = {
   [PREFIX] = handlePrefix,
   [INFIX]  = handleInfix,
@@ -229,7 +231,7 @@ int verifyArityAllowable(Symbolizer  *symbolizer, Symbol *symbol, OperationType 
       if(isIdArity(symbolizer->lastSymbolId, SUFFIX) || isIdArity(symbolizer->lastSymbolId, NUMBER))    //3++ +3 OR 2+3
         return  1;
       else
-        symbolThrowInfixException(symbol, ERROR_INVALID_INFIX, symbolizer);
+        handleException(symbol, symbolizer, ERROR_INVALID_INFIX);
       break;
     case  PREFIX:
       if(isIdArity(symbolizer->lastSymbolId, INFIX) || isIdArity(symbolizer->lastSymbolId, PREFIX) || isIdArity(symbolizer->lastSymbolId, NONE))  //2+ ++3 OR -++3 OR -3
@@ -253,6 +255,14 @@ int verifyArityAllowable(Symbolizer  *symbolizer, Symbol *symbol, OperationType 
       throwException(UNEXPECTED_OPERATOR, NULL, 0, "ERROR code %x : Not the desired operator!", UNEXPECTED_OPERATOR);
   }
   return  0;
+}
+
+void  handleException(Symbol  *symbol, Symbolizer *symbolizer, int  errorCode){
+  char  *previousStr = returnSymbolCharGivenId(symbolizer->lastSymbolId);
+  char  *currentStr = returnSymbolCharGivenId(symbol->id);
+  ExceptionTable  exceptionInfo = exceptionTable[errorCode];
+  freeSymbolizer(symbolizer);
+  exceptionInfo.exceptionPtr(symbol, errorCode, previousStr, currentStr);
 }
 
 char  *returnSymbolCharGivenId(OperationType  operationId){

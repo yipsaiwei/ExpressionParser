@@ -110,6 +110,8 @@ void  handlePrefixSuffixIncOrDec(StackStruct *operandStack, StackStruct *operato
 void  handleRightToLeftAssociativity(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *symbol, Symbolizer *symbolizer);
 void  executeStoreHandler(StackStruct  *operandStack, StackStruct  *operatorStack, Symbol  *symbol, Symbolizer *symbolizer);
 
+void  handleException(Symbol  *symbol, Symbolizer *symbolizer, int  errorCode);
+
 char  *createResultString(void  *result, OperationType type);
 int countDoubleDigitNumber(double number, int afterpoint);
 int countIntegerDigitNumber(int number);

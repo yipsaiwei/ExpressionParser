@@ -1,5 +1,9 @@
 #include "ExcpetionThrowing.h"
 
+ExceptionTable  exceptionTable[] = {
+  [ERROR_INVALID_INFIX] = symbolThrowInfixException,
+};
+
 extern  SymbolTableStruct  symbolTable[];
 
 /*
@@ -20,16 +24,11 @@ void  symbolThrowException(Symbol *symbol, int errorCode, char *message,...){
 }
 */
 
-void  symbolThrowInfixException(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer){
-  char  *currentStr = returnSymbolCharGivenId(symbol->id);
-  if(symbolizer->lastSymbolId == _NULL){
-    freeSymbolizer(symbolizer);
+void  symbolThrowInfixException(Symbol  *symbol, int  errorCode, char *previousStr, char  *currentStr){
+  if(currentStr == NULL)
     throwException(errorCode, symbol, 0, "Invalid Infix %s after NULL! Only numbers or suffix are allowed.", currentStr);
-  }else{
-    char  *previousStr = returnSymbolCharGivenId(symbolizer->lastSymbolId);
-    freeSymbolizer(symbolizer);
+  else
     throwException(errorCode, symbol, 0, "Invalid Infix '%s' before '%s'. Only numbers or suffix are allowed.", currentStr, previousStr);
-  }
 }
 
 void  dumpSymbolErrorMessage(CEXCEPTION_T ex, int lineNo){
