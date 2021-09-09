@@ -1564,8 +1564,8 @@ void  test_throwException(){
   Tokenizer *tokenizer = NULL;
   tokenizer = createTokenizer(" $  ");
   Token *token = NULL;
-  token = getToken(tokenizer);
   Try{
+    token = getToken(tokenizer);
     throwException(0x33, token, 0, "Just to test exception %s Hello world", token->str);
     TEST_FAIL_MESSAGE("No exception ");
   }Catch(ex){
@@ -1573,7 +1573,6 @@ void  test_throwException(){
     TEST_ASSERT_EQUAL(0x33, ex->errorCode);
     freeException(ex);
   }
-  freeToken(token);
   freeTokenizer(tokenizer);
 }
 
