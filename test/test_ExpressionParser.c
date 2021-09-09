@@ -1523,9 +1523,10 @@ void  test_shuntingYard_given_infix_minus_bracket_prefix_dec_divide_expect_corre
   freeStack(operatorStack, free); 
 } 
 
+/*
 void  test_shuntingYard_given_multiply_divide_expect_exception_to_be_thrown(){
   Tokenizer *tokenizer = NULL;
-  tokenizer = createTokenizer("5*/3");
+  tokenizer = createTokenizer("5* /3");
   
   StackStruct *operandStack = createStack();
   StackStruct *operatorStack = createStack();
@@ -1541,6 +1542,7 @@ void  test_shuntingYard_given_multiply_divide_expect_exception_to_be_thrown(){
   freeStack(operandStack, free); 
   freeStack(operatorStack, free);   
 }
+*/
 
 /*
 void  test_shuntingYard_given_multiply_pre_inc_exception_to_be_thrown(){
