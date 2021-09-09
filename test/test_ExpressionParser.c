@@ -14,7 +14,6 @@
 #include  "Data.h"
 #include  "Arity.h"
 #include "ExcpetionThrowing.h"
-#include <stdarg.h>
 
 CEXCEPTION_T  ex;
 
@@ -1566,8 +1565,8 @@ void  test_throwException(){
   Token *token = NULL;
   Try{
     token = getToken(tokenizer);
-    throwException(0x33, token, 0, "Just to test exception %s Hello world", token->str);
-    TEST_FAIL_MESSAGE("No exception ");
+    throwException(0x33, token, 0, "Just to test exception Hello world");
+    TEST_FAIL_MESSAGE("No exception received");
   }Catch(ex){
     dumpTokenErrorMessage(ex, 1);
     TEST_ASSERT_EQUAL(0x33, ex->errorCode);
