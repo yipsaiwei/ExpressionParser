@@ -34,6 +34,7 @@ SymbolTableStruct  symbolTable[] = {
   [LOGICAL_OR]        = {12000, INFIX , infixLogicalOr,   pushAccordingToPrecedence,        "||\0"},
   [INTEGER]           = {0,     NUMBER, NULL,             forcePush,                        NULL},
   [DOUBLE]            = {0,     NUMBER, NULL,             forcePush,                        NULL},
+  [_NULL]             = {0,     NONE,   NULL,             NULL,                             NULL},
 };
 
 extern  ExceptionTable  exceptionTable[];
