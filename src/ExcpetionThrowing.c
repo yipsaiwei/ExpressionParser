@@ -35,7 +35,7 @@ void  symbolThrowInfixException(Symbol  *symbol, int  errorCode, Symbolizer *sym
 void  dumpSymbolErrorMessage(CEXCEPTION_T ex, int lineNo){
   Symbol *symbol = ex->data;
   if(symbol == NULL || isSymbolNull(symbol)){
-    printf("Error on line%d:%d: %s\n", lineNo, 0, ex->msg);
+    printf("Error on line%d:%d: %s\n%s\n", lineNo, symbol->token->startColumn, ex->msg, symbol->token->originalstr);
   }else{
     SymbolTableStruct instruction = symbolTable[symbol->id];
     char  *idChar = instruction.idChar;

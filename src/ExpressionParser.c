@@ -4,34 +4,34 @@
 
 //SymbolTableStruct   symbolTable
 SymbolTableStruct  symbolTable[] = {
-  [OPEN_PAREN]        = {10000, PREFIX, NULL,             forcePush,                        "("},  
-  [CLOSE_PAREN]       = {1000 , SUFFIX, NULL,             evaluateExpressionWithinBrackets, ")"},  //Call unwind until '('  
-  [OPEN_SQ_BRACKET]   = {1000 , PREFIX, NULL,             forcePush,                        "["},  
-  [CLOSE_SQ_BRACKET]  = {1000 , SUFFIX, NULL,             evaluateExpressionWithinBrackets, "]"}, 
-  [POST_INC]          = {1000 , SUFFIX, suffixInc,        handlePrefixSuffixIncOrDec,       "++"},   
-  [POST_DEC]          = {1000 , SUFFIX, suffixDec,        handlePrefixSuffixIncOrDec,       "--"},   
-  [INC]               = {2000 , PREFIX, prefixInc,        handlePrefixSuffixIncOrDec,       "++"},       //Right to left
-  [DEC]               = {2000 , PREFIX, prefixDec,        handlePrefixSuffixIncOrDec,       "--"},       //Right to left  separate function
-  [BITWISE_NOT]       = {2000 , PREFIX, prefixBitwiseNot, pushAccordingToPrecedence,        "~"},   //Right to left  (Change second func so that it will not take double
-  [LOGICAL_NOT]       = {2000 , PREFIX, prefixLogicNot,   pushAccordingToPrecedence,        "!"},   //Right to left
-  [PLUS_SIGN]         = {2000 , PREFIX, prefixPlus,       pushAccordingToPrecedence,        "+"},   //Right to left
-  [MINUS_SIGN]        = {2000 , PREFIX, prefixMinus,      pushAccordingToPrecedence,        "-"},   //Right to left
-  [MULTIPLY]          = {3000 , INFIX , infixMultiply,    pushAccordingToPrecedence,        "*"},  
-  [DIVIDE]            = {3000 , INFIX , infixDivide,      pushAccordingToPrecedence,        "/"},  
-  [REMAINDER]         = {3000 , INFIX , infixModulus,     pushAccordingToPrecedence,        "%"},  
-  [ADD]               = {4000 , INFIX , infixAdd,         handleAddOrSub,                   "+"},  
-  [MINUS]             = {4000 , INFIX , infixMinus,       handleAddOrSub,                   "-"},    
-  [SHIFT_LEFT]        = {5000 , INFIX , infixShiftLeft,   pushAccordingToPrecedence,        "<<"}, 
-  [SHIFT_RIGHT]       = {5000 , INFIX , infixShiftRight,  pushAccordingToPrecedence,        ">>"}, 
-  [LESSER]            = {6000 , INFIX , infixLesser,      pushAccordingToPrecedence,        "<"}, 
-  [LESSER_EQ]         = {6000 , INFIX , infixLesserEq,    pushAccordingToPrecedence,        "<="}, 
-  [GREATER]           = {6000 , INFIX , infixGreater,     pushAccordingToPrecedence,        ">"}, 
-  [GREATER_EQ]        = {6000 , INFIX , infixGreaterEq,   pushAccordingToPrecedence,        ">="}, 
-  [EQUAL]             = {7000 , INFIX , infixEqual,       pushAccordingToPrecedence,        "=="}, 
-  [BITWISE_AND]       = {8000 , INFIX , infixBitwiseAnd,  pushAccordingToPrecedence,        "&"},
-  [BITWISE_OR]        = {8000 , INFIX , infixBitwiseOr,   pushAccordingToPrecedence,        "|"},
-  [LOGICAL_AND]       = {12000, INFIX , infixLogicalAnd,  pushAccordingToPrecedence,        "&&"},
-  [LOGICAL_OR]        = {12000, INFIX , infixLogicalOr,   pushAccordingToPrecedence,        "||"},
+  [OPEN_PAREN]        = {10000, PREFIX, NULL,             forcePush,                        "(\0"},  
+  [CLOSE_PAREN]       = {1000 , SUFFIX, NULL,             evaluateExpressionWithinBrackets, ")\0"},  //Call unwind until '('  
+  [OPEN_SQ_BRACKET]   = {1000 , PREFIX, NULL,             forcePush,                        "[\0"},  
+  [CLOSE_SQ_BRACKET]  = {1000 , SUFFIX, NULL,             evaluateExpressionWithinBrackets, "]\0"}, 
+  [POST_INC]          = {1000 , SUFFIX, suffixInc,        handlePrefixSuffixIncOrDec,       "++\0"},   
+  [POST_DEC]          = {1000 , SUFFIX, suffixDec,        handlePrefixSuffixIncOrDec,       "--\0"},   
+  [INC]               = {2000 , PREFIX, prefixInc,        handlePrefixSuffixIncOrDec,       "++\0"},       //Right to left
+  [DEC]               = {2000 , PREFIX, prefixDec,        handlePrefixSuffixIncOrDec,       "--\0"},       //Right to left  separate function
+  [BITWISE_NOT]       = {2000 , PREFIX, prefixBitwiseNot, pushAccordingToPrecedence,        "~\0"},   //Right to left  (Change second func so that it will not take double
+  [LOGICAL_NOT]       = {2000 , PREFIX, prefixLogicNot,   pushAccordingToPrecedence,        "!\0"},   //Right to left
+  [PLUS_SIGN]         = {2000 , PREFIX, prefixPlus,       pushAccordingToPrecedence,        "+\0"},   //Right to left
+  [MINUS_SIGN]        = {2000 , PREFIX, prefixMinus,      pushAccordingToPrecedence,        "-\0"},   //Right to left
+  [MULTIPLY]          = {3000 , INFIX , infixMultiply,    pushAccordingToPrecedence,        "*\0"},  
+  [DIVIDE]            = {3000 , INFIX , infixDivide,      pushAccordingToPrecedence,        "/\0"},  
+  [REMAINDER]         = {3000 , INFIX , infixModulus,     pushAccordingToPrecedence,        "%\0"},  
+  [ADD]               = {4000 , INFIX , infixAdd,         handleAddOrSub,                   "+\0"},  
+  [MINUS]             = {4000 , INFIX , infixMinus,       handleAddOrSub,                   "-\0"},    
+  [SHIFT_LEFT]        = {5000 , INFIX , infixShiftLeft,   pushAccordingToPrecedence,        "<<\0"}, 
+  [SHIFT_RIGHT]       = {5000 , INFIX , infixShiftRight,  pushAccordingToPrecedence,        ">>\0"}, 
+  [LESSER]            = {6000 , INFIX , infixLesser,      pushAccordingToPrecedence,        "<\0"}, 
+  [LESSER_EQ]         = {6000 , INFIX , infixLesserEq,    pushAccordingToPrecedence,        "<=\0"}, 
+  [GREATER]           = {6000 , INFIX , infixGreater,     pushAccordingToPrecedence,        ">\0"}, 
+  [GREATER_EQ]        = {6000 , INFIX , infixGreaterEq,   pushAccordingToPrecedence,        ">=\0"}, 
+  [EQUAL]             = {7000 , INFIX , infixEqual,       pushAccordingToPrecedence,        "==\0"}, 
+  [BITWISE_AND]       = {8000 , INFIX , infixBitwiseAnd,  pushAccordingToPrecedence,        "&\0"},
+  [BITWISE_OR]        = {8000 , INFIX , infixBitwiseOr,   pushAccordingToPrecedence,        "|\0"},
+  [LOGICAL_AND]       = {12000, INFIX , infixLogicalAnd,  pushAccordingToPrecedence,        "&&\0"},
+  [LOGICAL_OR]        = {12000, INFIX , infixLogicalOr,   pushAccordingToPrecedence,        "||\0"},
   [INTEGER]           = {0,     NUMBER, NULL,             forcePush,                        NULL},
   [DOUBLE]            = {0,     NUMBER, NULL,             forcePush,                        NULL},
 };
