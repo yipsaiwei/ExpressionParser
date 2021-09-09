@@ -16,5 +16,5 @@
 
 //void  symbolThrowException(Symbol *symbol, int errorCode, char *message,...);
 void  dumpSymbolErrorMessage(CEXCEPTION_T ex, int lineNo);
-void  symbolThrowInfixException(Symbol  *symbol, int  errorCode, OperationType  previousType);
+void  symbolThrowInfixException(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer);
 #endif // EXCPETIONTHROWING_H

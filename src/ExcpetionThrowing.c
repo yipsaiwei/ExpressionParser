@@ -20,12 +20,13 @@ void  symbolThrowException(Symbol *symbol, int errorCode, char *message,...){
 }
 */
 
-void  symbolThrowInfixException(Symbol  *symbol, int  errorCode, OperationType  previousType){
+void  symbolThrowInfixException(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer){
   char  *currentStr = returnSymbolCharGivenId(symbol->id);
-  if(previousType == _NULL)
+  if(symbolizer->lastSymbolId == _NULL)
     throwException(errorCode, symbol, 0, "Invalid Infix %s after NULL! Only numbers or suffix are allowed.", currentStr);
   else{
-    char  *previousStr = returnSymbolCharGivenId(previousType);
+    char  *previousStr = returnSymbolCharGivenId(symbolizer->lastSymbolId);
+    freeSymbolizer(symbolizer);
     throwException(errorCode, symbol, 0, "Invalid Infix '%s' before '%s'. Only numbers or suffix are allowed.", currentStr, previousStr);
   }
 }

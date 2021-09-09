@@ -87,7 +87,7 @@ void  pushSymbolToStack(StackStruct *operatorStack, StackStruct *operandStack, S
 //typedef void    (*preHandleOperator)(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *operator);
 void  handleAddOrSub(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer){
   if(!arityAllowable(symbolizer->lastSymbolId, symbol->id) || symbolizer->lastSymbolId == _NULL){
-    verifyArityAllowable(symbolizer->lastSymbolId, PLUS_SIGN, symbol);
+    verifyArityAllowable(symbolizer, symbol, PLUS_SIGN);
     if(symbol->id == ADD)
       symbol->id = PLUS_SIGN;
     else
@@ -98,7 +98,7 @@ void  handleAddOrSub(StackStruct *operandStack, StackStruct *operatorStack, Symb
 
 void  handlePrefixSuffixIncOrDec(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer){
   if(!arityAllowable(symbolizer->lastSymbolId, symbol->id)){
-    verifyArityAllowable(symbolizer->lastSymbolId, POST_INC, symbol);
+    verifyArityAllowable(symbolizer, symbol, POST_INC);
     if(symbol->id == INC)
       symbol->id = POST_INC; 
     else
@@ -108,7 +108,7 @@ void  handlePrefixSuffixIncOrDec(StackStruct *operandStack, StackStruct *operato
 }
 
 void  pushAccordingToPrecedence(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *symbol, Symbolizer  *symbolizer){
-  verifyArityAllowable(symbolizer->lastSymbolId, symbol->id, symbol);
+  verifyArityAllowable(symbolizer, symbol, symbol->id);
   ListItem  *peekItem = peekTopOfStack(operatorStack);
   if(isIdArity(symbol->id, PREFIX) && (!isStackEmpty(operatorStack) && areTwoIdPrecedenceSame(getItemSymbolId(peekItem), symbol->id)))
     handleRightToLeftAssociativity(operandStack, operatorStack, symbol, symbolizer);
@@ -221,28 +221,28 @@ int arityAllowable(OperationType  previousType, OperationType currentType){
   }  
 }
 
-int verifyArityAllowable(OperationType  previousType, OperationType currentType, Symbol *symbol){
-  switch(returnArityOfAnId(currentType)){
+int verifyArityAllowable(Symbolizer  *symbolizer, Symbol *symbol, OperationType typeToCheck){
+  switch(returnArityOfAnId(typeToCheck)){
     case  INFIX:
-      if(isIdArity(previousType, SUFFIX) || isIdArity(previousType, NUMBER))    //3++ +3 OR 2+3
+      if(isIdArity(symbolizer->lastSymbolId, SUFFIX) || isIdArity(symbolizer->lastSymbolId, NUMBER))    //3++ +3 OR 2+3
         return  1;
       else
-        symbolThrowInfixException(symbol, ERROR_INVALID_INFIX, previousType);
+        symbolThrowInfixException(symbol, ERROR_INVALID_INFIX, symbolizer);
       break;
     case  PREFIX:
-      if(isIdArity(previousType, INFIX) || isIdArity(previousType, PREFIX) || isIdArity(previousType, NONE))  //2+ ++3 OR -++3 OR -3
+      if(isIdArity(symbolizer->lastSymbolId, INFIX) || isIdArity(symbolizer->lastSymbolId, PREFIX) || isIdArity(symbolizer->lastSymbolId, NONE))  //2+ ++3 OR -++3 OR -3
         return  1;
       else
         throwException(UNEXPECTED_OPERATOR, NULL, 0, "ERROR code %x : Not the desired operator!", UNEXPECTED_OPERATOR);
       break;
     case  SUFFIX:
-      if(isIdArity(previousType, NUMBER))    //3++
+      if(isIdArity(symbolizer->lastSymbolId, NUMBER))    //3++
         return  1;
       else
         throwException(UNEXPECTED_OPERATOR, NULL, 0, "ERROR code %x : Not the desired operator!", UNEXPECTED_OPERATOR);
      break;
     case  NUMBER:
-      if(isIdArity(previousType, NONE) || isIdArity(previousType, PREFIX) || isIdArity(previousType, INFIX))  //3 OR -3 OR 2+3
+      if(isIdArity(symbolizer->lastSymbolId, NONE) || isIdArity(symbolizer->lastSymbolId, PREFIX) || isIdArity(symbolizer->lastSymbolId, INFIX))  //3 OR -3 OR 2+3
         return  1;
       else
         throwException(UNEXPECTED_OPERATOR, NULL, 0, "ERROR code %x : Not the desired operator!", UNEXPECTED_OPERATOR);

@@ -102,7 +102,7 @@ Symbol  *prefixDec(Symbol  *number1, Symbol  *number2);
 int returnOperatorPrecedence(OperationType  type);
 char  *returnSymbolCharGivenId(OperationType  operationId);
 
-int verifyArityAllowable(OperationType  previousType, OperationType currentType, Symbol *symbol);
+int verifyArityAllowable(Symbolizer  *symbolizer, Symbol *symbol, OperationType typeToCheck);
 int arityAllowable(OperationType  previousType, OperationType currentType);
 void  pushAccordingToPrecedence(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *symbol, Symbolizer  *symbolizer);
 void  handleAddOrSub(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer);
