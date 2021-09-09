@@ -28,7 +28,7 @@ void  symbolThrowInfixException(Symbol  *symbol, int  errorCode, char *previousS
   if(previousStr == NULL)
     throwException(errorCode, symbol, 0, "Invalid Infix '%s' detected(after %S)! Only numbers or suffix are allowed.", currentStr, previousStr);
   else
-    throwException(errorCode, symbol, 0, "Invalid Infix '%s' before '%s'. Only numbers or suffix are allowed.", currentStr, previousStr);
+    throwException(errorCode, symbol, 0, "Invalid Infix '%s' after '%s'. Only numbers or suffix are allowed.", currentStr, previousStr);
 }
 
 void  dumpSymbolErrorMessage(CEXCEPTION_T ex, int lineNo){

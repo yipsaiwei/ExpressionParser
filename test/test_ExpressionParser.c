@@ -1560,6 +1560,23 @@ void  test_shuntingYard_given_multiply_pre_inc_exception_to_be_thrown(){
   freeStack(operatorStack, free);   
 }
 
+void  test_throwException(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer(" $  ");
+  Token *token = NULL;
+  token = getToken(tokenizer);
+  Try{
+    throwException(0x33, token, 0, "Just to test exception %s Hello world", token->str);
+    TEST_FAIL_MESSAGE("No exception ");
+  }Catch(ex){
+    dumpTokenErrorMessage(ex, 1);
+    TEST_ASSERT_EQUAL(0x33, ex->errorCode);
+    freeException(ex);
+  }
+  freeToken(token);
+  freeTokenizer(tokenizer);
+}
+
 /*
 void  test_shuntingYard_given_prefix_minus_pre_INC_expect_correct_value_minus_2_returned(){
   Tokenizer *tokenizer = NULL;
