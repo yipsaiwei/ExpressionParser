@@ -20,11 +20,14 @@ void  symbolThrowException(Symbol *symbol, int errorCode, char *message,...){
 }
 */
 
-void  symbolThrowInfixException(Symbol  *symbol, int  errorCode, char *previousStr, char  *currentStr){
-  if(isSymbolNull(symbol))
+void  symbolThrowInfixException(Symbol  *symbol, int  errorCode, OperationType  previousType){
+  char  *currentStr = returnSymbolCharGivenId(symbol->id);
+  if(previousType == _NULL)
     throwException(errorCode, symbol, 0, "Invalid Infix %s after NULL! Only numbers or suffix are allowed.", currentStr);
-  else
+  else{
+    char  *previousStr = returnSymbolCharGivenId(previousType);
     throwException(errorCode, symbol, 0, "Invalid Infix '%s' before '%s'. Only numbers or suffix are allowed.", currentStr, previousStr);
+  }
 }
 
 void  dumpSymbolErrorMessage(CEXCEPTION_T ex, int lineNo){
@@ -39,5 +42,6 @@ void  dumpSymbolErrorMessage(CEXCEPTION_T ex, int lineNo){
     errorLine = errorIndicator(symbol->token->startColumn, idCharSize);
     printf("Error on line %d:%d: %s\n%s\n%s\n", lineNo, symbol->token->startColumn, ex->msg, symbol->token->originalstr, errorLine);
     free(errorLine);
+    freeSymbol(symbol);
   }
 }

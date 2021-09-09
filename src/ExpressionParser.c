@@ -226,11 +226,8 @@ int verifyArityAllowable(OperationType  previousType, OperationType currentType,
     case  INFIX:
       if(isIdArity(previousType, SUFFIX) || isIdArity(previousType, NUMBER))    //3++ +3 OR 2+3
         return  1;
-      else{
-        char  *charBefore = returnSymbolCharGivenId(previousType);
-        char  *charAfter = returnSymbolCharGivenId(symbol->id);
-        symbolThrowInfixException(symbol, ERROR_INVALID_INFIX, charBefore, charAfter);
-      }
+      else
+        symbolThrowInfixException(symbol, ERROR_INVALID_INFIX, previousType);
       break;
     case  PREFIX:
       if(isIdArity(previousType, INFIX) || isIdArity(previousType, PREFIX) || isIdArity(previousType, NONE))  //2+ ++3 OR -++3 OR -3
