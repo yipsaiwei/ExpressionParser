@@ -6,6 +6,7 @@ Data  *createData(){
   Data  *data = memAlloc(sizeof(Data));
   data->val1 = 0;
   data->val2 = 0;
+  return  data;
 }
 
 void  freeData(Data *data){

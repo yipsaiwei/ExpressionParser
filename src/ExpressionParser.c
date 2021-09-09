@@ -137,8 +137,10 @@ void pushOperator(StackStruct *operandStack, StackStruct *operatorStack, Symbol 
 
 ListItem  *popOperator(StackStruct *operatorStack, OperationType type){
   ListItem  *popItem = popFromStack(operatorStack);
-  if(getItemSymbolId(popItem) != type)
+  if(getItemSymbolId(popItem) != type){
     throwException(UNEXPECTED_OPERATOR, NULL, 0, "ERROR code %x : Not the desired operator!", UNEXPECTED_OPERATOR);
+    return  NULL;
+  }
   else
     return  popItem;
 }
@@ -250,6 +252,7 @@ int verifyArityAllowable(Symbolizer  *symbolizer, Symbol *symbol, OperationType 
     default:
       throwException(UNEXPECTED_OPERATOR, NULL, 0, "ERROR code %x : Not the desired operator!", UNEXPECTED_OPERATOR);
   }
+  return  0;
 }
 
 char  *returnSymbolCharGivenId(OperationType  operationId){

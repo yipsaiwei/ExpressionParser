@@ -136,7 +136,6 @@ void  test_infixAddition_given_1_floating_pt_1_int_39point18_n_90_expect_result_
   TEST_ASSERT_EQUAL_FLOAT(129.18, getSymbolDouble(result));
   TEST_ASSERT_EQUAL(DOUBLE, result->id);
   
-  
   freeSymbol(number1);
   freeSymbol(number2);
   freeSymbol(result);
