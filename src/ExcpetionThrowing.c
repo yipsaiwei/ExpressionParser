@@ -44,6 +44,6 @@ void  dumpSymbolErrorMessage(CEXCEPTION_T ex, int lineNo){
     errorLine = errorIndicator(symbol->token->startColumn, idCharSize);
     printf("Error on line %d:%d: %s\n%s\n%s\n", lineNo, symbol->token->startColumn, ex->msg, symbol->token->originalstr, errorLine);
     free(errorLine);
-    //freeSymbol(symbol);
   }
+  freeSymbol(symbol);
 }
