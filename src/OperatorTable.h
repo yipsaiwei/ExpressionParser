@@ -21,10 +21,13 @@
 #define isSymbolNull(symbol)                                    symbol->id == _NULL
 #define isSymbolOperatorType(symbol)                            symbol->type == OPERATOR
 
+#define isPreviousIdNull(symbolizer)                            symbolizer->lastSymbol == NULL
+#define isPreviousIdNotNull(symbolizer)                         symbolizer->lastSymbol != NULL
 #define isPreviousSymbolType(symbolizer, type)                  getLastSymbolType(symbolizer) == type
-#define isPreviousArity(symbolizer, arity)                      returnArityOfAnId(symbolizer->lastSymbolId) == arity
+#define isPreviousArity(symbolizer, arity)                      returnArityOfAnId(symbolizer->lastSymbol->id) == arity
 #define isIdArity(symbolId, arity)                              returnArityOfAnId(symbolId) == arity
-#define isPreviousSymbolId(symbolizer, id)                      symbolizer->lastSymbolId== id
+#define isPreviousSymbolId(symbolizer, prevId)                  symbolizer->lastSymbol->id == prevId
+#define isNotPreviousSymbolId(symbolizer, prevId)               symbolizer->lastSymbol->id != prevId
 
 typedef enum{
   UND,
@@ -89,7 +92,7 @@ struct  Symbol{
 typedef struct  Symbolizer  Symbolizer;
 struct  Symbolizer{
   Tokenizer *tokenizer;
-  OperationType lastSymbolId;
+  //OperationType lastSymbolId;
   Symbol  *lastSymbol;
 };
 
@@ -113,6 +116,7 @@ Symbolizer  *createSymbolizer(Tokenizer  *tokenizer);
 void  freeSymbolizer(Symbolizer *symbolizer);
 Symbol  *createSymbol(Token *token, AttributeType type, OperationType id);
 Symbol  *getSymbol(Symbolizer *symbolizer);
+Symbol  *cloneSymbol(Symbol *symbol);
 void  freeSymbol(Symbol *symbol);
 
 AttributeType getLastSymbolType(Symbolizer  *symbolizer);

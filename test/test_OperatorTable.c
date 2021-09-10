@@ -30,7 +30,7 @@ void  test_createSymbolizer_given_tokenizer_expect_correct_symbolizer_returned()
   Symbolizer  *symbolizer = createSymbolizer(tokenizer);
   
   TEST_ASSERT_EQUAL_PTR(tokenizer, symbolizer->tokenizer);
-  TEST_ASSERT_EQUAL(_NULL, symbolizer->lastSymbolId);
+  TEST_ASSERT_EQUAL(_NULL, symbolizer->lastSymbol->id);
   
   freeSymbolizer(symbolizer);
 }
@@ -237,4 +237,23 @@ void  test_get_symbol_given_symbolizer_with_float_expect_integer_symbol_returned
   
   freeSymbolizer(symbolizer);
   freeSymbol(symbol);   
+}
+
+void  test_cloneSymbol_given_a_symbol_expect_correct_informations_cloned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("    12.9876 ");  
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
+
+  Symbol  *symbol = getSymbol(symbolizer);
+
+  Symbol  *newSymbol = cloneSymbol(symbol);
+
+  TEST_ASSERT_EQUAL(symbol->type, newSymbol->type);
+  TEST_ASSERT_EQUAL(symbol->id, newSymbol->id);
+  TEST_ASSERT_EQUAL_STRING(symbol->token->str, newSymbol->token->str);
+  TEST_ASSERT_EQUAL_FLOAT(((FloatToken *)symbol->token)->value, ((FloatToken *)newSymbol->token)->value);
+  
+  freeSymbolizer(symbolizer);
+  freeSymbol(symbol);
+  freeSymbol(newSymbol);
 }

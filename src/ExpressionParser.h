@@ -101,7 +101,7 @@ Symbol  *prefixInc(Symbol  *number1, Symbol  *number2);
 Symbol  *prefixDec(Symbol  *number1, Symbol  *number2);
 
 int returnOperatorPrecedence(OperationType  type);
-char  *returnSymbolCharGivenId(OperationType  operationId);
+char  *returnSymbolCharGivenId(Symbol *symbol);
 
 int verifyArityAllowable(Symbolizer  *symbolizer, Symbol *symbol, OperationType typeToCheck);
 int arityAllowable(OperationType  previousType, OperationType currentType);

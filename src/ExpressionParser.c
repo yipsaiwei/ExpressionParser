@@ -49,7 +49,7 @@ ArityHandler  arityHandler[] = {
 void  shuntingYard(Tokenizer  *tokenizer, StackStruct *operatorStack, StackStruct *operandStack){
   //SymbolTableStruct instruction;
   Symbolizer  *symbolizer = createSymbolizer(tokenizer);
-  Symbol  *symbol = symbolizerUpdateLastSymbolAndGetNewSymbol(symbolizer, NULL);
+  Symbol  *symbol = getSymbol(symbolizer);
   ListItem  *popItem;
   while(!(isSymbolNull(symbol))){
     executeStoreHandler(operandStack, operatorStack, symbol, symbolizer);
@@ -74,9 +74,12 @@ Symbol  *symbolizerUpdateLastSymbolAndGetNewSymbol(Symbolizer  *symbolizer, Symb
 
 void  symbolizerUpdateLastSymbol(Symbol *symbol, Symbolizer *symbolizer){
   if(symbol == NULL)
-    symbolizer->lastSymbolId = _NULL;
-  else
-    symbolizer->lastSymbolId = symbol->id;
+    symbolizer->lastSymbol = NULL;
+  else{
+    if(symbolizer->lastSymbol)
+      freeSymbol(symbolizer->lastSymbol);
+    symbolizer->lastSymbol = cloneSymbol(symbol);
+  }
   //symbolizer->lastSymbolArity = symbol->arity;  
 }
 
@@ -89,7 +92,7 @@ void  pushSymbolToStack(StackStruct *operatorStack, StackStruct *operandStack, S
 
 //typedef void    (*preHandleOperator)(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *operator);
 void  handleAddOrSub(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer){
-  if(!arityAllowable(symbolizer->lastSymbolId, symbol->id) || symbolizer->lastSymbolId == _NULL){
+  if(!arityAllowable(symbolizer->lastSymbol->id, symbol->id) || isPreviousSymbolId(symbolizer, _NULL)){
     verifyArityAllowable(symbolizer, symbol, PLUS_SIGN);
     if(symbol->id == ADD)
       symbol->id = PLUS_SIGN;
@@ -100,8 +103,8 @@ void  handleAddOrSub(StackStruct *operandStack, StackStruct *operatorStack, Symb
 }
 
 void  handlePrefixSuffixInc(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer){
-  if(!arityAllowable(symbolizer->lastSymbolId, symbol->id)){
-    if(!arityAllowable(symbolizer->lastSymbolId, POST_INC))
+  if(!arityAllowable(symbolizer->lastSymbol->id, symbol->id)){
+    if(!arityAllowable(symbolizer->lastSymbol->id, POST_INC))
       verifyArityAllowable(symbolizer, symbol, symbol->id);
     symbol->id = POST_INC; 
   }
@@ -109,8 +112,8 @@ void  handlePrefixSuffixInc(StackStruct *operandStack, StackStruct *operatorStac
 }
 
 void  handlePrefixSuffixDec(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer){
-  if(!arityAllowable(symbolizer->lastSymbolId, symbol->id)){
-    if(!arityAllowable(symbolizer->lastSymbolId, POST_DEC))
+  if(!arityAllowable(symbolizer->lastSymbol->id, symbol->id)){
+    if(!arityAllowable(symbolizer->lastSymbol->id, POST_DEC))
       verifyArityAllowable(symbolizer, symbol, symbol->id);
     symbol->id = POST_DEC; 
   }
@@ -121,7 +124,7 @@ void  handleNumber(StackStruct *operandStack, StackStruct *operatorStack, Symbol
   verifyArityAllowable(symbolizer, symbol, symbol->id);
   ListItem  *peekItem = peekTopOfStack(operatorStack);
   forcePush(operandStack, operatorStack, symbol, symbolizer);
-  if(isPreviousArity(symbolizer, PREFIX) && !isPreviousSymbolId(symbolizer, OPEN_PAREN))
+  if(isNotPreviousSymbolId(symbolizer, OPEN_PAREN) && isPreviousArity(symbolizer, PREFIX))
     unwindStackForAnArityInSequence(operandStack, operatorStack, PREFIX);
 }
 
@@ -205,7 +208,7 @@ void  unwindStackUntil(StackStruct *operandStack, StackStruct *operatorStack, Op
 
 void  unwindStackForAnArityInSequence(StackStruct *operandStack, StackStruct *operatorStack, ARITY  arity){
   ListItem  *peekItem = peekTopOfStack(operatorStack);
-  while(!isStackEmpty(operatorStack) && returnArityOfAnId(getItemSymbolId(peekItem)) == arity){
+  while(!isStackEmpty(operatorStack) && returnArityOfAnId(getItemSymbolId(peekItem)) == arity && getItemSymbolId(peekItem) != OPEN_PAREN){
     unwindStack(operatorStack, operandStack);
     peekItem = peekTopOfStack(operatorStack);
   }
@@ -251,25 +254,25 @@ int arityAllowable(OperationType  previousType, OperationType currentType){
 int verifyArityAllowable(Symbolizer  *symbolizer, Symbol *symbol, OperationType typeToCheck){
   switch(returnArityOfAnId(typeToCheck)){
     case  INFIX:
-      if(isIdArity(symbolizer->lastSymbolId, SUFFIX) || isIdArity(symbolizer->lastSymbolId, NUMBER))    //3++ +3 OR 2+3
+      if(isIdArity(symbolizer->lastSymbol->id, SUFFIX || isIdArity(symbolizer->lastSymbol->id, NUMBER)))    //3++ +3 OR 2+3
         return  1;
       else
         handleException(symbol, symbolizer, ERROR_INVALID_INFIX);
       break;
     case  PREFIX:
-      if(isIdArity(symbolizer->lastSymbolId, INFIX) || isIdArity(symbolizer->lastSymbolId, PREFIX) || isIdArity(symbolizer->lastSymbolId, NONE))  //2+ ++3 OR -++3 OR -3
+      if(isIdArity(symbolizer->lastSymbol->id, NONE) || isIdArity(symbolizer->lastSymbol->id, INFIX) || isIdArity(symbolizer->lastSymbol->id, PREFIX))  //2+ ++3 OR -++3 OR -3
         return  1;
       else
         handleException(symbol, symbolizer, ERROR_INVALID_PREFIX);
       break;
     case  SUFFIX:
-      if(isIdArity(symbolizer->lastSymbolId, NUMBER))    //3++
+      if(isIdArity(symbolizer->lastSymbol->id, NUMBER))    //3++
         return  1;
       else
         throwException(UNEXPECTED_OPERATOR, NULL, 0, "ERROR code %x : Not the desired operator!", UNEXPECTED_OPERATOR);
      break;
     case  NUMBER:
-      if(isIdArity(symbolizer->lastSymbolId, NONE) || isIdArity(symbolizer->lastSymbolId, PREFIX) || isIdArity(symbolizer->lastSymbolId, INFIX))  //3 OR -3 OR 2+3
+      if(isIdArity(symbolizer->lastSymbol->id, NONE) || isIdArity(symbolizer->lastSymbol->id, PREFIX) || isIdArity(symbolizer->lastSymbol->id, INFIX))  //3 OR -3 OR 2+3
         return  1;
       else
         throwException(UNEXPECTED_OPERATOR, NULL, 0, "ERROR code %x : Not the desired operator!", UNEXPECTED_OPERATOR);
@@ -281,15 +284,15 @@ int verifyArityAllowable(Symbolizer  *symbolizer, Symbol *symbol, OperationType 
 }
 
 void  handleException(Symbol  *symbol, Symbolizer *symbolizer, int  errorCode){
-  char  *previousStr = returnSymbolCharGivenId(symbolizer->lastSymbolId);
-  char  *currentStr = returnSymbolCharGivenId(symbol->id);
+  char  *previousStr = returnSymbolCharGivenId(symbolizer->lastSymbol);
+  char  *currentStr = returnSymbolCharGivenId(symbol);
   ExceptionTable  exceptionInfo = exceptionTable[errorCode];
   freeSymbolizer(symbolizer);
   exceptionInfo.exceptionPtr(symbol, errorCode, previousStr, currentStr);
 }
 
-char  *returnSymbolCharGivenId(OperationType  operationId){
-  SymbolTableStruct instruction = symbolTable[operationId];
+char  *returnSymbolCharGivenId(Symbol *symbol){
+  SymbolTableStruct instruction = symbolTable[symbol->id];
   return  instruction.idChar;
 }
 
@@ -362,8 +365,10 @@ createInfixLogicFunction(infixLogicalAnd, &&);
 createInfixLogicFunction(infixBitwiseOr, |);
 createInfixLogicFunction(infixLogicalOr, ||);
 createPrefixLogicFunction(prefixLogicNot, !);
-createPrefixLogicFunction(prefixInc, ++);
-createPrefixLogicFunction(prefixDec, --);
+//createPrefixLogicFunction(prefixInc, ++);
+createPrefixArithmeticFunction(prefixInc, ++);
+//createPrefixLogicFunction(prefixDec, --);
+createPrefixArithmeticFunction(prefixDec, --);
 createPrefixLogicFunction(prefixBitwiseNot, ~);
 
 createSuffixIncDecFunction(suffixDec, --);

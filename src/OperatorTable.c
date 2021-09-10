@@ -31,13 +31,17 @@ int returnStringSize(char *str){
 Symbolizer  *createSymbolizer(Tokenizer  *tokenizer){
   Symbolizer  *symbolizer = malloc(sizeof(Symbolizer));
   symbolizer->tokenizer = tokenizer;
-  symbolizer->lastSymbolId = _NULL;
+  //symbolizer->lastSymbolId = _NULL;
+  Token *token = createNULLToken(tokenizer->str, 0, TOKEN_NULL_TYPE);
+  symbolizer->lastSymbol = createSymbol(token, EMPTY, _NULL);
   return  symbolizer;
 }
 
 void  freeSymbolizer(Symbolizer *symbolizer){
   if(symbolizer->tokenizer)
     freeTokenizer(symbolizer->tokenizer);
+  if(symbolizer->lastSymbol)
+    freeSymbol(symbolizer->lastSymbol);
   if(symbolizer)
     free(symbolizer);
 }
@@ -48,6 +52,11 @@ Symbol  *createSymbol(Token *token, AttributeType type, OperationType id){
   symbol->type = type;
   symbol->id = id;
   return  symbol;
+}
+
+Symbol  *cloneSymbol(Symbol *symbol){
+  Token *newToken = cloneToken(symbol->token);
+  return  createSymbol(newToken, symbol->type, symbol->id);
 }
 
 void  freeSymbol(Symbol *symbol){
