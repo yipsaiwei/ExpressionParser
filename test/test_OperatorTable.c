@@ -43,7 +43,7 @@ void  test_handleSymbol_given_2_adjacent_different_token_expect_correct_double_c
   
   Symbol  *symbol = handleSymbol(symbolizer, token);
   
-  TEST_ASSERT_EQUAL_STRING("<", symbol->token->str);
+  TEST_ASSERT_EQUAL_STRING("<=", symbol->token->str);
   TEST_ASSERT_EQUAL(LESSER_EQ, symbol->id);
   
   freeSymbolizer(symbolizer);
@@ -88,7 +88,7 @@ void  test_handleRepeatedSymbol_given_2_adjacent_plus_token_expect_INC_returned(
   
   Symbol  *symbol = handleRepeatedSymbol(symbolizer, token);
   
-  TEST_ASSERT_EQUAL_STRING("+", symbol->token->str);
+  TEST_ASSERT_EQUAL_STRING("++", symbol->token->str);
   TEST_ASSERT_EQUAL(INC, symbol->id);
   
   freeSymbolizer(symbolizer);
@@ -118,7 +118,7 @@ void  test_handleShiftSymbol_given_3_operators_left_shift_assign_expect_3_charac
 
   Symbol  *symbol = handleShiftSymbol(symbolizer, token);
   
-  TEST_ASSERT_EQUAL_STRING("<", symbol->token->str);
+  TEST_ASSERT_EQUAL_STRING("<<=", symbol->token->str);
   TEST_ASSERT_EQUAL(SHIFT_LEFT_ASSIGN, symbol->id);
   
   freeSymbolizer(symbolizer);
@@ -133,7 +133,7 @@ void  test_handleShiftSymbol_given_3_operators_right_shift_assign_expect_3_chara
 
   Symbol  *symbol = handleShiftSymbol(symbolizer, token);
   
-  TEST_ASSERT_EQUAL_STRING(">", symbol->token->str);
+  TEST_ASSERT_EQUAL_STRING(">>=", symbol->token->str);
   TEST_ASSERT_EQUAL(SHIFT_RIGHT_ASSIGN, symbol->id);
   
   freeSymbolizer(symbolizer);
@@ -148,7 +148,7 @@ void  test_handleShiftSymbol_given_3_operators_right_shift_space_assign_expect_r
 
   Symbol  *symbol = handleShiftSymbol(symbolizer, token);
   
-  TEST_ASSERT_EQUAL_STRING(">", symbol->token->str);
+  TEST_ASSERT_EQUAL_STRING(">>", symbol->token->str);
   TEST_ASSERT_EQUAL(SHIFT_RIGHT, symbol->id);
   
   freeSymbolizer(symbolizer);
@@ -176,7 +176,7 @@ void  test_get_symbol_given_symbolizer_with_bitwise_or_assign_operator_expect_op
 
   Symbol  *symbol = getSymbol(symbolizer);
   
-  TEST_ASSERT_EQUAL_STRING("|", symbol->token->str);
+  TEST_ASSERT_EQUAL_STRING("|=", symbol->token->str);
   TEST_ASSERT_EQUAL(BITWISE_OR_ASSIGN, symbol->id);
   
   freeSymbolizer(symbolizer);
@@ -190,7 +190,7 @@ void  test_get_symbol_given_symbolizer_with_shift_right_assign_operator_expect_o
 
   Symbol  *symbol = getSymbol(symbolizer);
   
-  TEST_ASSERT_EQUAL_STRING(">", symbol->token->str);
+  TEST_ASSERT_EQUAL_STRING(">>=", symbol->token->str);
   TEST_ASSERT_EQUAL(SHIFT_RIGHT_ASSIGN, symbol->id);
   
   freeSymbolizer(symbolizer);
@@ -204,7 +204,7 @@ void  test_get_symbol_given_symbolizer_with_shift_left_operator_expect_operator_
 
   Symbol  *symbol = getSymbol(symbolizer);
   
-  TEST_ASSERT_EQUAL_STRING("<", symbol->token->str);
+  TEST_ASSERT_EQUAL_STRING("<<", symbol->token->str);
   TEST_ASSERT_EQUAL(SHIFT_LEFT, symbol->id);
   
   freeSymbolizer(symbolizer);

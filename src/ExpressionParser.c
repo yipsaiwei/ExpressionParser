@@ -8,10 +8,10 @@ SymbolTableStruct  symbolTable[] = {
   [CLOSE_PAREN]       = {1000 , SUFFIX, NULL,             evaluateExpressionWithinBrackets, ")\0"},  //Call unwind until '('  
   [OPEN_SQ_BRACKET]   = {1000 , PREFIX, NULL,             forcePush,                        "[\0"},  
   [CLOSE_SQ_BRACKET]  = {1000 , SUFFIX, NULL,             evaluateExpressionWithinBrackets, "]\0"}, 
-  [POST_INC]          = {1000 , SUFFIX, suffixInc,        handlePrefixSuffixIncOrDec,       "++\0"},   
-  [POST_DEC]          = {1000 , SUFFIX, suffixDec,        handlePrefixSuffixIncOrDec,       "--\0"},   
-  [INC]               = {2000 , PREFIX, prefixInc,        handlePrefixSuffixIncOrDec,       "++\0"},       //Right to left
-  [DEC]               = {2000 , PREFIX, prefixDec,        handlePrefixSuffixIncOrDec,       "--\0"},       //Right to left  separate function
+  [POST_INC]          = {1000 , SUFFIX, suffixInc,        handlePrefixSuffixInc,            "++\0"},   
+  [POST_DEC]          = {1000 , SUFFIX, suffixDec,        handlePrefixSuffixDec,            "--\0"},   
+  [INC]               = {2000 , PREFIX, prefixInc,        handlePrefixSuffixInc,            "++\0"},       //Right to left
+  [DEC]               = {2000 , PREFIX, prefixDec,        handlePrefixSuffixDec,            "--\0"},       //Right to left
   [BITWISE_NOT]       = {2000 , PREFIX, prefixBitwiseNot, pushAccordingToPrecedence,        "~\0"},   //Right to left  (Change second func so that it will not take double
   [LOGICAL_NOT]       = {2000 , PREFIX, prefixLogicNot,   pushAccordingToPrecedence,        "!\0"},   //Right to left
   [PLUS_SIGN]         = {2000 , PREFIX, prefixPlus,       pushAccordingToPrecedence,        "+\0"},   //Right to left
@@ -32,8 +32,8 @@ SymbolTableStruct  symbolTable[] = {
   [BITWISE_OR]        = {8000 , INFIX , infixBitwiseOr,   pushAccordingToPrecedence,        "|\0"},
   [LOGICAL_AND]       = {12000, INFIX , infixLogicalAnd,  pushAccordingToPrecedence,        "&&\0"},
   [LOGICAL_OR]        = {12000, INFIX , infixLogicalOr,   pushAccordingToPrecedence,        "||\0"},
-  [INTEGER]           = {0,     NUMBER, NULL,             forcePush,                        NULL},
-  [DOUBLE]            = {0,     NUMBER, NULL,             forcePush,                        NULL},
+  [INTEGER]           = {0,     NUMBER, NULL,             handleNumber,                     NULL},
+  [DOUBLE]            = {0,     NUMBER, NULL,             handleNumber,                     NULL},
   [_NULL]             = {0,     NONE,   NULL,             NULL,                             NULL},
 };
 
@@ -99,15 +99,30 @@ void  handleAddOrSub(StackStruct *operandStack, StackStruct *operatorStack, Symb
   pushAccordingToPrecedence(operandStack, operatorStack, symbol, symbolizer);
 }
 
-void  handlePrefixSuffixIncOrDec(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer){
+void  handlePrefixSuffixInc(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer){
   if(!arityAllowable(symbolizer->lastSymbolId, symbol->id)){
-    verifyArityAllowable(symbolizer, symbol, POST_INC);
-    if(symbol->id == INC)
-      symbol->id = POST_INC; 
-    else
-      symbol->id = POST_DEC; 
+    if(!arityAllowable(symbolizer->lastSymbolId, POST_INC))
+      verifyArityAllowable(symbolizer, symbol, symbol->id);
+    symbol->id = POST_INC; 
   }
   pushAccordingToPrecedence(operandStack, operatorStack, symbol, symbolizer);
+}
+
+void  handlePrefixSuffixDec(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer){
+  if(!arityAllowable(symbolizer->lastSymbolId, symbol->id)){
+    if(!arityAllowable(symbolizer->lastSymbolId, POST_DEC))
+      verifyArityAllowable(symbolizer, symbol, symbol->id);
+    symbol->id = POST_DEC; 
+  }
+  pushAccordingToPrecedence(operandStack, operatorStack, symbol, symbolizer);
+}
+
+void  handleNumber(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer){
+  verifyArityAllowable(symbolizer, symbol, symbol->id);
+  ListItem  *peekItem = peekTopOfStack(operatorStack);
+  forcePush(operandStack, operatorStack, symbol, symbolizer);
+  if(isPreviousArity(symbolizer, PREFIX) && !isPreviousSymbolId(symbolizer, OPEN_PAREN))
+    unwindStackForAnArityInSequence(operandStack, operatorStack, PREFIX);
 }
 
 void  pushAccordingToPrecedence(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *symbol, Symbolizer  *symbolizer){
@@ -121,12 +136,11 @@ void  pushAccordingToPrecedence(StackStruct *operandStack, StackStruct *operator
 
 void  handleRightToLeftAssociativity(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *symbol, Symbolizer *symbolizer){
   ListItem  *peekItem = peekTopOfStack(operatorStack);
-  while(isIdArity(symbol->id, PREFIX) && areTwoIdPrecedenceSame(getItemSymbolId(peekItem), symbol->id)){
+  if(isIdArity(symbol->id, PREFIX) && areTwoIdPrecedenceSame(getItemSymbolId(peekItem), symbol->id)){
     pushToStack(operatorStack, symbol);
-    symbol = symbolizerUpdateLastSymbolAndGetNewSymbol(symbolizer, symbol);
-    peekItem = peekTopOfStack(operatorStack);
+    //symbol = symbolizerUpdateLastSymbolAndGetNewSymbol(symbolizer, symbol);
+    //peekItem = peekTopOfStack(operatorStack);
   }
-  executeStoreHandler(operandStack, operatorStack, symbol, symbolizer);
 }
 
 void pushOperator(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *operatorToPush){
@@ -189,6 +203,14 @@ void  unwindStackUntil(StackStruct *operandStack, StackStruct *operatorStack, Op
     throwException(UNEXPECTED_OPERATOR, NULL, 0, "ERROR code %x : Not the desired operator!", UNEXPECTED_OPERATOR);
 }
 
+void  unwindStackForAnArityInSequence(StackStruct *operandStack, StackStruct *operatorStack, ARITY  arity){
+  ListItem  *peekItem = peekTopOfStack(operatorStack);
+  while(!isStackEmpty(operatorStack) && returnArityOfAnId(getItemSymbolId(peekItem)) == arity){
+    unwindStack(operatorStack, operandStack);
+    peekItem = peekTopOfStack(operatorStack);
+  }
+}
+
 //check the index of the top of both stacks to determine which one comes just before this operator to check. 
 //if no operator/number before = prefix
 //if previous is number = infix / suffix
@@ -238,7 +260,7 @@ int verifyArityAllowable(Symbolizer  *symbolizer, Symbol *symbol, OperationType 
       if(isIdArity(symbolizer->lastSymbolId, INFIX) || isIdArity(symbolizer->lastSymbolId, PREFIX) || isIdArity(symbolizer->lastSymbolId, NONE))  //2+ ++3 OR -++3 OR -3
         return  1;
       else
-        throwException(UNEXPECTED_OPERATOR, NULL, 0, "ERROR code %x : Not the desired operator!", UNEXPECTED_OPERATOR);
+        handleException(symbol, symbolizer, ERROR_INVALID_PREFIX);
       break;
     case  SUFFIX:
       if(isIdArity(symbolizer->lastSymbolId, NUMBER))    //3++

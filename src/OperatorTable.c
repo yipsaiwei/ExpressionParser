@@ -78,7 +78,9 @@ Symbol  *handleSymbol(Symbolizer *symbolizer, Token  *token){
   OperatorInformationTable  information = operatorInformationTable[*(token->str)]; 
   if(!isTokenNull(nextToken) && isNextAdjacentTokenStringEqual(token, nextToken)){
     nextToken = getToken(symbolizer->tokenizer);
+    tokenExpandString(token, 1);
     symbol = createSymbol(token, OPERATOR, information.type[1]);   
+    freeToken(nextToken);
   }else
     symbol = createSymbol(token, OPERATOR, information.type[0]);
   return  symbol;
@@ -90,6 +92,7 @@ Symbol  *handleRepeatedSymbol(Symbolizer *symbolizer, Token  *token){
   OperatorInformationTable  information = operatorInformationTable[*(token->str)];
   if(!isTokenNull(nextToken) && isNextAdjacentTokenSame(token, nextToken)){
     nextToken = getToken(symbolizer->tokenizer);
+    tokenExpandString(token, 1);
     symbol = createSymbol(token, OPERATOR, information.type[2]); 
     freeToken(nextToken); 
   }else
@@ -106,7 +109,7 @@ Symbol  *handleShiftSymbol(Symbolizer *symbolizer, Token  *token){
     Token *nextNextToken = peekToken(symbolizer->tokenizer);
     if(!isTokenNull(nextNextToken) && isNextAdjacentTokenStringEqual(nextToken, nextNextToken)){
       nextNextToken = getToken(symbolizer->tokenizer);
-      char  *strPtr = concatenateTwoStrings(token->str, nextToken->str);
+      tokenExpandString(token, 2);
       symbol = createSymbol(token, OPERATOR, information.type[3]);
       freeToken(nextToken);
       freeToken(nextNextToken);

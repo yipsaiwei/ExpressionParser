@@ -13,6 +13,7 @@
 #define ERROR_INVALID_INFIX_AFTER_NONE    0x112
 #define ERROR_INVALID_PREFIX              0x222
 #define ERROR_INVALID_SUFFIX              0x333
+#define ERROR_INVALID_NUMBER              0x444
 
 typedef void  (*ExceptionFuncPtr)(Symbol  *symbol, int  errorCode, char *previousStr, char  *currentStr); 
 
@@ -24,4 +25,7 @@ struct  ExceptionTable{
 //void  symbolThrowException(Symbol *symbol, int errorCode, char *message,...);
 void  dumpSymbolErrorMessage(CEXCEPTION_T ex, int lineNo);
 void  symbolThrowInfixException(Symbol  *symbol, int  errorCode, char *previousStr, char  *currentStr);
+void  symbolThrowPrefixException(Symbol  *symbol, int  errorCode, char *previousStr, char  *currentStr);
+void  symbolThrowSuffixException(Symbol  *symbol, int  errorCode, char *previousStr, char  *currentStr);
+void  symbolThrowNumberException(Symbol  *symbol, int  errorCode, char *previousStr, char  *currentStr);
 #endif // EXCPETIONTHROWING_H

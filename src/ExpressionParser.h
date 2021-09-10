@@ -64,6 +64,7 @@ void  handlePrefix(StackStruct *operandStack, StackStruct *operatorStack);
 void  handleSuffix(StackStruct *operandStack, StackStruct *operatorStack);
 void  unwindStack(StackStruct *operatorStack, StackStruct *operandStack);
 void  unwindStackUntil(StackStruct *operandStack, StackStruct *operatorStack, OperationType type);
+void  unwindStackForAnArityInSequence(StackStruct *operandStack, StackStruct *operatorStack, ARITY  arity);
 void  operateOperatorInOperatorStack(StackStruct  *operandStack, StackStruct  *operatorStack);
 void  evaluateExpressionWithinBrackets(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer);
 void pushOperator(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *operatorToPush);
@@ -106,8 +107,10 @@ int verifyArityAllowable(Symbolizer  *symbolizer, Symbol *symbol, OperationType 
 int arityAllowable(OperationType  previousType, OperationType currentType);
 void  pushAccordingToPrecedence(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *symbol, Symbolizer  *symbolizer);
 void  handleAddOrSub(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer);
-void  handlePrefixSuffixIncOrDec(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer);
+void  handlePrefixSuffixInc(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer);
+void  handlePrefixSuffixDec(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer);
 void  handleRightToLeftAssociativity(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *symbol, Symbolizer *symbolizer);
+void  handleNumber(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer);
 void  executeStoreHandler(StackStruct  *operandStack, StackStruct  *operatorStack, Symbol  *symbol, Symbolizer *symbolizer);
 
 void  handleException(Symbol  *symbol, Symbolizer *symbolizer, int  errorCode);

@@ -90,6 +90,7 @@ typedef struct  Symbolizer  Symbolizer;
 struct  Symbolizer{
   Tokenizer *tokenizer;
   OperationType lastSymbolId;
+  Symbol  *lastSymbol;
 };
 
 typedef Symbol *(*FuncPtr)(Symbolizer *symbolizer, Token  *token);

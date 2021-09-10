@@ -2,6 +2,9 @@
 
 ExceptionTable  exceptionTable[] = {
   [ERROR_INVALID_INFIX] = symbolThrowInfixException,
+  [ERROR_INVALID_PREFIX] = symbolThrowPrefixException,
+  [ERROR_INVALID_SUFFIX] = symbolThrowSuffixException,
+  [ERROR_INVALID_NUMBER] = symbolThrowNumberException,
 };
 
 extern  SymbolTableStruct  symbolTable[];
@@ -29,6 +32,18 @@ void  symbolThrowInfixException(Symbol  *symbol, int  errorCode, char *previousS
     throwException(errorCode, symbol, 0, "Invalid Infix '%s' detected(after %S)! Only numbers or suffix are allowed.", currentStr, previousStr);
   else
     throwException(errorCode, symbol, 0, "Invalid Infix '%s' after '%s'. Only numbers or suffix are allowed.", currentStr, previousStr);
+}
+
+void  symbolThrowPrefixException(Symbol  *symbol, int  errorCode, char *previousStr, char  *currentStr){
+  throwException(errorCode, symbol, 0, "Invalid type '%s' after '%s'. Only prefix or infix at this position are allowed.", currentStr, previousStr);
+}
+
+void  symbolThrowSuffixException(Symbol  *symbol, int  errorCode, char *previousStr, char  *currentStr){
+  throwException(errorCode, symbol, 0, "Invalid type '%s' after '%s'. Only infix at this position are allowed.", currentStr, previousStr);
+}
+
+void  symbolThrowNumberException(Symbol  *symbol, int  errorCode, char *previousStr, char  *currentStr){
+  throwException(errorCode, symbol, 0, "Invalid number '%s' after '%s'. Only infix at this position are allowed.", currentStr, previousStr);
 }
 
 void  dumpSymbolErrorMessage(CEXCEPTION_T ex, int lineNo){
