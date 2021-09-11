@@ -257,7 +257,8 @@ int verifyArityAllowable(Symbolizer  *symbolizer, Symbol *symbol, OperationType 
       if(isIdArity(symbolizer->lastSymbol->id, SUFFIX || isIdArity(symbolizer->lastSymbol->id, NUMBER)))    //3++ +3 OR 2+3
         return  1;
       else
-        handleException(symbol, symbolizer, ERROR_INVALID_INFIX);
+        //handleException(symbol, symbolizer, ERROR_INVALID_INFIX);
+      symbolThrowInfixException(symbol, ERROR_INVALID_INFIX, symbolizer);
       break;
     case  PREFIX:
       if(isIdArity(symbolizer->lastSymbol->id, NONE) || isIdArity(symbolizer->lastSymbol->id, INFIX) || isIdArity(symbolizer->lastSymbol->id, PREFIX))  //2+ ++3 OR -++3 OR -3
