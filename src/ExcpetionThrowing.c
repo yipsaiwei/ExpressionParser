@@ -31,10 +31,13 @@ void  symbolThrowInfixException(Symbol  *symbol, int  errorCode, Symbolizer *sym
   SymbolExceptionInfo *symbolInfo = malloc(sizeof(SymbolExceptionInfo));
   symbolInfo->symbol = symbol;
   symbolInfo->symbolizer = symbolizer;
+  char  *currentStr = getCurrentString(symbol);
+  char  *previousStr = getPreviousString(symbolizer);
+  printf("In symbolThrowInfixException function %s  %s\n", currentStr, previousStr);
   if(getPreviousString(symbolizer) == NULL)
-    throwException(errorCode, symbolInfo, 0, "Invalid Infix '%s' detected(after %S)! Only numbers or suffix are allowed.", getCurrentString(symbol), getPreviousString(symbolizer));
+    throwException(errorCode, symbolInfo, 0, "Invalid Infix '%s' detected after NULL(%s)! Only numbers or suffix are allowed.", currentStr, previousStr);
   else
-    throwException(errorCode, symbolInfo, 0, "Invalid Infix '%s' after '%s'. Only numbers or suffix are allowed.", getCurrentString(symbol), getPreviousString(symbolizer));
+    throwException(errorCode, symbolInfo, 0, "Invalid Infix '%s' after '%s'. Only numbers or suffix are allowed.", currentStr, previousStr);
 }
 
 void  symbolThrowPrefixException(Symbol  *symbol, int  errorCode, char *previousStr, char  *currentStr){
@@ -70,8 +73,7 @@ void  dumpSymbolErrorMessageV2(CEXCEPTION_T ex, int lineNo){
   if(symbol == NULL || isSymbolNull(symbol)){
     printf("Error on line%d:%d: %s\n%s\n", lineNo, symbol->token->startColumn, ex->msg, symbol->token->originalstr);
   }else{
-    SymbolTableStruct instruction = symbolTable[symbol->id];
-    char  *idChar = instruction.idChar;
+    char  *idChar = symbol->token->str;
     int idCharSize = strlen(idChar);
     char  *errorLine;
     errorLine = errorIndicator(symbol->token->startColumn, idCharSize);
@@ -80,5 +82,6 @@ void  dumpSymbolErrorMessageV2(CEXCEPTION_T ex, int lineNo){
   }
   freeSymbol(symbol);
   freeSymbolizer(((SymbolExceptionInfo *)ex->data)->symbolizer);
-  free(((SymbolExceptionInfo *)ex->data));
+  if(ex->data)
+    free(((SymbolExceptionInfo *)ex->data));
 }

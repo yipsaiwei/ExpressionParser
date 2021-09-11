@@ -124,8 +124,8 @@ void  handleNumber(StackStruct *operandStack, StackStruct *operatorStack, Symbol
   verifyArityAllowable(symbolizer, symbol, symbol->id);
   ListItem  *peekItem = peekTopOfStack(operatorStack);
   forcePush(operandStack, operatorStack, symbol, symbolizer);
-  if(isNotPreviousSymbolId(symbolizer, OPEN_PAREN) && isPreviousArity(symbolizer, PREFIX))
-    unwindStackForAnArityInSequence(operandStack, operatorStack, PREFIX);
+  //if(isNotPreviousSymbolId(symbolizer, OPEN_PAREN) && isPreviousArity(symbolizer, PREFIX))
+  //  unwindStackForAnArityInSequence(operandStack, operatorStack, PREFIX);
 }
 
 void  pushAccordingToPrecedence(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *symbol, Symbolizer  *symbolizer){
@@ -193,7 +193,7 @@ void  forcePush(StackStruct *operandStack, StackStruct *operatorStack, Symbol *s
 void  evaluateExpressionWithinBrackets(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer){
   unwindStackUntil(operandStack, operatorStack, OPEN_PAREN);
   ListItem  *operatorItem = popOperator(operatorStack, OPEN_PAREN);
-  linkedListFreeListItem(operatorItem); 
+  freeListItemWithSymbol(operatorItem); 
 }
 
 void  unwindStackUntil(StackStruct *operandStack, StackStruct *operatorStack, OperationType type){
@@ -302,6 +302,13 @@ int returnOperatorPrecedence(OperationType  type){
   return  instruction.precedence;
 }
 
+void  freeListItemWithSymbol(ListItem *item){
+  if(getItemSymbol(item))
+    freeSymbol(getItemSymbol(item));
+  if(item)
+    linkedListFreeListItem(item);
+}
+
 void  handleInfix(StackStruct *operandStack, StackStruct *operatorStack){
   ListItem *operand2 = popFromStack(operandStack);
   ListItem *operand1 = popFromStack(operandStack);
@@ -310,9 +317,9 @@ void  handleInfix(StackStruct *operandStack, StackStruct *operatorStack){
   SymbolTableStruct instruction = symbolTable[getItemSymbolId(operator)];
   result = instruction.arithmeticHandler(getItemSymbol(operand1), getItemSymbol(operand2));
   pushToStack(operandStack, (void *)result);
-  linkedListFreeListItem(operand1);                         
-  linkedListFreeListItem(operand2); 
-  linkedListFreeListItem(operator);
+  freeListItemWithSymbol(operand1);                         
+  freeListItemWithSymbol(operand2); 
+  freeListItemWithSymbol(operator);
 }
 
 void  handlePrefix(StackStruct *operandStack, StackStruct *operatorStack){
@@ -322,8 +329,8 @@ void  handlePrefix(StackStruct *operandStack, StackStruct *operatorStack){
   SymbolTableStruct instruction = symbolTable[getItemSymbolId(operator)];
   result = instruction.arithmeticHandler(getItemSymbol(operand), NULL);
   pushToStack(operandStack, (void *)result);
-  linkedListFreeListItem(operand); 
-  linkedListFreeListItem(operator);  
+  freeListItemWithSymbol(operand); 
+  freeListItemWithSymbol(operator);  
 }
 
 void  handleSuffix(StackStruct *operandStack, StackStruct *operatorStack){
@@ -333,8 +340,8 @@ void  handleSuffix(StackStruct *operandStack, StackStruct *operatorStack){
   SymbolTableStruct instruction = symbolTable[getItemSymbolId(operator)];
   result = instruction.arithmeticHandler(getItemSymbol(operand), NULL);
   pushToStack(operandStack, (void *)result);
-  linkedListFreeListItem(operand); 
-  linkedListFreeListItem(operator);  
+  freeListItemWithSymbol(operand); 
+  freeListItemWithSymbol(operator);  
 }
 ARITY returnArityOfAnId(OperationType id){
   if(id == INTEGER || id == DOUBLE)

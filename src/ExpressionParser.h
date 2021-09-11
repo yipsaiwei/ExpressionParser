@@ -72,6 +72,7 @@ void  forcePush(StackStruct *operandStack, StackStruct *operatorStack, Symbol *s
 void  pushSymbolToStack(StackStruct *operatorStack, StackStruct *operandStack, Symbol *symbol);
 void  symbolizerUpdateLastSymbol(Symbol *symbol, Symbolizer *symbolizer);
 Symbol  *symbolizerUpdateLastSymbolAndGetNewSymbol(Symbolizer  *symbolizer, Symbol  *symbol);
+void  freeListItemWithSymbol(ListItem *item);
 
 Symbol  *infixAdd(Symbol  *number1, Symbol  *number2);
 Symbol  *infixMinus(Symbol  *number1, Symbol  *number2);
