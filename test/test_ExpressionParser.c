@@ -1521,6 +1521,26 @@ void  test_shuntingYard_given_infix_minus_bracket_prefix_dec_divide_expect_corre
   freeStack(operatorStack, free); 
 } 
 
+void  test_symbolThrowInfixException(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("5* /3");
+
+  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
+  Symbol  *prevSymbol = getSymbol(symbolizer);
+  Symbol  *currentSymbol = getSymbol(symbolizer);
+  
+  symbolizer->lastSymbol = prevSymbol;
+  
+   Try{
+    symbolThrowInfixException(currentSymbol, ERROR_INVALID_INFIX, symbolizer);
+    TEST_FAIL_MESSAGE("EXPECT ERROR_INVALID_INFIX TO BE THROWN, BUT UNRECEIVED");
+  }Catch(ex){
+    dumpSymbolErrorMessageV2(ex, 1); 
+    TEST_ASSERT_EQUAL(ERROR_INVALID_INFIX, ex->errorCode);
+    freeException(ex);
+  } 
+}
+
 /*
 void  test_shuntingYard_given_multiply_divide_expect_exception_to_be_thrown(){
   Tokenizer *tokenizer = NULL;
@@ -1558,26 +1578,6 @@ void  test_shuntingYard_given_multiply_pre_inc_exception_to_be_thrown(){
   }
   freeStack(operandStack, free); 
   freeStack(operatorStack, free);   
-}
-
-void  test_symbolThrowInfixException(){
-  Tokenizer *tokenizer = NULL;
-  tokenizer = createTokenizer("5* /3");
-
-  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
-  Symbol  *prevSymbol = getSymbol(symbolizer);
-  Symbol  *currentSymbol = getSymbol(symbolizer);
-  
-  symbolizer->lastSymbol = prevSymbol;
-  
-   Try{
-    symbolThrowInfixException(currentSymbol, ERROR_INVALID_INFIX, symbolizer);
-    TEST_FAIL_MESSAGE("EXPECT ERROR_INVALID_INFIX TO BE THROWN, BUT UNRECEIVED");
-  }Catch(ex){
-    dumpSymbolErrorMessageV2(ex, 1); 
-    TEST_ASSERT_EQUAL(ERROR_INVALID_INFIX, ex->errorCode);
-    freeException(ex);
-  } 
 }
 
 void  test_verifyArityAllowable_expect_exception_to_be_thrown(){
