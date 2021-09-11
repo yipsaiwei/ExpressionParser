@@ -304,13 +304,6 @@ int returnOperatorPrecedence(OperationType  type){
   return  instruction.precedence;
 }
 
-void  freeListItemWithSymbol(ListItem *item){
-  if(getItemSymbol(item))
-    freeSymbol(getItemSymbol(item));
-  if(item)
-    linkedListFreeListItem(item);
-}
-
 void  handleInfix(StackStruct *operandStack, StackStruct *operatorStack){
   ListItem *operand2 = popFromStack(operandStack);
   ListItem *operand1 = popFromStack(operandStack);

@@ -14,6 +14,7 @@
 #include  "Data.h"
 #include  "Arity.h"
 #include "ExcpetionThrowing.h"
+#include "FreeListItemWithSymbol.h"
 
 CEXCEPTION_T  ex;
 
@@ -818,8 +819,8 @@ void  test_handleInfix_given_two_operand_Integers_1_infix_add_expect_the_values_
   TEST_ASSERT_EQUAL(OPERAND, getItemSymbolType(peekItem));
   TEST_ASSERT_EQUAL(INTEGER, getItemSymbolId(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
   freeTokenizer(tokenizer);
 }
 
@@ -848,8 +849,8 @@ void  test_handleInfix_given_two_operand_Integer_Double_1_infix_mult_expect_the_
   TEST_ASSERT_EQUAL(OPERAND, getItemSymbolType(peekItem));
   TEST_ASSERT_EQUAL(DOUBLE, getItemSymbolId(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
   freeTokenizer(tokenizer);
 }
 
@@ -878,8 +879,8 @@ void  test_handleInfix_given_two_operand_Integers_1_infix_mult_expect_double_val
   TEST_ASSERT_EQUAL(OPERAND, getItemSymbolType(peekItem));
   TEST_ASSERT_EQUAL(DOUBLE, getItemSymbolId(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
   freeTokenizer(tokenizer);
 }
 
@@ -908,8 +909,8 @@ void  test_handleInfix_given_two_operand_Doubles_1_infix_division_expect_the_val
   TEST_ASSERT_EQUAL(OPERAND, getItemSymbolType(peekItem));
   TEST_ASSERT_EQUAL(DOUBLE, getItemSymbolId(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
   freeTokenizer(tokenizer);
 }
 
@@ -935,8 +936,8 @@ void  test_handlePrefix_given_operand_bitwise_not_expect_the_value_able_to_be_re
   TEST_ASSERT_EQUAL(OPERAND, getItemSymbolType(peekItem));
   TEST_ASSERT_EQUAL(INTEGER, getItemSymbolId(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
   freeTokenizer(tokenizer);
 }
 
@@ -962,8 +963,8 @@ void  test_handlePrefix_given_operand_logic_not_expect_the_value_able_to_be_retu
   TEST_ASSERT_EQUAL(OPERAND, getItemSymbolType(peekItem));
   TEST_ASSERT_EQUAL(INTEGER, getItemSymbolId(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
   freeTokenizer(tokenizer);
 }
 
@@ -990,8 +991,8 @@ void  test_unwindStack_given_2_operands_1_operator_inside_operator_stack_expect_
   TEST_ASSERT_EQUAL(0, operatorStack->size);
   TEST_ASSERT_EQUAL_FLOAT(67.542, getItemSymbolDouble(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
   freeSymbolizer(symbolizer);
 }
 
@@ -1022,8 +1023,8 @@ void  test_unwindStack_given_2_operands_1_lower_precedence_operator_inside_opera
   TEST_ASSERT_EQUAL(1, operatorStack->size);
   TEST_ASSERT_EQUAL_FLOAT(0.2387424, getItemSymbolDouble(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
   freeSymbolizer(symbolizer);
 }
 
@@ -1049,8 +1050,8 @@ void  test_unwindStack_given_2_operands_1_operator_inside_operator_stack_expect_
   TEST_ASSERT_EQUAL(OPERAND, getItemSymbolType(peekItem));
   TEST_ASSERT_EQUAL(INTEGER, getItemSymbolId(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
   freeSymbolizer(symbolizer);
 }
 
@@ -1077,8 +1078,8 @@ void  test_forcePush_given_open_bracket_operator_expect_the_bracket_able_to_be_p
   TEST_ASSERT_EQUAL(2, operatorStack->size);
   TEST_ASSERT_EQUAL(OPEN_PAREN, getItemSymbolId(peekItem));  
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
   freeSymbolizer(symbolizer);
 }
 
@@ -1106,8 +1107,8 @@ void  test_pushOperator_given_2_operands_1_lower_precedence_operator_inside_oper
   TEST_ASSERT_EQUAL(2, operandStack->size);
   TEST_ASSERT_EQUAL(DIVIDE, getItemSymbolId(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
   freeSymbolizer(symbolizer);
 }
 
@@ -1144,8 +1145,8 @@ void  test_pushOperator_given_2_operators_1_higher_precedence_operator_inside_op
   TEST_ASSERT_EQUAL(OPERAND, getItemSymbolType(peekItem));
   TEST_ASSERT_EQUAL(INTEGER, getItemSymbolId(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
   freeSymbolizer(symbolizer);
 }
 
@@ -1174,8 +1175,8 @@ void  test_evaluateExpressionWithinBrackets_given_brackets_operators_operands(){
   
   TEST_ASSERT_EQUAL(21, getItemSymbolInteger(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
   freeSymbolizer(symbolizer);
 }
 
@@ -1218,8 +1219,8 @@ void  test_evaluateExpressionWithinBrackets_given_brackets_3operators_4operands(
   TEST_ASSERT_EQUAL(MULTIPLY, getItemSymbolId(peekItem));
   TEST_ASSERT_EQUAL(1, operatorStack->size);
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
   freeSymbolizer(symbolizer); 
 }
 
@@ -1279,8 +1280,8 @@ void  test_shuntingYard_given_1_operator_2_operands_expect_correct_value_121_ret
   
   TEST_ASSERT_EQUAL(121, getItemSymbolInteger(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
 }
 
 void  test_shuntingYard_given_2_operator_4_operands_expect_correct_value_42_returned(){
@@ -1295,8 +1296,8 @@ void  test_shuntingYard_given_2_operator_4_operands_expect_correct_value_42_retu
   
   TEST_ASSERT_EQUAL(42, getItemSymbolInteger(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
 }
 
 void  test_shuntingYard_given_2_operator_4_operands_with_ftpoint_expect_correct_value_31point777_returned(){
@@ -1312,8 +1313,8 @@ void  test_shuntingYard_given_2_operator_4_operands_with_ftpoint_expect_correct_
   
   TEST_ASSERT_EQUAL_FLOAT(31.777, getItemSymbolDouble(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
 }
 
 void  test_shuntingYard_given_3_operator_6_operands_with_ftpoint_expect_correct_value_5point5_returned(){
@@ -1329,8 +1330,8 @@ void  test_shuntingYard_given_3_operator_6_operands_with_ftpoint_expect_correct_
   
   TEST_ASSERT_EQUAL_FLOAT(5.5, getItemSymbolDouble(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
 }
 
 void  test_shuntingYard_given_4_operator_5_operands_with_bracket_expect_correct_value_48_returned(){
@@ -1346,8 +1347,8 @@ void  test_shuntingYard_given_4_operator_5_operands_with_bracket_expect_correct_
   
   TEST_ASSERT_EQUAL(48, getItemSymbolInteger(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
 }
 
 void  test_shuntingYard_given_pre_INC_expect_correct_value_6_returned(){
@@ -1363,8 +1364,8 @@ void  test_shuntingYard_given_pre_INC_expect_correct_value_6_returned(){
   
   TEST_ASSERT_EQUAL(6, getItemSymbolInteger(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
 }
 
 void  test_shuntingYard_given_post_INC_expect_correct_value_6_returned(){
@@ -1380,8 +1381,8 @@ void  test_shuntingYard_given_post_INC_expect_correct_value_6_returned(){
   
   TEST_ASSERT_EQUAL(16, getItemSymbolInteger(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
 }
 
 
@@ -1398,8 +1399,8 @@ void  test_shuntingYard_given_prefix_minus_pre_INC_expect_correct_value_minus_4_
   
   TEST_ASSERT_EQUAL(-4, getItemSymbolInteger(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
 }
 
 void  test_shuntingYard_given_prefix_plus_pre_INC_expect_correct_value_4_returned(){
@@ -1415,8 +1416,8 @@ void  test_shuntingYard_given_prefix_plus_pre_INC_expect_correct_value_4_returne
   
   TEST_ASSERT_EQUAL(4, getItemSymbolInteger(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
 }
 
 void  test_shuntingYard_given_multiply_plus_shift_left_expect_correct_value_7_returned(){
@@ -1432,8 +1433,8 @@ void  test_shuntingYard_given_multiply_plus_shift_left_expect_correct_value_7_re
   
   TEST_ASSERT_EQUAL(7, getItemSymbolInteger(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
 }
 
 void  test_shuntingYard_given_prefix_inc_infix_minus_prefix_plus_multiply_expect_correct_value_0_returned(){
@@ -1449,8 +1450,8 @@ void  test_shuntingYard_given_prefix_inc_infix_minus_prefix_plus_multiply_expect
   
   TEST_ASSERT_EQUAL(0, getItemSymbolInteger(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
 }
 
 void  test_shuntingYard_given_multiply_post_inc_infix_minus_pre_inc_expect_correct_value_seven_returned(){
@@ -1466,8 +1467,8 @@ void  test_shuntingYard_given_multiply_post_inc_infix_minus_pre_inc_expect_corre
   
   TEST_ASSERT_EQUAL(7, getItemSymbolInteger(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
 }
 
 void  test_shuntingYard_given_post_inc_infix_plus_prefix_minus_infix_minus_multiply_expect_correct_value_minus4_returned(){
@@ -1483,8 +1484,8 @@ void  test_shuntingYard_given_post_inc_infix_plus_prefix_minus_infix_minus_multi
   
   TEST_ASSERT_EQUAL(-4, getItemSymbolInteger(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
 } 
 
 void  test_shuntingYard_given_post_dec_infix_minus_divide_expect_correct_value_minus0_returned(){
@@ -1500,8 +1501,8 @@ void  test_shuntingYard_given_post_dec_infix_minus_divide_expect_correct_value_m
   
   TEST_ASSERT_EQUAL_FLOAT(4.0-1.0/3.0, getItemSymbolDouble(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
 } 
 
 void  test_shuntingYard_given_infix_minus_bracket_prefix_dec_divide_expect_correct_value_5_returned(){
@@ -1517,31 +1518,10 @@ void  test_shuntingYard_given_infix_minus_bracket_prefix_dec_divide_expect_corre
   
   TEST_ASSERT_EQUAL(5-0/3, getItemSymbolInteger(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList);  
 } 
 
-void  test_symbolThrowInfixException(){
-  Tokenizer *tokenizer = NULL;
-  tokenizer = createTokenizer("5* /3");
-
-  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
-  Symbol  *prevSymbol = getSymbol(symbolizer);
-  Symbol  *currentSymbol = getSymbol(symbolizer);
-  
-  symbolizer->lastSymbol = prevSymbol;
-  
-   Try{
-    symbolThrowInfixException(currentSymbol, ERROR_INVALID_INFIX, symbolizer);
-    TEST_FAIL_MESSAGE("EXPECT ERROR_INVALID_INFIX TO BE THROWN, BUT UNRECEIVED");
-  }Catch(ex){
-    dumpSymbolErrorMessageV2(ex, 1); 
-    TEST_ASSERT_EQUAL(ERROR_INVALID_INFIX, ex->errorCode);
-    freeException(ex);
-  } 
-}
-
-/*
 void  test_shuntingYard_given_multiply_divide_expect_exception_to_be_thrown(){
   Tokenizer *tokenizer = NULL;
   tokenizer = createTokenizer("5* /3");
@@ -1557,10 +1537,11 @@ void  test_shuntingYard_given_multiply_divide_expect_exception_to_be_thrown(){
     TEST_ASSERT_EQUAL(ERROR_INVALID_INFIX, ex->errorCode);
     freeException(ex);
   }
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free);   
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList);   
 }
 
+/*
 void  test_shuntingYard_given_multiply_pre_inc_exception_to_be_thrown(){
   Tokenizer *tokenizer = NULL;
   tokenizer = createTokenizer("  *  ++3");
@@ -1576,8 +1557,8 @@ void  test_shuntingYard_given_multiply_pre_inc_exception_to_be_thrown(){
     TEST_ASSERT_EQUAL(ERROR_INVALID_INFIX, ex->errorCode);
     freeException(ex);
   }
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free);   
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList);   
 }
 
 void  test_verifyArityAllowable_expect_exception_to_be_thrown(){
@@ -1617,8 +1598,8 @@ void  test_shuntingYard_given_suffix_dec_prefix_inc_exception_to_be_thrown(){
     TEST_ASSERT_EQUAL(ERROR_INVALID_PREFIX, ex->errorCode);
     freeException(ex);
   }
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free);   
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList);   
 }
 */
 
@@ -1635,8 +1616,8 @@ void  test_shuntingYard_given_multiple_brackets_with_prefixes_expect_calculate_c
   
   TEST_ASSERT_EQUAL(-((-+-(-2)* + -2) - +9), getItemSymbolInteger(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
 }
 
 void  test_shuntingYard_given_prefix_inc_dec_expect_calculate_correctly(){
@@ -1652,8 +1633,8 @@ void  test_shuntingYard_given_prefix_inc_dec_expect_calculate_correctly(){
   
   TEST_ASSERT_EQUAL_FLOAT(4 *2 /4 + 1 + -11-+-3, getItemSymbolInteger(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
 }
 
 void  test_shuntingYard_given_prefix_PLUS_MINUS_expect_calculate_correctly(){
@@ -1669,8 +1650,8 @@ void  test_shuntingYard_given_prefix_PLUS_MINUS_expect_calculate_correctly(){
   
   TEST_ASSERT_EQUAL_FLOAT(-3, getItemSymbolInteger(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
 }
 
 void  test_shuntingYard_given_infix_MINUS_expect_calculate_correctly(){
@@ -1686,8 +1667,8 @@ void  test_shuntingYard_given_infix_MINUS_expect_calculate_correctly(){
   
   TEST_ASSERT_EQUAL_FLOAT(-3, getItemSymbolInteger(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
 }
 
 void  test_shuntingYard_given_suffix_dec_infix_minus_shift_left_multiply_expect_correct_value_returned(){
@@ -1703,8 +1684,8 @@ void  test_shuntingYard_given_suffix_dec_infix_minus_shift_left_multiply_expect_
   
   TEST_ASSERT_EQUAL(18-3*5<<1*2, getItemSymbolInteger(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free);  
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList);  
 }
 
 void  test_shuntingYard_given_infix_plus_greater_infix_minus_right_shift_expect_correct_value_returned(){
@@ -1720,8 +1701,8 @@ void  test_shuntingYard_given_infix_plus_greater_infix_minus_right_shift_expect_
   
   TEST_ASSERT_EQUAL(13 + 6 > 7 - 2 >> 1, getItemSymbolInteger(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free);  
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList);  
 }
 
 void  test_shuntingYard_given_complex_brackets_correct_value_returned(){
@@ -1737,8 +1718,8 @@ void  test_shuntingYard_given_complex_brackets_correct_value_returned(){
   
   TEST_ASSERT_EQUAL_FLOAT(((2.0+1.0)*2.0+- -2.0)*(+-2.0*2.0/-2.0)*(100.0/9.0), getItemSymbolDouble(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free);  
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList);  
 }
 
 //1-4+-+-+-5+63*+-+-+-(12+1*(2-2+3*3))/2
@@ -1755,8 +1736,8 @@ void  test_shuntingYard_given_tons_of_prefix_plus_minus_correct_value_returned()
   
   TEST_ASSERT_EQUAL_FLOAT(1-4+-+-+-5+63*+-+-+-(12+1*(2-2+3*3))/2.0, getItemSymbolDouble(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free);  
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList);  
 }
 
 //"9*(9*(1-5*(5+4/(3*6+4-(9+3/2)))))"
@@ -1773,8 +1754,8 @@ void  test_shuntingYard_given_brackets_in_brackets_expect_correct_value_returned
   
   TEST_ASSERT_EQUAL_FLOAT(9*(9*(1-5*(5+4/(3.0*6.0+4-(9+3.0/2.0))))), getItemSymbolDouble(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free);  
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList);  
 }
 
 //1.435+3.565-6.674/4*7
@@ -1791,8 +1772,8 @@ void  test_shuntingYard_given_double_values_expect_correct_value_returned(){
   
   TEST_ASSERT_EQUAL_FLOAT(1.435+3.565-6.674/4*7, getItemSymbolDouble(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free);  
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList);  
 }
 
 //-+-12.56363-6.7/(-8.999*4.65+12.2-(- -8.963+-+4*5.3))
@@ -1809,8 +1790,8 @@ void  test_shuntingYard_given_complex_double_values_expect_correct_value_returne
   
   TEST_ASSERT_EQUAL_FLOAT(-+-12.56363-6.7/(-8.999*4.65+12.2-(- -8.963+-+4*5.3)), getItemSymbolDouble(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free);  
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList);  
 }
 /*
 void  test_verifyArityAllowable_given_previous_operand_current_suffix_expect_1_returned(){
@@ -1858,8 +1839,8 @@ void  test_operateExpressionBetweenBracket_given_2_layer_brackets_operators_oper
   
   TEST_ASSERT_EQUAL(42, getItemInteger(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
 
   freeTokenizer(tokenizer);  
 }
@@ -1877,8 +1858,8 @@ void  test_operateExpressionBetweenBracket_given_2_layer_brackets_between_expres
   
   TEST_ASSERT_EQUAL(40, getItemInteger(peekItem));
   
-  freeStack(operandStack, free); 
-  freeStack(operatorStack, free); 
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList); 
 
   freeTokenizer(tokenizer);  
 }

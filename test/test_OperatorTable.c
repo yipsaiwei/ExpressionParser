@@ -13,6 +13,7 @@
 #include "ExpressionParser.h"
 #include  "OperatorTable.h"
 #include "ExcpetionThrowing.h"
+#include "FreeListItemWithSymbol.h"
 
 CEXCEPTION_T  ex;
 

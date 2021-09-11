@@ -1,0 +1,10 @@
+#ifndef FREELISTITEMWITHSYMBOL_H
+#define FREELISTITEMWITHSYMBOL_H
+
+#include "OperatorTable.h"
+#include "DoubleLinkedList.h"
+
+void  freeListItemWithSymbol(ListItem *item);
+void  freeSymbolInLinkedList(void *symbolToFree);
+
+#endif // FREELISTITEMWITHSYMBOL_H

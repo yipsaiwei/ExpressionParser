@@ -14,6 +14,7 @@
 #include  "Arithmetic.h"
 #include  "Arity.h"
 #include "ExcpetionThrowing.h"
+#include "FreeListItemWithSymbol.h"
 
 //typedef void (*Operation)(StackStruct *operandStack);
 typedef Symbol  *(*ArithmeticOperation)(Symbol  *number1, Symbol  *number2); 
@@ -72,7 +73,6 @@ void  forcePush(StackStruct *operandStack, StackStruct *operatorStack, Symbol *s
 void  pushSymbolToStack(StackStruct *operatorStack, StackStruct *operandStack, Symbol *symbol);
 void  symbolizerUpdateLastSymbol(Symbol *symbol, Symbolizer *symbolizer);
 Symbol  *symbolizerUpdateLastSymbolAndGetNewSymbol(Symbolizer  *symbolizer, Symbol  *symbol);
-void  freeListItemWithSymbol(ListItem *item);
 
 Symbol  *infixAdd(Symbol  *number1, Symbol  *number2);
 Symbol  *infixMinus(Symbol  *number1, Symbol  *number2);

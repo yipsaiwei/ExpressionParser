@@ -152,3 +152,12 @@ Token *peekToken(Tokenizer  *tokenizer){
   tokenizer->index = indexBeforeGetToken;
   return  token;
 }
+
+/*
+void  freeStackAndItsListItem(StackStruct *stack){
+  ListItem  *listptr;
+  if(stack->list){
+    while(
+  }
+}
+*/
