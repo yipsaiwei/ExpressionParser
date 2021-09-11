@@ -1559,7 +1559,6 @@ void  test_shuntingYard_given_multiply_pre_inc_exception_to_be_thrown(){
   freeStack(operandStack, free); 
   freeStack(operatorStack, free);   
 }
-*/
 
 void  test_symbolThrowInfixException(){
   Tokenizer *tokenizer = NULL;
@@ -1581,7 +1580,6 @@ void  test_symbolThrowInfixException(){
   } 
 }
 
-/*
 void  test_verifyArityAllowable_expect_exception_to_be_thrown(){
   Tokenizer *tokenizer = NULL;
   tokenizer = createTokenizer("5* /3");
@@ -1603,7 +1601,6 @@ void  test_verifyArityAllowable_expect_exception_to_be_thrown(){
   } 
   freeSymbol(symbol1);
 }
-*/
 
 void  test_shuntingYard_given_suffix_dec_prefix_inc_exception_to_be_thrown(){
   Tokenizer *tokenizer = NULL;
@@ -1623,6 +1620,7 @@ void  test_shuntingYard_given_suffix_dec_prefix_inc_exception_to_be_thrown(){
   freeStack(operandStack, free); 
   freeStack(operatorStack, free);   
 }
+*/
 
 void  test_shuntingYard_given_multiple_brackets_with_prefixes_expect_calculate_correctly(){
   Tokenizer *tokenizer = NULL;
@@ -1703,7 +1701,77 @@ void  test_shuntingYard_given_suffix_dec_infix_minus_shift_left_multiply_expect_
   
   ListItem  *peekItem = peekTopOfStack(operandStack);
   
-  TEST_ASSERT_EQUAL(3 << 2, getItemSymbolInteger(peekItem));
+  TEST_ASSERT_EQUAL(18-3*5<<1*2, getItemSymbolInteger(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free);  
+}
+
+void  test_shuntingYard_given_infix_plus_greater_infix_minus_right_shift_expect_correct_value_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer(" 13 + 6 > 7 - 2 >> 1");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  shuntingYard(tokenizer, operatorStack, operandStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL(13 + 6 > 7 - 2 >> 1, getItemSymbolInteger(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free);  
+}
+
+void  test_shuntingYard_given_complex_brackets_correct_value_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("((2+--2)*2+- -2)*(+-2*2/-2)*(100/--+10)");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  shuntingYard(tokenizer, operatorStack, operandStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL_FLOAT(((2.0+1.0)*2.0+- -2.0)*(+-2.0*2.0/-2.0)*(100.0/9.0), getItemSymbolDouble(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free);  
+}
+
+//1-4+-+-+-5+63*+-+-+-(12+1*(2-2+3*3))/2
+void  test_shuntingYard_given_tons_of_prefix_plus_minus_correct_value_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("1-4+-+-+-5+63*+-+-+-(12+1*(2-2+3*3))/2");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  shuntingYard(tokenizer, operatorStack, operandStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL_FLOAT(1-4+-+-+-5+63*+-+-+-(12+1*(2-2+3*3))/2.0, getItemSymbolDouble(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free);  
+}
+
+//"9*(9*(1-5*(5+4/(3*6+4-(9+3/2)))))"
+void  test_shuntingYard_given_brackets_in_brackets_expect_correct_value_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("9*(9*(1-5*(5+4/(3*6+4-(9+3.0/2.0)))))");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  shuntingYard(tokenizer, operatorStack, operandStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL_FLOAT(9*(9*(1-5*(5+4/(3.0*6.0+4-(9+3.0/2.0))))), getItemSymbolDouble(peekItem));
   
   freeStack(operandStack, free); 
   freeStack(operatorStack, free);  
