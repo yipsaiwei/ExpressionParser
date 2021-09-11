@@ -18,7 +18,7 @@
 
 #define getCurrentString(symbol)          symbol->token->str
 #define getPreviousString(symbolizer)     symbolizer->lastSymbol->token->str
-typedef void  (*ExceptionFuncPtr)(Symbol  *symbol, int  errorCode, char *previousStr, char  *currentStr); 
+typedef void  (*ExceptionFuncPtr)(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer); 
 
 typedef struct  ExceptionTable  ExceptionTable;
 struct  ExceptionTable{
@@ -35,7 +35,7 @@ struct  SymbolExceptionInfo{
 void  dumpSymbolErrorMessage(CEXCEPTION_T ex, int lineNo);
 void  dumpSymbolErrorMessageV2(CEXCEPTION_T ex, int lineNo);
 void  symbolThrowInfixException(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer);
-void  symbolThrowPrefixException(Symbol  *symbol, int  errorCode, char *previousStr, char  *currentStr);
-void  symbolThrowSuffixException(Symbol  *symbol, int  errorCode, char *previousStr, char  *currentStr);
-void  symbolThrowNumberException(Symbol  *symbol, int  errorCode, char *previousStr, char  *currentStr);
+void  symbolThrowPrefixException(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer);
+void  symbolThrowSuffixException(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer);
+void  symbolThrowNumberException(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer);
 #endif // EXCPETIONTHROWING_H

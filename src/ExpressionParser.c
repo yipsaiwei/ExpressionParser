@@ -264,19 +264,19 @@ int verifyArityAllowable(Symbolizer  *symbolizer, Symbol *symbol, OperationType 
       if(isIdArity(symbolizer->lastSymbol->id, NONE) || isIdArity(symbolizer->lastSymbol->id, INFIX) || isIdArity(symbolizer->lastSymbol->id, PREFIX))  //2+ ++3 OR -++3 OR -3
         return  1;
       else
-        handleException(symbol, symbolizer, ERROR_INVALID_PREFIX);
+        symbolThrowPrefixException(symbol, ERROR_INVALID_PREFIX, symbolizer);
       break;
     case  SUFFIX:
       if(isIdArity(symbolizer->lastSymbol->id, NUMBER))    //3++
         return  1;
       else
-        throwException(UNEXPECTED_OPERATOR, NULL, 0, "ERROR code %x : Not the desired operator!", UNEXPECTED_OPERATOR);
+        symbolThrowSuffixException(symbol, ERROR_INVALID_SUFFIX, symbolizer);
      break;
     case  NUMBER:
       if(isIdArity(symbolizer->lastSymbol->id, NONE) || isIdArity(symbolizer->lastSymbol->id, PREFIX) || isIdArity(symbolizer->lastSymbol->id, INFIX))  //3 OR -3 OR 2+3
         return  1;
       else
-        throwException(UNEXPECTED_OPERATOR, NULL, 0, "ERROR code %x : Not the desired operator!", UNEXPECTED_OPERATOR);
+        symbolThrowNumberException(symbol, ERROR_INVALID_NUMBER, symbolizer);
     break;
     default:
       throwException(UNEXPECTED_OPERATOR, NULL, 0, "ERROR code %x : Not the desired operator!", UNEXPECTED_OPERATOR);
@@ -284,6 +284,7 @@ int verifyArityAllowable(Symbolizer  *symbolizer, Symbol *symbol, OperationType 
   return  0;
 }
 
+/*
 void  handleException(Symbol  *symbol, Symbolizer *symbolizer, int  errorCode){
   char  *previousStr = returnSymbolCharGivenId(symbolizer->lastSymbol);
   char  *currentStr = returnSymbolCharGivenId(symbol);
@@ -291,6 +292,7 @@ void  handleException(Symbol  *symbol, Symbolizer *symbolizer, int  errorCode){
   freeSymbolizer(symbolizer);
   exceptionInfo.exceptionPtr(symbol, errorCode, previousStr, currentStr);
 }
+*/
 
 char  *returnSymbolCharGivenId(Symbol *symbol){
   SymbolTableStruct instruction = symbolTable[symbol->id];

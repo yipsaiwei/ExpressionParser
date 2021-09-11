@@ -38,16 +38,16 @@ void  symbolThrowInfixException(Symbol  *symbol, int  errorCode, Symbolizer *sym
     throwException(errorCode, symbolInfo, 0, "Invalid Infix '%s' after '%s'. Only numbers or suffix are allowed.", getCurrentString(symbol), getPreviousString(symbolizer));
 }
 
-void  symbolThrowPrefixException(Symbol  *symbol, int  errorCode, char *previousStr, char  *currentStr){
-  throwException(errorCode, symbol, 0, "Invalid type '%s' after '%s'. Only prefix or infix at this position are allowed.", currentStr, previousStr);
+void  symbolThrowPrefixException(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer){
+  throwException(errorCode, symbol, 0, "Invalid type '%s' after '%s'. Prefix cannot appear after suffix.", getCurrentString(symbol), getPreviousString(symbolizer));
 }
 
-void  symbolThrowSuffixException(Symbol  *symbol, int  errorCode, char *previousStr, char  *currentStr){
-  throwException(errorCode, symbol, 0, "Invalid type '%s' after '%s'. Only infix at this position are allowed.", currentStr, previousStr);
+void  symbolThrowSuffixException(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer){
+  throwException(errorCode, symbol, 0, "Invalid type '%s' after '%s'. Suffix can only appear after a number.", getCurrentString(symbol), getPreviousString(symbolizer));
 }
 
-void  symbolThrowNumberException(Symbol  *symbol, int  errorCode, char *previousStr, char  *currentStr){
-  throwException(errorCode, symbol, 0, "Invalid number '%s' after '%s'. Only infix at this position are allowed.", currentStr, previousStr);
+void  symbolThrowNumberException(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer){
+  throwException(errorCode, symbol, 0, "Invalid number '%s' after '%s'. Number cannot appear after a suffix.", getCurrentString(symbol), getPreviousString(symbolizer));
 }
 
 void  dumpSymbolErrorMessage(CEXCEPTION_T ex, int lineNo){
