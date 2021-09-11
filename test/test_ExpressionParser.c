@@ -1762,7 +1762,7 @@ void  test_shuntingYard_given_tons_of_prefix_plus_minus_correct_value_returned()
 //"9*(9*(1-5*(5+4/(3*6+4-(9+3/2)))))"
 void  test_shuntingYard_given_brackets_in_brackets_expect_correct_value_returned(){
   Tokenizer *tokenizer = NULL;
-  tokenizer = createTokenizer("9*(9*(1-5*(5+4/(3*6+4-(9+3.0/2.0)))))");
+  tokenizer = createTokenizer("9*(9* (1-   5*( 5+ 4/( 3*6+  4- (9+ 3.0 / 2.0)))))");
   
   StackStruct *operandStack = createStack();
   StackStruct *operatorStack = createStack();
@@ -1772,6 +1772,42 @@ void  test_shuntingYard_given_brackets_in_brackets_expect_correct_value_returned
   ListItem  *peekItem = peekTopOfStack(operandStack);
   
   TEST_ASSERT_EQUAL_FLOAT(9*(9*(1-5*(5+4/(3.0*6.0+4-(9+3.0/2.0))))), getItemSymbolDouble(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free);  
+}
+
+//1.435+3.565-6.674/4*7
+void  test_shuntingYard_given_double_values_expect_correct_value_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("1.435+3.565-6.674/4*7");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  shuntingYard(tokenizer, operatorStack, operandStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL_FLOAT(1.435+3.565-6.674/4*7, getItemSymbolDouble(peekItem));
+  
+  freeStack(operandStack, free); 
+  freeStack(operatorStack, free);  
+}
+
+//-+-12.56363-6.7/(-8.999*4.65+12.2-(- -8.963+-+4*5.3))
+void  test_shuntingYard_given_complex_double_values_expect_correct_value_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("-+-12.56363-6.7/(-8.999*4.65+12.2-(- -8.963+-+4*5.3))");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  shuntingYard(tokenizer, operatorStack, operandStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL_FLOAT(-+-12.56363-6.7/(-8.999*4.65+12.2-(- -8.963+-+4*5.3)), getItemSymbolDouble(peekItem));
   
   freeStack(operandStack, free); 
   freeStack(operatorStack, free);  

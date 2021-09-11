@@ -384,6 +384,26 @@ createPrefixLogicFunction(prefixBitwiseNot, ~);
 createSuffixIncDecFunction(suffixDec, --);
 createSuffixIncDecFunction(suffixInc, ++);
 
+/*
+Symbol  *prefixMinus(Symbol  *number, Symbol  *number2){
+  Symbol  *result;
+  Token *resultToken;
+  char  *resultStr;
+  if(isSymbolInteger(number)){
+    int resultNum = -(getSymbolInteger(number));
+    resultStr = createResultString((void  *)&resultNum, INTEGER);
+    resultToken = (Token  *)createIntToken(resultNum, number->token->startColumn, number->token->originalstr, resultStr, TOKEN_INTEGER_TYPE);
+    result = createSymbol(resultToken,  OPERAND, INTEGER); 
+  }else{
+    double  resultNum = -(getSymbolDouble(number));
+    resultStr = createResultString((void  *)&resultNum, DOUBLE);
+    resultToken = (Token  *)createFloatToken(resultNum, number->token->startColumn, number->token->originalstr, resultStr, TOKEN_FLOAT_TYPE);
+    result = createSymbol(resultToken, OPERAND, DOUBLE);
+  } 
+  return  result;
+}
+*/
+
 char  *duplicateString(char *str, int length){
   char  *resultstr = memAlloc((length+1)*sizeof(char));
   strncpy(resultstr, str, length);

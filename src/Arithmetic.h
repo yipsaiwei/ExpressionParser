@@ -129,7 +129,7 @@ Symbol  *funcName(Symbol  *number1, Symbol *number2){                       \
   }else{                                                                                                                                         \
     double  resultNum = operator(getSymbolDouble(operand));                                                                                      \
     resultStr = createResultString((void  *)&resultNum, DOUBLE);                                                                                 \
-    resultToken = (Token  *)createFloatToken(resultNum, number2->token->startColumn, number2->token->originalstr, resultStr, TOKEN_FLOAT_TYPE);  \
+    resultToken = (Token  *)createFloatToken(resultNum, number->token->startColumn, number->token->originalstr, resultStr, TOKEN_FLOAT_TYPE);    \
     result = createSymbol(resultToken, OPERAND, DOUBLE);                                                                                         \
   }    
   
