@@ -31,13 +31,11 @@ void  symbolThrowInfixException(Symbol  *symbol, int  errorCode, Symbolizer *sym
   SymbolExceptionInfo *symbolInfo = malloc(sizeof(SymbolExceptionInfo));
   symbolInfo->symbol = symbol;
   symbolInfo->symbolizer = symbolizer;
-  char  *currentStr = getCurrentString(symbol);
-  char  *previousStr = getPreviousString(symbolizer);
-  printf("In symbolThrowInfixException function %s  %s\n", currentStr, previousStr);
+  printf("In symbolThrowInfixException function %s  %s\n", getCurrentString(symbol), getPreviousString(symbolizer));
   if(getPreviousString(symbolizer) == NULL)
-    throwException(errorCode, symbolInfo, 0, "Invalid Infix '%s' detected after NULL(%s)! Only numbers or suffix are allowed.", currentStr, previousStr);
+    throwException(errorCode, symbolInfo, 0, "Invalid Infix '%s' detected after NULL(%s)! Only numbers or suffix are allowed.", getCurrentString(symbol), getPreviousString(symbolizer));
   else
-    throwException(errorCode, symbolInfo, 0, "Invalid Infix '%s' after '%s'. Only numbers or suffix are allowed.", currentStr, previousStr);
+    throwException(errorCode, symbolInfo, 0, "Invalid Infix '%s' after '%s'. Only numbers or suffix are allowed.", getCurrentString(symbol), getPreviousString(symbolizer));
 }
 
 void  symbolThrowPrefixException(Symbol  *symbol, int  errorCode, char *previousStr, char  *currentStr){
