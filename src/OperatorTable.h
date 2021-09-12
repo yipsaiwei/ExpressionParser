@@ -6,6 +6,7 @@
 //#include "ExpressionParser.h"
 #include  "Arity.h"
 #include <string.h>
+#include  "MemAlloc.h"
 
 #define isTokenNull(token)                                      (token->type == TOKEN_NULL_TYPE)
 #define areTokenStringSame(token1, token2)                      (*(token1->str) == *(token2->str))                                                                
@@ -30,6 +31,25 @@
 #define isPreviousSymbolId(symbolizer, prevId)                  symbolizer->lastSymbol->id == prevId
 #define isNotPreviousSymbolId(symbolizer, prevId)               symbolizer->lastSymbol->id != prevId
 
+#define getItemSymbol(item)                                     ((Symbol  *)(*item).data)
+
+#define getSymbolInteger(symbol)                                ((IntegerToken *)(*symbol).token)->value
+#define getSymbolDouble(symbol)                                 ((FloatToken *)(*symbol).token)->value
+#define getSymbolType(symbol)                                   symbol->type
+#define getSymbolId(symbol)                                     symbol->id
+#define getSymbolArity(symbol)                                  symbol->arity
+#define getItemSymbolType(item)                                 (((Symbol *)(*item).data)->type)
+#define getItemSymbolId(item)                                   (((Symbol *)(*item).data)->id)
+#define getItemSymbolInteger(item)                              ((IntegerToken  *)((Symbol  *)(*item).data)->token)->value
+#define getItemSymbolDouble(item)                               ((FloatToken  *)((Symbol  *)(*item).data)->token)->value
+
+#define comparePrecedence(currentSym, nextSym)                  returnOperatorPrecedence(currentSym->id) < returnOperatorPrecedence(nextSym->id)
+
+#define areTwoIdPrecedenceSame(id1, id2)                        returnOperatorPrecedence(id1) == returnOperatorPrecedence(id2)
+#define isCurrentType(type, checkType)                          type == checkType
+  
+#define isTokenNULLType(token)                                  token->type == TOKEN_NULL_TYPE
+#define isLastOperatorInStack(stack)                            stack->size == 1
 typedef enum{
   UND,
   ADD,

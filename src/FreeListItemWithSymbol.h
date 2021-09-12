@@ -3,6 +3,7 @@
 
 #include "OperatorTable.h"
 #include "DoubleLinkedList.h"
+#include  "MemAlloc.h"
 
 void  freeListItemWithSymbol(ListItem *item);
 void  freeSymbolInLinkedList(void *symbolToFree);

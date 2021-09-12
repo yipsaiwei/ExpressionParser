@@ -29,7 +29,7 @@ int returnStringSize(char *str){
 }
 
 Symbolizer  *createSymbolizer(Tokenizer  *tokenizer){
-  Symbolizer  *symbolizer = malloc(sizeof(Symbolizer));
+  Symbolizer  *symbolizer = memAlloc(sizeof(Symbolizer));
   symbolizer->tokenizer = tokenizer;
   //symbolizer->lastSymbolId = _NULL;
   Token *token = createNULLToken(tokenizer->str, 0, TOKEN_NULL_TYPE);
@@ -43,11 +43,11 @@ void  freeSymbolizer(Symbolizer *symbolizer){
   if(symbolizer->lastSymbol)
     freeSymbol(symbolizer->lastSymbol);
   if(symbolizer)
-    free(symbolizer);
+    memFree(symbolizer);
 }
 
 Symbol  *createSymbol(Token *token, AttributeType type, OperationType id){
-  Symbol  *symbol = malloc(sizeof(Symbol));
+  Symbol  *symbol = memAlloc(sizeof(Symbol));
   symbol->token = token;
   symbol->type = type;
   symbol->id = id;
@@ -63,7 +63,7 @@ void  freeSymbol(Symbol *symbol){
   if(symbol->token)
     freeToken(symbol->token);
   if(symbol)
-    free(symbol);
+    memFree(symbol);
 }
 
 Symbol  *getSymbol(Symbolizer *symbolizer){
@@ -139,7 +139,7 @@ AttributeType getLastSymbolType(Symbolizer  *symbolizer){
 }
 
 char  *concatenateTwoStrings(char  *str1, char *str2){
-  char  *destination = malloc(sizeof(char) * (1 + strlen(str1) + strlen(str2)));
+  char  *destination = memAlloc(sizeof(char) * (1 + strlen(str1) + strlen(str2)));
   destination = strdup(str1);
   strcat(destination, str2);
   return  destination;

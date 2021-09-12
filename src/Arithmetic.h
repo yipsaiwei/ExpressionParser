@@ -147,12 +147,21 @@ Symbol  *funcName(Symbol  *number1, Symbol *number2){                       \
     resultToken = (Token  *)createFloatToken(resultNum, number2->token->startColumn, number2->token->originalstr, resultStr, TOKEN_FLOAT_TYPE);  \
     result = createSymbol(resultToken, OPERAND, DOUBLE);                                                                                         \
   }    
-  
-#define infixLogicCalculation(operand1, operand2, operator)                                                                                     \
-    int resultNum = getSymbolInteger(number1) operator getSymbolInteger(number2);                                                               \
-    resultStr = createResultString((void  *)&resultNum, INTEGER);                                                                               \
-    resultToken = (Token  *)createIntToken(resultNum, number2->token->startColumn, number2->token->originalstr, resultStr, TOKEN_INTEGER_TYPE); \
-    result = createSymbol(resultToken,  OPERAND, INTEGER);                  
+
+//If operand 1 or operand 2 is double, it will be forced to convert to integer (For shift left right etc that won't accept double) 
+#define infixLogicCalculation(operand1, operand2, operator)                                                                                      \
+  int resultNum;                                                                                                                                 \
+  if(isSymbolInteger(number1) && isSymbolInteger(number2))                                                                                       \
+    resultNum = getSymbolInteger(number1) operator getSymbolInteger(number2);                                                                    \
+  else if(isSymbolDouble(number1) && isSymbolInteger(number2))                                                                                   \
+   resultNum = (int)getSymbolDouble(number1) operator getSymbolInteger(number2);                                                                 \
+  else if(isSymbolInteger(number1) && isSymbolDouble(number2))                                                                                   \
+    resultNum = getSymbolInteger(number1) operator (int)getSymbolDouble(number2);                                                                \
+  else                                                                                                                                           \
+    resultNum = (int)getSymbolDouble(number1) operator (int)getSymbolDouble(number2);                                                            \
+  resultStr = createResultString((void  *)&resultNum, INTEGER);                                                                                  \
+  resultToken = (Token  *)createIntToken(resultNum, number2->token->startColumn, number2->token->originalstr, resultStr, TOKEN_INTEGER_TYPE);    \
+  result = createSymbol(resultToken,  OPERAND, INTEGER);                  
 
 #define infixLogicCalculationWithDouble(operand1, operand2, operator)                                                                            \
   int resultNum;                                                                                                                                 \
@@ -170,7 +179,11 @@ Symbol  *funcName(Symbol  *number1, Symbol *number2){                       \
  
   
 #define prefixLogicCalculation(operand, operator)                                                                                               \
-    int resultNum = operator(getSymbolInteger(operand));                                                                                        \
+    int resultNum;                                                                                                                              \
+    if(isSymbolInteger(operand))                                                                                                                \
+      resultNum = operator(getSymbolInteger(operand));                                                                                          \
+    else                                                                                                                                        \
+      resultNum = operator((int)getSymbolDouble(operand));                                                                                      \
     resultStr = createResultString((void  *)&resultNum, INTEGER);                                                                               \
     resultToken = (Token  *)createIntToken(resultNum, operand->token->startColumn, operand->token->originalstr, resultStr, TOKEN_INTEGER_TYPE); \
     result = createSymbol(resultToken,  OPERAND, INTEGER);     

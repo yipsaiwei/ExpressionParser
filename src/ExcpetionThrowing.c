@@ -1,7 +1,7 @@
 #include "ExcpetionThrowing.h"
 
 void  symbolThrowInfixException(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer){
-  SymbolExceptionInfo *symbolInfo = malloc(sizeof(SymbolExceptionInfo));
+  SymbolExceptionInfo *symbolInfo = memAlloc(sizeof(SymbolExceptionInfo));
   symbolInfo->symbol = symbol;
   symbolInfo->symbolizer = symbolizer;
   printf("In symbolThrowInfixException function %s  %s\n", getCurrentString(symbol), getPreviousString(symbolizer));
@@ -12,28 +12,28 @@ void  symbolThrowInfixException(Symbol  *symbol, int  errorCode, Symbolizer *sym
 }
 
 void  symbolThrowPrefixException(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer){
-  SymbolExceptionInfo *symbolInfo = malloc(sizeof(SymbolExceptionInfo));
+  SymbolExceptionInfo *symbolInfo = memAlloc(sizeof(SymbolExceptionInfo));
   symbolInfo->symbol = symbol;
   symbolInfo->symbolizer = symbolizer;
   throwException(errorCode, symbolInfo, 0, "Invalid prefix '%s' after '%s'. Prefix cannot appear after suffix.", getCurrentString(symbol), getPreviousString(symbolizer));
 }
 
 void  symbolThrowSuffixException(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer){
-  SymbolExceptionInfo *symbolInfo = malloc(sizeof(SymbolExceptionInfo));
+  SymbolExceptionInfo *symbolInfo = memAlloc(sizeof(SymbolExceptionInfo));
   symbolInfo->symbol = symbol;
   symbolInfo->symbolizer = symbolizer;
   throwException(errorCode, symbolInfo, 0, "Invalid suffix '%s' after '%s'. Suffix can only appear after a number.", getCurrentString(symbol), getPreviousString(symbolizer));
 }
 
 void  symbolThrowNumberException(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer){
-  SymbolExceptionInfo *symbolInfo = malloc(sizeof(SymbolExceptionInfo));
+  SymbolExceptionInfo *symbolInfo = memAlloc(sizeof(SymbolExceptionInfo));
   symbolInfo->symbol = symbol;
   symbolInfo->symbolizer = symbolizer;
   throwException(errorCode, symbolInfo, 0, "Invalid number '%s' after '%s'. Number cannot appear after a suffix.", getCurrentString(symbol), getPreviousString(symbolizer));
 }
 
 void  symbolThrowMissingParenException(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer){
-  SymbolExceptionInfo *symbolInfo = malloc(sizeof(SymbolExceptionInfo));
+  SymbolExceptionInfo *symbolInfo = memAlloc(sizeof(SymbolExceptionInfo));
   symbolInfo->symbol = symbol;
   symbolInfo->symbolizer = symbolizer;  
   if(errorCode == ERROR_MISSING_OPEN_PAREN)
@@ -52,13 +52,14 @@ void  dumpSymbolErrorMessage(CEXCEPTION_T ex, int lineNo){
     char  *errorLine;
     errorLine = errorIndicator(symbol->token->startColumn, idCharSize);
     printf("Error on line %d:%d: %s\n%s\n%s\n", lineNo, symbol->token->startColumn, ex->msg, symbol->token->originalstr, errorLine);
-    free(errorLine);
+    memFree(errorLine);
   }
-  freeSymbol(symbol);
+  if(symbol)
+    freeSymbol(symbol);
   Symbolizer  *symbolizer = ((SymbolExceptionInfo *)ex->data)->symbolizer;
   freeSymbolizer(symbolizer);
   if(ex->data){
     SymbolExceptionInfo *infoptr = (SymbolExceptionInfo *)ex->data;
-    free(infoptr);
+    memFree(infoptr);
   }
 }

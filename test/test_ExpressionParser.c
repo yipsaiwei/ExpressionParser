@@ -919,7 +919,7 @@ void  test_handlePrefix_given_operand_bitwise_not_expect_the_value_able_to_be_re
   Token *operatorToken = getToken(tokenizer);
   Token *operandToken = getToken(tokenizer);
 
-  Symbol  *number = createSymbol(operandToken, OPERAND, DOUBLE); 
+  Symbol  *number = createSymbol(operandToken, OPERAND, INTEGER); 
   Symbol  *operator = createSymbol(operatorToken, OPERATOR, BITWISE_NOT);
   
   StackStruct *operandStack = createStack();
@@ -946,7 +946,7 @@ void  test_handlePrefix_given_operand_logic_not_expect_the_value_able_to_be_retu
   Token *operatorToken = getToken(tokenizer);
   Token *operandToken = getToken(tokenizer);
 
-  Symbol  *number = createSymbol(operandToken, OPERAND, DOUBLE); 
+  Symbol  *number = createSymbol(operandToken, OPERAND, INTEGER); 
   Symbol  *operator = createSymbol(operatorToken, OPERATOR, LOGICAL_NOT);
   
   StackStruct *operandStack = createStack();
@@ -1530,7 +1530,6 @@ void  test_shuntingYard_given_infix_minus_bracket_prefix_dec_divide_expect_corre
   freeStack(operatorStack, freeSymbolInLinkedList);  
 } 
 
-/*
 void  test_shuntingYard_given_multiply_divide_expect_exception_to_be_thrown(){
   Tokenizer *tokenizer = NULL;
   tokenizer = createTokenizer("5* /3");
@@ -1542,7 +1541,7 @@ void  test_shuntingYard_given_multiply_divide_expect_exception_to_be_thrown(){
     shuntingYard(tokenizer, operatorStack, operandStack);
     TEST_FAIL_MESSAGE("EXPECT ERROR_INVALID_INFIX TO BE THROWN, BUT UNRECEIVED");
   }Catch(ex){
-    dumpSymbolErrorMessage(ex, 1); 
+    dumpSymbolErrorMessage(ex, __LINE__); 
     TEST_ASSERT_EQUAL(ERROR_INVALID_INFIX, ex->errorCode);
     freeException(ex);
   }
@@ -1561,7 +1560,7 @@ void  test_shuntingYard_given_multiply_pre_inc_exception_to_be_thrown(){
     shuntingYard(tokenizer, operatorStack, operandStack);
     TEST_FAIL_MESSAGE("EXPECT ERROR_INVALID_INFIX TO BE THROWN, BUT UNRECEIVED");
   }Catch(ex){
-    dumpSymbolErrorMessage(ex, 1); 
+    dumpSymbolErrorMessage(ex, __LINE__); 
     TEST_ASSERT_EQUAL(ERROR_INVALID_INFIX, ex->errorCode);
     freeException(ex);
   }
@@ -1584,7 +1583,7 @@ void  test_verifyArityAllowable_expect_exception_to_be_thrown(){
     verifyArityAllowable(symbolizer, symbol3, symbol3->id);
     TEST_FAIL_MESSAGE("EXPECT ERROR_INVALID_INFIX TO BE THROWN, BUT UNRECEIVED");
   }Catch(ex){
-    dumpSymbolErrorMessage(ex, 1); 
+    dumpSymbolErrorMessage(ex, __LINE__); 
     TEST_ASSERT_EQUAL(ERROR_INVALID_INFIX, ex->errorCode);
     freeException(ex);
   } 
@@ -1602,7 +1601,7 @@ void  test_shuntingYard_given_prefix_followed_after_suffix_expect_exception_to_b
     shuntingYard(tokenizer, operatorStack, operandStack);
     TEST_FAIL_MESSAGE("EXPECT ERROR_INVALID_PREFIX TO BE THROWN, BUT UNRECEIVED");
   }Catch(ex){
-    dumpSymbolErrorMessage(ex, 1); 
+    dumpSymbolErrorMessage(ex, __LINE__); 
     TEST_ASSERT_EQUAL(ERROR_INVALID_PREFIX, ex->errorCode);
     freeException(ex);
   }
@@ -1621,7 +1620,7 @@ void  test_shuntingYard_given_suffix_followed_after_suffix_expect_exception_to_b
     shuntingYard(tokenizer, operatorStack, operandStack);
     TEST_FAIL_MESSAGE("EXPECT ERROR_INVALID_SUFFIX TO BE THROWN, BUT UNRECEIVED");
   }Catch(ex){
-    dumpSymbolErrorMessage(ex, 1); 
+    dumpSymbolErrorMessage(ex, __LINE__); 
     TEST_ASSERT_EQUAL(ERROR_INVALID_SUFFIX, ex->errorCode);
     freeException(ex);
   }
@@ -1640,7 +1639,7 @@ void  test_shuntingYard_given_missing_open_paren_expect_exception_to_be_thrown()
     shuntingYard(tokenizer, operatorStack, operandStack);
     TEST_FAIL_MESSAGE("EXPECT ERROR_MISSING_OPEN_PAREN TO BE THROWN, BUT UNRECEIVED");
   }Catch(ex){
-    dumpSymbolErrorMessage(ex, 1); 
+    dumpSymbolErrorMessage(ex, __LINE__); 
     TEST_ASSERT_EQUAL(ERROR_MISSING_OPEN_PAREN, ex->errorCode);
     freeException(ex);
   }
@@ -1659,7 +1658,7 @@ void  test_shuntingYard_given_complex_missing_open_paren_expect_exception_to_be_
     shuntingYard(tokenizer, operatorStack, operandStack);
     TEST_FAIL_MESSAGE("EXPECT ERROR_MISSING_OPEN_PAREN TO BE THROWN, BUT UNRECEIVED");
   }Catch(ex){
-    dumpSymbolErrorMessage(ex, 1); 
+    dumpSymbolErrorMessage(ex, __LINE__); 
     TEST_ASSERT_EQUAL(ERROR_MISSING_OPEN_PAREN, ex->errorCode);
     freeException(ex);
   }
@@ -1678,14 +1677,70 @@ void  test_shuntingYard_given__missing_closing_paren_expect_exception_to_be_thro
     shuntingYard(tokenizer, operatorStack, operandStack);
     TEST_FAIL_MESSAGE("EXPECT ERROR_MISSING_CLOSING_PAREN TO BE THROWN, BUT UNRECEIVED");
   }Catch(ex){
-    dumpSymbolErrorMessage(ex, 1); 
+    dumpSymbolErrorMessage(ex, __LINE__); 
     TEST_ASSERT_EQUAL(ERROR_MISSING_CLOSING_PAREN, ex->errorCode);
     freeException(ex);
   }
   freeStack(operandStack, freeSymbolInLinkedList); 
   freeStack(operatorStack, freeSymbolInLinkedList);   
 }
-*/
+
+void  test_shuntingYard_given_complex_missing_closing_paren_expect_exception_to_be_thrown(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("1-2/4+(5*(8-999)*10");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  Try{
+    shuntingYard(tokenizer, operatorStack, operandStack);
+    TEST_FAIL_MESSAGE("EXPECT ERROR_MISSING_CLOSING_PAREN TO BE THROWN, BUT UNRECEIVED");
+  }Catch(ex){
+    dumpSymbolErrorMessage(ex, __LINE__); 
+    TEST_ASSERT_EQUAL(ERROR_MISSING_CLOSING_PAREN, ex->errorCode);
+    freeException(ex);
+  }
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList);   
+}
+
+void  test_shuntingYard_given_invalid_number_position_expect_exception_to_be_thrown(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("(5*1++2)-3");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  Try{
+    shuntingYard(tokenizer, operatorStack, operandStack);
+    TEST_FAIL_MESSAGE("EXPECT ERROR_INVALID_NUMBER TO BE THROWN, BUT UNRECEIVED");
+  }Catch(ex){
+    dumpSymbolErrorMessage(ex, __LINE__); 
+    TEST_ASSERT_EQUAL(ERROR_INVALID_NUMBER, ex->errorCode);
+    freeException(ex);
+  }
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList);   
+}
+
+void  test_shuntingYard_given_invalid_number_after_number_expect_exception_to_be_thrown(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("1*1 3+53");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  Try{
+    shuntingYard(tokenizer, operatorStack, operandStack);
+    TEST_FAIL_MESSAGE("EXPECT ERROR_INVALID_NUMBER TO BE THROWN, BUT UNRECEIVED");
+  }Catch(ex){
+    dumpSymbolErrorMessage(ex, __LINE__); 
+    TEST_ASSERT_EQUAL(ERROR_INVALID_NUMBER, ex->errorCode);
+    freeException(ex);
+  }
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList);   
+}
 
 void  test_shuntingYard_given_multiple_brackets_with_prefixes_expect_calculate_correctly(){
   Tokenizer *tokenizer = NULL;
@@ -1789,6 +1844,24 @@ void  test_shuntingYard_given_infix_plus_greater_infix_minus_right_shift_expect_
   freeStack(operatorStack, freeSymbolInLinkedList);  
 }
 
+//If double passed into the logix that only receive integer, it will forced to int before evaluation
+void  test_shuntingYard_given_infix_shift_left_with_double_expect_correct_value_returned(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer(" 8.97 >> 1.12");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  shuntingYard(tokenizer, operatorStack, operandStack);
+  
+  ListItem  *peekItem = peekTopOfStack(operandStack);
+  
+  TEST_ASSERT_EQUAL(4, getItemSymbolInteger(peekItem));
+  
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList);  
+}
+
 void  test_shuntingYard_given_complex_brackets_correct_value_returned(){
   Tokenizer *tokenizer = NULL;
   tokenizer = createTokenizer("((2+--2)*2+- -2)*(+-2*2/-2)*(100/--+10)");
@@ -1877,74 +1950,20 @@ void  test_shuntingYard_given_complex_double_values_expect_correct_value_returne
   freeStack(operandStack, freeSymbolInLinkedList); 
   freeStack(operatorStack, freeSymbolInLinkedList);  
 }
-/*
-void  test_verifyArityAllowable_given_previous_operand_current_suffix_expect_1_returned(){
-  TEST_ASSERT_EQUAL(1, verifyArityAllowable(INTEGER, POST_INC, NULL));
-}
-*/
 
-/*
-void  test_verifyArityAllowable_given_previous_prefix_current_operand_expect_1_returned(){
-  Tokenizer *tokenizer = createTokenizer("  !7");
-  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
-  
-  symbolizer->lastSymbolId = LOGICAL_NOT;
-  
-  Token *operatorToken = getToken(tokenizer);
-  Token *operandToken = getToken(tokenizer);
-  
-  Symbol  *symbol = createSymbol(operandToken, OPERAND, INTEGER);  
-  symbol->arity = NUMBER;
-  
-  TEST_ASSERT_EQUAL(1, verifyArityAllowable(symbol, symbolizer));
-  
-  freeSymbolizer(symbolizer);
-}
-*/
-
-/*
-void  test_arityAllowable_given_previous_NULL_current_prefix_expect_1_returned(){
-    Tokenizer *tokenizer = createTokenizer(" 6*(200 -10/2) ");
-  Symbolizer  *symbolizer = createSymbolizer(tokenizer);
-}
-*/
-
-/*
-void  test_operateExpressionBetweenBracket_given_2_layer_brackets_operators_operands(){
+void  test_shuntingYard_given_mixed_integer_double_values_expect_correct_value_returned(){
   Tokenizer *tokenizer = NULL;
-  tokenizer = createTokenizer(" (7*(3+3))");
+  tokenizer = createTokenizer(" (1+3.2)*0.453+(6/(5*105)-4)");
   
   StackStruct *operandStack = createStack();
-  StackStruct *operatorStack = createStack();  
+  StackStruct *operatorStack = createStack();
   
-  operateExpressionBetweenBracket(operandStack, operatorStack, tokenizer);
+  shuntingYard(tokenizer, operatorStack, operandStack);
   
   ListItem  *peekItem = peekTopOfStack(operandStack);
   
-  TEST_ASSERT_EQUAL(42, getItemInteger(peekItem));
+  TEST_ASSERT_EQUAL_FLOAT((1+3.2)*0.453+(6/(5*105.0)-4.0), getItemSymbolDouble(peekItem));
   
   freeStack(operandStack, freeSymbolInLinkedList); 
-  freeStack(operatorStack, freeSymbolInLinkedList); 
-
-  freeTokenizer(tokenizer);  
+  freeStack(operatorStack, freeSymbolInLinkedList);  
 }
-
-void  test_operateExpressionBetweenBracket_given_2_layer_brackets_between_expression_operators_operands(){
-  Tokenizer *tokenizer = NULL;
-  tokenizer = createTokenizer(" (7*(3+3)  -2)");
-  
-  StackStruct *operandStack = createStack();
-  StackStruct *operatorStack = createStack();  
-  
-  operateExpressionBetweenBracket(operandStack, operatorStack, tokenizer);
-  
-  ListItem  *peekItem = peekTopOfStack(operandStack);
-  
-  TEST_ASSERT_EQUAL(40, getItemInteger(peekItem));
-  
-  freeStack(operandStack, freeSymbolInLinkedList); 
-  freeStack(operatorStack, freeSymbolInLinkedList); 
-
-  freeTokenizer(tokenizer);  
-}
-*/

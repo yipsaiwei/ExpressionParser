@@ -15,6 +15,7 @@
 #include  "Arity.h"
 #include "ExcpetionThrowing.h"
 #include "FreeListItemWithSymbol.h"
+#include  "MemAlloc.h"
 
 //typedef void (*Operation)(StackStruct *operandStack);
 typedef Symbol  *(*ArithmeticOperation)(Symbol  *number1, Symbol  *number2); 
@@ -25,8 +26,7 @@ struct  SymbolTableStruct{
     int precedence;
     ARITY arity;
     ArithmeticOperation arithmeticHandler;
-    operatorStoringOperation   storeHandler; 
-    char  *idChar;    
+    operatorStoringOperation   storeHandler;   
 };
 
 typedef int    (*arityHandleOperator)(StackStruct *operandStack, StackStruct *operatorStack);  
@@ -38,26 +38,6 @@ struct  ArityHandler{
 extern  OperatorInformationTable operatorInformationTable[];
 
 #define UNEXPECTED_OPERATOR                         0x10
-
-#define getItemSymbol(item)                         ((Symbol  *)(*item).data)
-
-#define getSymbolInteger(symbol)                    ((IntegerToken *)(*symbol).token)->value
-#define getSymbolDouble(symbol)                     ((FloatToken *)(*symbol).token)->value
-#define getSymbolType(symbol)                       symbol->type
-#define getSymbolId(symbol)                         symbol->id
-#define getSymbolArity(symbol)                      symbol->arity
-#define getItemSymbolType(item)                     (((Symbol *)(*item).data)->type)
-#define getItemSymbolId(item)                       (((Symbol *)(*item).data)->id)
-#define getItemSymbolInteger(item)                  ((IntegerToken  *)((Symbol  *)(*item).data)->token)->value
-#define getItemSymbolDouble(item)                   ((FloatToken  *)((Symbol  *)(*item).data)->token)->value
-
-#define comparePrecedence(currentSym, nextSym)      returnOperatorPrecedence(currentSym->id) < returnOperatorPrecedence(nextSym->id)
-
-#define areTwoIdPrecedenceSame(id1, id2)            returnOperatorPrecedence(id1) == returnOperatorPrecedence(id2)
-#define isCurrentType(type, checkType)        type == checkType
-  
-#define isTokenNULLType(token)            token->type == TOKEN_NULL_TYPE
-#define isLastOperatorInStack(stack)      stack->size == 1
 
 void  shuntingYard(Tokenizer  *tokenizer, StackStruct *operatorStack, StackStruct *operandStack);
 int   handleInfix(StackStruct *operandStack, StackStruct *operatorStack);
@@ -95,6 +75,7 @@ Symbol  *suffixInc(Symbol  *number1, Symbol  *number2);
 Symbol  *suffixDec(Symbol  *number1, Symbol  *number2);
 Symbol  *infixBitwiseOr(Symbol  *number1, Symbol  *number2);
 Symbol  *infixBitwiseAnd(Symbol  *number1, Symbol  *number2);
+Symbol  *infixBitwiseXor(Symbol  *number1, Symbol  *number2);
 ARITY returnArityOfAnId(OperationType type);
 
 Symbol  *prefixPlus(Symbol  *number1, Symbol  *number2);
@@ -103,7 +84,6 @@ Symbol  *prefixInc(Symbol  *number1, Symbol  *number2);
 Symbol  *prefixDec(Symbol  *number1, Symbol  *number2);
 
 int returnOperatorPrecedence(OperationType  type);
-char  *returnSymbolCharGivenId(Symbol *symbol);
 
 int verifyArityAllowable(Symbolizer  *symbolizer, Symbol *symbol, OperationType typeToCheck);
 int arityAllowable(OperationType  previousType, OperationType currentType);

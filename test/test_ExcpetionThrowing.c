@@ -11,6 +11,7 @@
 #include  "OperatorTable.h"
 #include "Stack.h"
 #include "FreeListItemWithSymbol.h"
+#include  "MemAlloc.h"
 
 void setUp(void)
 {

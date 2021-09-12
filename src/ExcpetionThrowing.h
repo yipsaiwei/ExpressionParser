@@ -9,6 +9,7 @@
 #include "ExpressionParser.h"
 //#include "Token.h"
 #include "Tokenizer.h"
+#include  "MemAlloc.h"
 
 #define ERROR_INVALID_INFIX               0x111
 #define ERROR_INVALID_INFIX_AFTER_NONE    0x112
@@ -17,6 +18,7 @@
 #define ERROR_INVALID_NUMBER              0x444
 #define ERROR_MISSING_OPEN_PAREN          0x555
 #define ERROR_MISSING_CLOSING_PAREN       0x556
+#define ERROR_EXCESS_OPERAND              0x666
 
 #define getCurrentString(symbol)          symbol->token->str
 #define getPreviousString(symbolizer)     symbolizer->lastSymbol->token->str
