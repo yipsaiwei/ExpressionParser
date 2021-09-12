@@ -55,7 +55,10 @@ void  dumpSymbolErrorMessage(CEXCEPTION_T ex, int lineNo){
     free(errorLine);
   }
   freeSymbol(symbol);
-  freeSymbolizer(((SymbolExceptionInfo *)ex->data)->symbolizer);
-  if(ex->data)
-    free(((SymbolExceptionInfo *)ex->data));
+  Symbolizer  *symbolizer = ((SymbolExceptionInfo *)ex->data)->symbolizer;
+  freeSymbolizer(symbolizer);
+  if(ex->data){
+    SymbolExceptionInfo *infoptr = (SymbolExceptionInfo *)ex->data;
+    free(infoptr);
+  }
 }
