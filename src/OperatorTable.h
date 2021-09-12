@@ -3,7 +3,6 @@
 
 #include "Token.h"
 #include "Tokenizer.h"
-//#include "ExpressionParser.h"
 #include  "Arity.h"
 #include <string.h>
 #include  "MemAlloc.h"
@@ -113,7 +112,6 @@ struct  Symbol{
 typedef struct  Symbolizer  Symbolizer;
 struct  Symbolizer{
   Tokenizer *tokenizer;
-  //OperationType lastSymbolId;
   Symbol  *lastSymbol;
 };
 

@@ -51,22 +51,24 @@ void  shuntingYard(Tokenizer  *tokenizer, StackStruct *operatorStack, StackStruc
   Symbolizer  *symbolizer = createSymbolizer(tokenizer);
   Symbol  *symbol = getSymbol(symbolizer);
   ListItem  *popItem;
-  while(!(isSymbolNull(symbol))){
+  while(!(isSymbolNull(symbol))){           //Get the symbol(until expression end) and store it into their stacks 
     executeStoreHandler(operandStack, operatorStack, symbol, symbolizer);
     symbol = symbolizerUpdateLastSymbolAndGetNewSymbol(symbolizer, symbol);
   }
-  while(!isStackEmpty(operatorStack)){
+  while(!isStackEmpty(operatorStack)){    //Unwind until end of stack, throw exception if the operator failed to be unwind
     if(!unwindStack(operatorStack, operandStack))
       checkAndThrowException(symbol, symbolizer, operatorStack);
   }
   freeSymbolizer(symbolizer);
 }
 
+//Access the store handler function for different types of operator through function pointer
 void  executeStoreHandler(StackStruct  *operandStack, StackStruct  *operatorStack, Symbol  *symbol, Symbolizer *symbolizer){
   SymbolTableStruct instruction = symbolTable[symbol->id];
   instruction.storeHandler(operandStack, operatorStack, symbol, symbolizer);  
 }
 
+//Update last symbol pointed by symbolizer, return new symbol obtained
 Symbol  *symbolizerUpdateLastSymbolAndGetNewSymbol(Symbolizer  *symbolizer, Symbol *symbol){
   symbolizerUpdateLastSymbol(symbol, symbolizer); 
   symbol = getSymbol(symbolizer);
@@ -74,6 +76,7 @@ Symbol  *symbolizerUpdateLastSymbolAndGetNewSymbol(Symbolizer  *symbolizer, Symb
   return  symbol;
 }
 
+//Update last symbol by clonning the last symbol and will be pointed by symbolizer
 void  symbolizerUpdateLastSymbol(Symbol *symbol, Symbolizer *symbolizer){
   if(symbol == NULL)
     symbolizer->lastSymbol = NULL;
@@ -84,6 +87,7 @@ void  symbolizerUpdateLastSymbol(Symbol *symbol, Symbolizer *symbolizer){
   }
 }
 
+//Check type of symbol, then push the symbol into their respective stack
 void  pushSymbolToStack(StackStruct *operatorStack, StackStruct *operandStack, Symbol *symbol){
   if(isSymbolOperatorType(symbol))
     pushOperator(operandStack, operatorStack, symbol);
@@ -91,7 +95,7 @@ void  pushSymbolToStack(StackStruct *operatorStack, StackStruct *operandStack, S
     pushToStack(operandStack, (void  *)symbol);  
 }
 
-//typedef void    (*preHandleOperator)(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *operator);
+//Detect whether the plus sign is infix or prefix or invalid based on the last symbol
 void  handleAddOrSub(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer){
   if(!arityAllowable(symbolizer->lastSymbol->id, symbol->id) || isPreviousSymbolId(symbolizer, _NULL)){
     verifyArityAllowable(symbolizer, symbol, PLUS_SIGN);
@@ -103,6 +107,7 @@ void  handleAddOrSub(StackStruct *operandStack, StackStruct *operatorStack, Symb
   pushAccordingToPrecedence(operandStack, operatorStack, symbol, symbolizer);
 }
 
+//Detect whether the increment is suffix or prefix or invalid based on the last symbol
 void  handlePrefixSuffixInc(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer){
   if(!arityAllowable(symbolizer->lastSymbol->id, symbol->id)){
     if(!arityAllowable(symbolizer->lastSymbol->id, POST_INC))
@@ -112,6 +117,7 @@ void  handlePrefixSuffixInc(StackStruct *operandStack, StackStruct *operatorStac
   pushAccordingToPrecedence(operandStack, operatorStack, symbol, symbolizer);
 }
 
+//Detect whether the decrement is suffix or prefix or invalid based on the last symbol
 void  handlePrefixSuffixDec(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer){
   if(!arityAllowable(symbolizer->lastSymbol->id, symbol->id)){
     if(!arityAllowable(symbolizer->lastSymbol->id, POST_DEC))
@@ -121,6 +127,7 @@ void  handlePrefixSuffixDec(StackStruct *operandStack, StackStruct *operatorStac
   pushAccordingToPrecedence(operandStack, operatorStack, symbol, symbolizer);
 }
 
+//Check whether the number position is allowed based on the last symbol
 void  handleNumber(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer){
   verifyArityAllowable(symbolizer, symbol, symbol->id);
   ListItem  *peekItem = peekTopOfStack(operatorStack);
@@ -138,6 +145,7 @@ void  pushAccordingToPrecedence(StackStruct *operandStack, StackStruct *operator
   }
 }
 
+//Check exception error and throw it
 void  checkAndThrowException(Symbol *symbol, Symbolizer *symbolizer, StackStruct  *operatorStack){
   ListItem  *peekItem = peekTopOfStack(operatorStack);
   if(getItemSymbolId(peekItem) == OPEN_PAREN){
@@ -149,6 +157,7 @@ void  checkAndThrowException(Symbol *symbol, Symbolizer *symbolizer, StackStruct
   }
 }
 
+//For prefix, need to handle from right to left
 void  handleRightToLeftAssociativity(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *symbol, Symbolizer *symbolizer){
   ListItem  *peekItem = peekTopOfStack(operatorStack);
   if(isIdArity(symbol->id, PREFIX) && areTwoIdPrecedenceSame(getItemSymbolId(peekItem), symbol->id)){
@@ -156,6 +165,7 @@ void  handleRightToLeftAssociativity(StackStruct *operandStack, StackStruct *ope
   }
 }
 
+//Push operator, if there are lower precedence operator inside the operatorStack, unwind it
 int pushOperator(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *operatorToPush){
   ListItem *peekItem = peekTopOfStack(operatorStack);
   while(!isStackEmpty(operatorStack) && comparePrecedence(operatorToPush, getItemSymbol(peekItem)) < 1){

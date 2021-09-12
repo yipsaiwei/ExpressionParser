@@ -17,7 +17,6 @@
 #include "FreeListItemWithSymbol.h"
 #include  "MemAlloc.h"
 
-//typedef void (*Operation)(StackStruct *operandStack);
 typedef Symbol  *(*ArithmeticOperation)(Symbol  *number1, Symbol  *number2); 
 typedef void    (*operatorStoringOperation)(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *symbol, Symbolizer  *symbolizer);
 

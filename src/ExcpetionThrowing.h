@@ -35,9 +35,7 @@ struct  SymbolExceptionInfo{
   Symbolizer  *symbolizer;
 };
 
-//void  symbolThrowException(Symbol *symbol, int errorCode, char *message,...);
 void  dumpSymbolErrorMessage(CEXCEPTION_T ex, int lineNo);
-//void  dumpSymbolErrorMessageV2(CEXCEPTION_T ex, int lineNo);
 void  symbolThrowInfixException(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer);
 void  symbolThrowPrefixException(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer);
 void  symbolThrowSuffixException(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer);
