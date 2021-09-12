@@ -29,7 +29,7 @@ struct  SymbolTableStruct{
     char  *idChar;    
 };
 
-typedef void    (*arityHandleOperator)(StackStruct *operandStack, StackStruct *operatorStack);  
+typedef int    (*arityHandleOperator)(StackStruct *operandStack, StackStruct *operatorStack);  
 typedef struct  ArityHandler  ArityHandler;
 struct  ArityHandler{
     arityHandleOperator  arityHandler;       
@@ -60,19 +60,20 @@ extern  OperatorInformationTable operatorInformationTable[];
 #define isLastOperatorInStack(stack)      stack->size == 1
 
 void  shuntingYard(Tokenizer  *tokenizer, StackStruct *operatorStack, StackStruct *operandStack);
-void  handleInfix(StackStruct *operandStack, StackStruct *operatorStack);
-void  handlePrefix(StackStruct *operandStack, StackStruct *operatorStack);
-void  handleSuffix(StackStruct *operandStack, StackStruct *operatorStack);
-void  unwindStack(StackStruct *operatorStack, StackStruct *operandStack);
-void  unwindStackUntil(StackStruct *operandStack, StackStruct *operatorStack, OperationType type);
+int   handleInfix(StackStruct *operandStack, StackStruct *operatorStack);
+int   handlePrefix(StackStruct *operandStack, StackStruct *operatorStack);
+int   handleSuffix(StackStruct *operandStack, StackStruct *operatorStack);
+int   unwindStack(StackStruct *operatorStack, StackStruct *operandStack);
+int   unwindStackUntil(StackStruct *operandStack, StackStruct *operatorStack, OperationType type);
 void  unwindStackForAnArityInSequence(StackStruct *operandStack, StackStruct *operatorStack, ARITY  arity);
-void  operateOperatorInOperatorStack(StackStruct  *operandStack, StackStruct  *operatorStack);
+int   operateOperatorInOperatorStack(StackStruct  *operandStack, StackStruct  *operatorStack);
 void  evaluateExpressionWithinBrackets(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer);
-void pushOperator(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *operatorToPush);
+int   pushOperator(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *operatorToPush);
 void  forcePush(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer);
 void  pushSymbolToStack(StackStruct *operatorStack, StackStruct *operandStack, Symbol *symbol);
 void  symbolizerUpdateLastSymbol(Symbol *symbol, Symbolizer *symbolizer);
 Symbol  *symbolizerUpdateLastSymbolAndGetNewSymbol(Symbolizer  *symbolizer, Symbol  *symbol);
+void  checkAndThrowException(Symbol *symbol, Symbolizer *symbolizer, StackStruct  *operatorStack);
 
 Symbol  *infixAdd(Symbol  *number1, Symbol  *number2);
 Symbol  *infixMinus(Symbol  *number1, Symbol  *number2);

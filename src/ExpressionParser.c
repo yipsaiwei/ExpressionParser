@@ -55,8 +55,10 @@ void  shuntingYard(Tokenizer  *tokenizer, StackStruct *operatorStack, StackStruc
     executeStoreHandler(operandStack, operatorStack, symbol, symbolizer);
     symbol = symbolizerUpdateLastSymbolAndGetNewSymbol(symbolizer, symbol);
   }
-  while(operatorStack->size > 0)
-    unwindStack(operatorStack, operandStack);
+  while(!isStackEmpty(operatorStack)){
+    if(!unwindStack(operatorStack, operandStack))
+      checkAndThrowException(symbol, symbolizer, operatorStack);
+  }
   freeSymbolizer(symbolizer);
 }
 
@@ -133,8 +135,16 @@ void  pushAccordingToPrecedence(StackStruct *operandStack, StackStruct *operator
   ListItem  *peekItem = peekTopOfStack(operatorStack);
   if(isIdArity(symbol->id, PREFIX) && (!isStackEmpty(operatorStack) && areTwoIdPrecedenceSame(getItemSymbolId(peekItem), symbol->id)))
     handleRightToLeftAssociativity(operandStack, operatorStack, symbol, symbolizer);
-  else
-    pushOperator(operandStack, operatorStack, symbol);
+  else{
+    if(!pushOperator(operandStack, operatorStack, symbol))
+      checkAndThrowException(symbol, symbolizer, operatorStack);
+  }
+}
+
+void  checkAndThrowException(Symbol *symbol, Symbolizer *symbolizer, StackStruct  *operatorStack){
+  ListItem  *peekItem = peekTopOfStack(operatorStack);
+  if(getItemSymbolId(peekItem) == OPEN_PAREN)
+    symbolThrowMissingParenException(symbol, ERROR_MISSING_CLOSING_PAREN, symbolizer);
 }
 
 void  handleRightToLeftAssociativity(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *symbol, Symbolizer *symbolizer){
@@ -146,19 +156,21 @@ void  handleRightToLeftAssociativity(StackStruct *operandStack, StackStruct *ope
   }
 }
 
-void pushOperator(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *operatorToPush){
+int pushOperator(StackStruct *operandStack, StackStruct *operatorStack, Symbol  *operatorToPush){
   ListItem *peekItem = peekTopOfStack(operatorStack);
   while(!isStackEmpty(operatorStack) && comparePrecedence(operatorToPush, getItemSymbol(peekItem)) < 1){
-    unwindStack(operatorStack, operandStack);
+    if(!unwindStack(operatorStack, operandStack))
+      return  0;
     peekItem = peekTopOfStack(operatorStack);
   }
   pushToStack(operatorStack, (void  *)operatorToPush);
+  return  1;
 }
 
 ListItem  *popOperator(StackStruct *operatorStack, OperationType type){
   ListItem  *popItem = popFromStack(operatorStack);
   if(getItemSymbolId(popItem) != type){
-    throwException(UNEXPECTED_OPERATOR, NULL, 0, "ERROR code %x : Not the desired operator!", UNEXPECTED_OPERATOR);
+    //throwException(UNEXPECTED_OPERATOR, NULL, 0, "ERROR code %x : Not the desired operator!", UNEXPECTED_OPERATOR);
     return  NULL;
   }
   else
@@ -170,16 +182,17 @@ ListItem  *popOperator(StackStruct *operatorStack, OperationType type){
 //3 different scenarios " infix, prefix, suffix
 //Precedence checking in shuntingYard
 //Push operator to the stack
-void  unwindStack(StackStruct *operatorStack, StackStruct *operandStack){
-  ListItem *peekItem = peekTopOfStack(operatorStack);
-  operateOperatorInOperatorStack(operandStack, operatorStack);
-  peekItem = peekTopOfStack(operatorStack);
+int  unwindStack(StackStruct *operatorStack, StackStruct *operandStack){
+  return  operateOperatorInOperatorStack(operandStack, operatorStack);
 }
 
-void  operateOperatorInOperatorStack(StackStruct  *operandStack, StackStruct  *operatorStack){
+int  operateOperatorInOperatorStack(StackStruct  *operandStack, StackStruct  *operatorStack){
   ListItem  *popItem = peekTopOfStack(operatorStack);
   ArityHandler  arityFuncPtr = arityHandler[returnArityOfAnId(getItemSymbolId(popItem))];
-  arityFuncPtr.arityHandler(operandStack, operatorStack);  
+  if(arityFuncPtr.arityHandler(operandStack, operatorStack))  
+    return  1;
+  else
+    return  0;
 }
 
 
@@ -191,19 +204,28 @@ void  forcePush(StackStruct *operandStack, StackStruct *operatorStack, Symbol *s
 }
 
 void  evaluateExpressionWithinBrackets(StackStruct *operandStack, StackStruct *operatorStack, Symbol *symbol, Symbolizer  *symbolizer){
-  unwindStackUntil(operandStack, operatorStack, OPEN_PAREN);
+  if(!arityAllowable(symbolizer->lastSymbol->id, symbol->id)){
+   if(isNotPreviousSymbolId(symbolizer, CLOSE_PAREN) && isNotPreviousArity(symbolizer, SUFFIX))
+    verifyArityAllowable(symbolizer, symbol, symbol->id);
+  }
+  if(!unwindStackUntil(operandStack, operatorStack, OPEN_PAREN))
+    symbolThrowMissingParenException(symbol, ERROR_MISSING_OPEN_PAREN, symbolizer);
   ListItem  *operatorItem = popOperator(operatorStack, OPEN_PAREN);
+  if(operatorItem == NULL)
+    symbolThrowMissingParenException(symbol, ERROR_MISSING_OPEN_PAREN, symbolizer);
   freeListItemWithSymbol(operatorItem); 
 }
 
-void  unwindStackUntil(StackStruct *operandStack, StackStruct *operatorStack, OperationType type){
+int  unwindStackUntil(StackStruct *operandStack, StackStruct *operatorStack, OperationType type){
   ListItem  *peekItem = peekTopOfStack(operatorStack);
   while(!isStackEmpty(operatorStack) && getItemSymbolId(peekItem) != type){
     unwindStack(operatorStack, operandStack);
     peekItem = peekTopOfStack(operatorStack);
   }
   if(isStackEmpty(operatorStack))
-    throwException(UNEXPECTED_OPERATOR, NULL, 0, "ERROR code %x : Not the desired operator!", UNEXPECTED_OPERATOR);
+    return  0;
+  else
+    return  1;
 }
 
 void  unwindStackForAnArityInSequence(StackStruct *operandStack, StackStruct *operatorStack, ARITY  arity){
@@ -304,39 +326,49 @@ int returnOperatorPrecedence(OperationType  type){
   return  instruction.precedence;
 }
 
-void  handleInfix(StackStruct *operandStack, StackStruct *operatorStack){
+int  handleInfix(StackStruct *operandStack, StackStruct *operatorStack){
   ListItem *operand2 = popFromStack(operandStack);
   ListItem *operand1 = popFromStack(operandStack);
   ListItem *operator = popFromStack(operatorStack);
   Symbol  *result;
   SymbolTableStruct instruction = symbolTable[getItemSymbolId(operator)];
+  if(instruction.arithmeticHandler == NULL)
+    return  0;
   result = instruction.arithmeticHandler(getItemSymbol(operand1), getItemSymbol(operand2));
   pushToStack(operandStack, (void *)result);
   freeListItemWithSymbol(operand1);                         
   freeListItemWithSymbol(operand2); 
   freeListItemWithSymbol(operator);
+  return  1;
 }
 
-void  handlePrefix(StackStruct *operandStack, StackStruct *operatorStack){
-  ListItem *operand = popFromStack(operandStack);
-  ListItem *operator = popFromStack(operatorStack);
+int  handlePrefix(StackStruct *operandStack, StackStruct *operatorStack){
+  ListItem *operator = peekTopOfStack(operatorStack);
   Symbol  *result;
   SymbolTableStruct instruction = symbolTable[getItemSymbolId(operator)];
+  if(instruction.arithmeticHandler == NULL)
+    return  0;
+  ListItem *operand = popFromStack(operandStack);
+  operator = popFromStack(operatorStack);
   result = instruction.arithmeticHandler(getItemSymbol(operand), NULL);
   pushToStack(operandStack, (void *)result);
   freeListItemWithSymbol(operand); 
   freeListItemWithSymbol(operator);  
+  return  1;
 }
 
-void  handleSuffix(StackStruct *operandStack, StackStruct *operatorStack){
+int  handleSuffix(StackStruct *operandStack, StackStruct *operatorStack){
   ListItem *operand = popFromStack(operandStack);
   ListItem *operator = popFromStack(operatorStack);
   Symbol  *result;
   SymbolTableStruct instruction = symbolTable[getItemSymbolId(operator)];
+  if(instruction.arithmeticHandler == NULL)
+    return  0;
   result = instruction.arithmeticHandler(getItemSymbol(operand), NULL);
   pushToStack(operandStack, (void *)result);
   freeListItemWithSymbol(operand); 
   freeListItemWithSymbol(operator);  
+  return  1;
 }
 ARITY returnArityOfAnId(OperationType id){
   if(id == INTEGER || id == DOUBLE)

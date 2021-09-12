@@ -25,6 +25,7 @@
 #define isPreviousIdNotNull(symbolizer)                         symbolizer->lastSymbol != NULL
 #define isPreviousSymbolType(symbolizer, type)                  getLastSymbolType(symbolizer) == type
 #define isPreviousArity(symbolizer, arity)                      returnArityOfAnId(symbolizer->lastSymbol->id) == arity
+#define isNotPreviousArity(symbolizer, arity)                   returnArityOfAnId(symbolizer->lastSymbol->id) != arity
 #define isIdArity(symbolId, arity)                              returnArityOfAnId(symbolId) == arity
 #define isPreviousSymbolId(symbolizer, prevId)                  symbolizer->lastSymbol->id == prevId
 #define isNotPreviousSymbolId(symbolizer, prevId)               symbolizer->lastSymbol->id != prevId

@@ -1,32 +1,5 @@
 #include "ExcpetionThrowing.h"
 
-ExceptionTable  exceptionTable[] = {
-  //[ERROR_INVALID_INFIX] = symbolThrowInfixException,
-  [ERROR_INVALID_PREFIX] = symbolThrowPrefixException,
-  [ERROR_INVALID_SUFFIX] = symbolThrowSuffixException,
-  [ERROR_INVALID_NUMBER] = symbolThrowNumberException,
-};
-
-extern  SymbolTableStruct  symbolTable[];
-
-/*
-void  symbolThrowException(Symbol *symbol, int errorCode, char *message,...){
-	size_t len;
-	char *buffer;
-  
-	va_list va;
-	va_start(va, message);
-	len=vsnprintf(NULL, 0, message, va);
-	buffer=memAlloc(len+1);
-	vsprintf(buffer, message, va);
-	va_end(va);
-  
-  throwException(errorCode, symbol, 0, "%s\n", buffer);
-  
-  free(buffer);
-}
-*/
-
 void  symbolThrowInfixException(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer){
   SymbolExceptionInfo *symbolInfo = malloc(sizeof(SymbolExceptionInfo));
   symbolInfo->symbol = symbol;
@@ -39,34 +12,37 @@ void  symbolThrowInfixException(Symbol  *symbol, int  errorCode, Symbolizer *sym
 }
 
 void  symbolThrowPrefixException(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer){
-  throwException(errorCode, symbol, 0, "Invalid type '%s' after '%s'. Prefix cannot appear after suffix.", getCurrentString(symbol), getPreviousString(symbolizer));
+  SymbolExceptionInfo *symbolInfo = malloc(sizeof(SymbolExceptionInfo));
+  symbolInfo->symbol = symbol;
+  symbolInfo->symbolizer = symbolizer;
+  throwException(errorCode, symbolInfo, 0, "Invalid prefix '%s' after '%s'. Prefix cannot appear after suffix.", getCurrentString(symbol), getPreviousString(symbolizer));
 }
 
 void  symbolThrowSuffixException(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer){
-  throwException(errorCode, symbol, 0, "Invalid type '%s' after '%s'. Suffix can only appear after a number.", getCurrentString(symbol), getPreviousString(symbolizer));
+  SymbolExceptionInfo *symbolInfo = malloc(sizeof(SymbolExceptionInfo));
+  symbolInfo->symbol = symbol;
+  symbolInfo->symbolizer = symbolizer;
+  throwException(errorCode, symbolInfo, 0, "Invalid suffix '%s' after '%s'. Suffix can only appear after a number.", getCurrentString(symbol), getPreviousString(symbolizer));
 }
 
 void  symbolThrowNumberException(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer){
-  throwException(errorCode, symbol, 0, "Invalid number '%s' after '%s'. Number cannot appear after a suffix.", getCurrentString(symbol), getPreviousString(symbolizer));
+  SymbolExceptionInfo *symbolInfo = malloc(sizeof(SymbolExceptionInfo));
+  symbolInfo->symbol = symbol;
+  symbolInfo->symbolizer = symbolizer;
+  throwException(errorCode, symbolInfo, 0, "Invalid number '%s' after '%s'. Number cannot appear after a suffix.", getCurrentString(symbol), getPreviousString(symbolizer));
+}
+
+void  symbolThrowMissingParenException(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer){
+  SymbolExceptionInfo *symbolInfo = malloc(sizeof(SymbolExceptionInfo));
+  symbolInfo->symbol = symbol;
+  symbolInfo->symbolizer = symbolizer;  
+  if(errorCode == ERROR_MISSING_OPEN_PAREN)
+    throwException(errorCode, symbolInfo, 0, "Incomplete parenthesis!(Open parenthesis is missing).");
+  else
+    throwException(errorCode, symbolInfo, 0, "Incomplete parenthesis!(Closing parenthesis is missing).");
 }
 
 void  dumpSymbolErrorMessage(CEXCEPTION_T ex, int lineNo){
-  Symbol *symbol = ex->data;
-  if(symbol == NULL || isSymbolNull(symbol)){
-    printf("Error on line%d:%d: %s\n%s\n", lineNo, symbol->token->startColumn, ex->msg, symbol->token->originalstr);
-  }else{
-    SymbolTableStruct instruction = symbolTable[symbol->id];
-    char  *idChar = instruction.idChar;
-    int idCharSize = strlen(idChar);
-    char  *errorLine;
-    errorLine = errorIndicator(symbol->token->startColumn, idCharSize);
-    printf("Error on line %d:%d: %s\n%s\n%s\n", lineNo, symbol->token->startColumn, ex->msg, symbol->token->originalstr, errorLine);
-    free(errorLine);
-  }
-  freeSymbol(symbol);
-}
-
-void  dumpSymbolErrorMessageV2(CEXCEPTION_T ex, int lineNo){
   Symbol *symbol = ((SymbolExceptionInfo *)ex->data)->symbol;
   if(symbol == NULL || isSymbolNull(symbol)){
     printf("Error on line%d:%d: %s\n%s\n", lineNo, symbol->token->startColumn, ex->msg, symbol->token->originalstr);

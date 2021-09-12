@@ -15,6 +15,8 @@
 #define ERROR_INVALID_PREFIX              0x222
 #define ERROR_INVALID_SUFFIX              0x333
 #define ERROR_INVALID_NUMBER              0x444
+#define ERROR_MISSING_OPEN_PAREN          0x555
+#define ERROR_MISSING_CLOSING_PAREN       0x556
 
 #define getCurrentString(symbol)          symbol->token->str
 #define getPreviousString(symbolizer)     symbolizer->lastSymbol->token->str
@@ -33,9 +35,10 @@ struct  SymbolExceptionInfo{
 
 //void  symbolThrowException(Symbol *symbol, int errorCode, char *message,...);
 void  dumpSymbolErrorMessage(CEXCEPTION_T ex, int lineNo);
-void  dumpSymbolErrorMessageV2(CEXCEPTION_T ex, int lineNo);
+//void  dumpSymbolErrorMessageV2(CEXCEPTION_T ex, int lineNo);
 void  symbolThrowInfixException(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer);
 void  symbolThrowPrefixException(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer);
 void  symbolThrowSuffixException(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer);
 void  symbolThrowNumberException(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer);
+void  symbolThrowMissingParenException(Symbol  *symbol, int  errorCode, Symbolizer *symbolizer);
 #endif // EXCPETIONTHROWING_H

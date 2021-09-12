@@ -1160,6 +1160,8 @@ void  test_evaluateExpressionWithinBrackets_given_brackets_operators_operands(){
   Symbol  *number2 = getSymbol(symbolizer);
   Symbol  *currentOperator = getSymbol(symbolizer);
   
+  Symbol  *lastSymbol = cloneSymbol(number2);
+  
   StackStruct *operandStack = createStack();
   StackStruct *operatorStack = createStack();  
   
@@ -1169,7 +1171,9 @@ void  test_evaluateExpressionWithinBrackets_given_brackets_operators_operands(){
   pushToStack(operandStack, (void*)number1);
   pushToStack(operandStack, (void*)number2);
   
-  evaluateExpressionWithinBrackets(operandStack, operatorStack, currentOperator, 0);
+  symbolizer->lastSymbol = lastSymbol;
+  
+  evaluateExpressionWithinBrackets(operandStack, operatorStack, currentOperator, symbolizer);
   
   ListItem  *peekItem = peekTopOfStack(operandStack);
   
@@ -1195,6 +1199,10 @@ void  test_evaluateExpressionWithinBrackets_given_brackets_3operators_4operands(
   Symbol  *number4 = getSymbol(symbolizer);
   Symbol  *currentOperator = getSymbol(symbolizer);
   
+  Symbol  *lastSymbol = cloneSymbol(number4);
+  
+  symbolizer->lastSymbol = lastSymbol;
+  
   StackStruct *operandStack = createStack();
   StackStruct *operatorStack = createStack();  
   
@@ -1208,7 +1216,7 @@ void  test_evaluateExpressionWithinBrackets_given_brackets_3operators_4operands(
   pushToStack(operandStack, (void*)number3);
   pushToStack(operandStack, (void*)number4);
   
-  evaluateExpressionWithinBrackets(operandStack, operatorStack, currentOperator, 0);
+  evaluateExpressionWithinBrackets(operandStack, operatorStack, currentOperator, symbolizer);
   
   ListItem  *peekItem = peekTopOfStack(operandStack);
   
@@ -1533,7 +1541,7 @@ void  test_shuntingYard_given_multiply_divide_expect_exception_to_be_thrown(){
     shuntingYard(tokenizer, operatorStack, operandStack);
     TEST_FAIL_MESSAGE("EXPECT ERROR_INVALID_INFIX TO BE THROWN, BUT UNRECEIVED");
   }Catch(ex){
-    dumpSymbolErrorMessageV2(ex, 1); 
+    dumpSymbolErrorMessage(ex, 1); 
     TEST_ASSERT_EQUAL(ERROR_INVALID_INFIX, ex->errorCode);
     freeException(ex);
   }
@@ -1541,7 +1549,6 @@ void  test_shuntingYard_given_multiply_divide_expect_exception_to_be_thrown(){
   freeStack(operatorStack, freeSymbolInLinkedList);   
 }
 
-/*
 void  test_shuntingYard_given_multiply_pre_inc_exception_to_be_thrown(){
   Tokenizer *tokenizer = NULL;
   tokenizer = createTokenizer("  *  ++3");
@@ -1553,7 +1560,7 @@ void  test_shuntingYard_given_multiply_pre_inc_exception_to_be_thrown(){
     shuntingYard(tokenizer, operatorStack, operandStack);
     TEST_FAIL_MESSAGE("EXPECT ERROR_INVALID_INFIX TO BE THROWN, BUT UNRECEIVED");
   }Catch(ex){
-    dumpSymbolErrorMessageV2(ex, 1); 
+    dumpSymbolErrorMessage(ex, 1); 
     TEST_ASSERT_EQUAL(ERROR_INVALID_INFIX, ex->errorCode);
     freeException(ex);
   }
@@ -1576,23 +1583,23 @@ void  test_verifyArityAllowable_expect_exception_to_be_thrown(){
     verifyArityAllowable(symbolizer, symbol3, symbol3->id);
     TEST_FAIL_MESSAGE("EXPECT ERROR_INVALID_INFIX TO BE THROWN, BUT UNRECEIVED");
   }Catch(ex){
-    dumpSymbolErrorMessageV2(ex, 1); 
+    dumpSymbolErrorMessage(ex, 1); 
     TEST_ASSERT_EQUAL(ERROR_INVALID_INFIX, ex->errorCode);
     freeException(ex);
   } 
   freeSymbol(symbol1);
 }
 
-void  test_shuntingYard_given_suffix_dec_prefix_inc_exception_to_be_thrown(){
+void  test_shuntingYard_given_prefix_followed_after_suffix_expect_exception_to_be_thrown(){
   Tokenizer *tokenizer = NULL;
-  tokenizer = createTokenizer("  1--  ++3");
+  tokenizer = createTokenizer(" 3*1+ 2-- ++1");
   
   StackStruct *operandStack = createStack();
   StackStruct *operatorStack = createStack();
   
   Try{
     shuntingYard(tokenizer, operatorStack, operandStack);
-    TEST_FAIL_MESSAGE("EXPECT ERROR_INVALID_INFIX TO BE THROWN, BUT UNRECEIVED");
+    TEST_FAIL_MESSAGE("EXPECT ERROR_INVALID_PREFIX TO BE THROWN, BUT UNRECEIVED");
   }Catch(ex){
     dumpSymbolErrorMessage(ex, 1); 
     TEST_ASSERT_EQUAL(ERROR_INVALID_PREFIX, ex->errorCode);
@@ -1601,7 +1608,82 @@ void  test_shuntingYard_given_suffix_dec_prefix_inc_exception_to_be_thrown(){
   freeStack(operandStack, freeSymbolInLinkedList); 
   freeStack(operatorStack, freeSymbolInLinkedList);   
 }
-*/
+
+void  test_shuntingYard_given_suffix_followed_after_suffix_expect_exception_to_be_thrown(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer(" (1+2*)");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  Try{
+    shuntingYard(tokenizer, operatorStack, operandStack);
+    TEST_FAIL_MESSAGE("EXPECT ERROR_INVALID_SUFFIX TO BE THROWN, BUT UNRECEIVED");
+  }Catch(ex){
+    dumpSymbolErrorMessage(ex, 1); 
+    TEST_ASSERT_EQUAL(ERROR_INVALID_SUFFIX, ex->errorCode);
+    freeException(ex);
+  }
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList);   
+}
+
+void  test_shuntingYard_given_missing_open_paren_expect_exception_to_be_thrown(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer(" 3+ 5/67)");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  Try{
+    shuntingYard(tokenizer, operatorStack, operandStack);
+    TEST_FAIL_MESSAGE("EXPECT ERROR_MISSING_OPEN_PAREN TO BE THROWN, BUT UNRECEIVED");
+  }Catch(ex){
+    dumpSymbolErrorMessage(ex, 1); 
+    TEST_ASSERT_EQUAL(ERROR_MISSING_OPEN_PAREN, ex->errorCode);
+    freeException(ex);
+  }
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList);   
+}
+
+void  test_shuntingYard_given_complex_missing_open_paren_expect_exception_to_be_thrown(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("(5-3*6/12*(3-3)))");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  Try{
+    shuntingYard(tokenizer, operatorStack, operandStack);
+    TEST_FAIL_MESSAGE("EXPECT ERROR_MISSING_OPEN_PAREN TO BE THROWN, BUT UNRECEIVED");
+  }Catch(ex){
+    dumpSymbolErrorMessage(ex, 1); 
+    TEST_ASSERT_EQUAL(ERROR_MISSING_OPEN_PAREN, ex->errorCode);
+    freeException(ex);
+  }
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList);   
+}
+
+void  test_shuntingYard_given__missing_closing_paren_expect_exception_to_be_thrown(){
+  Tokenizer *tokenizer = NULL;
+  tokenizer = createTokenizer("1*(3+4-5");
+  
+  StackStruct *operandStack = createStack();
+  StackStruct *operatorStack = createStack();
+  
+  Try{
+    shuntingYard(tokenizer, operatorStack, operandStack);
+    TEST_FAIL_MESSAGE("EXPECT ERROR_MISSING_CLOSING_PAREN TO BE THROWN, BUT UNRECEIVED");
+  }Catch(ex){
+    dumpSymbolErrorMessage(ex, 1); 
+    TEST_ASSERT_EQUAL(ERROR_MISSING_CLOSING_PAREN, ex->errorCode);
+    freeException(ex);
+  }
+  freeStack(operandStack, freeSymbolInLinkedList); 
+  freeStack(operatorStack, freeSymbolInLinkedList);   
+}
 
 void  test_shuntingYard_given_multiple_brackets_with_prefixes_expect_calculate_correctly(){
   Tokenizer *tokenizer = NULL;
