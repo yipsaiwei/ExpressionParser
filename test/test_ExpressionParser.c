@@ -1530,6 +1530,7 @@ void  test_shuntingYard_given_infix_minus_bracket_prefix_dec_divide_expect_corre
   freeStack(operatorStack, freeSymbolInLinkedList);  
 } 
 
+/*
 void  test_shuntingYard_given_multiply_divide_expect_exception_to_be_thrown(){
   Tokenizer *tokenizer = NULL;
   tokenizer = createTokenizer("5* /3");
@@ -1684,6 +1685,7 @@ void  test_shuntingYard_given__missing_closing_paren_expect_exception_to_be_thro
   freeStack(operandStack, freeSymbolInLinkedList); 
   freeStack(operatorStack, freeSymbolInLinkedList);   
 }
+*/
 
 void  test_shuntingYard_given_multiple_brackets_with_prefixes_expect_calculate_correctly(){
   Tokenizer *tokenizer = NULL;
