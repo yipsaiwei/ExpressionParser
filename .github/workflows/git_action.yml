@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest,windows-latest,macos-latest]
-        compiler: [clang-latest, gcc-latest]
+        compiler: [gcc-latest]
         ruby: [ 2.5, 2.6 ]
     runs-on: ${{ matrix.os }}
     steps:
